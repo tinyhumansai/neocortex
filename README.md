@@ -8,9 +8,9 @@ Documentation and benchmarks for Neocortex models — the AI agent runtime and g
 
 Models are identified by **id** (not by URL path). Use the `model` field in request bodies to route to a specific model. Only one model is available at this time.
 
-| Id              | Description              | Docs                                                                                 |
-| --------------- | ------------------------ | ------------------------------------------------------------------------------------ |
-| **mk1-2026-02** | Neocortex MK1 (Feb 2026) | [mk1-2026-02 README](mk1-2026-02/README.md), [BENCHMARKS](mk1-2026-02/BENCHMARKS.md) |
+| Id              | Description              | Docs                                                                     |
+| --------------- | ------------------------ | ------------------------------------------------------------------------ |
+| **mk1-2026-02** | Neocortex MK1 (Feb 2026) | [README](mk1-2026-02/README.md), [BENCHMARKS](mk1-2026-02/BENCHMARKS.md) |
 
 ## Pricing
 
