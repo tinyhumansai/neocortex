@@ -10,7 +10,7 @@ Models are identified by **id** (not by URL path). Use the `model` field in requ
 
 | Id              | Description              | Docs                                                                     |
 | --------------- | ------------------------ | ------------------------------------------------------------------------ |
-| **mk1-2026-02** | Neocortex MK1 (Feb 2026) | [README](mk1-2026-02/README.md), [BENCHMARKS](mk1-2026-02/BENCHMARKS.md) |
+| **mk1** | Neocortex MK1 (Feb 2026) | [README](mk1/README.md), [BENCHMARKS](mk1/BENCHMARKS.md) |
 
 ## Pricing
 
@@ -18,4 +18,4 @@ Pricing is **per 1M tokens** (USD), by model id.
 
 | Model id    | Input (per 1M tokens) | Output (per 1M tokens) | Notes                   |
 | ----------- | --------------------- | ---------------------- | ----------------------- |
-| mk1-2026-02 | $2.00                 | $6.00                  | First Neocortex release |
+| mk1 | $2.00                 | $6.00                  | First Neocortex release |

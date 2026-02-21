@@ -1,11 +1,11 @@
 # Neocortex MK1 — Benchmarks
 
-Benchmark tests and results for the Neocortex MK1 model (**id:** `mk1-2026-02`). Base URL: `https://api.tinyhuman.xyz`.
+Benchmark tests and results for the Neocortex MK1 model (**id:** `mk1`). Base URL: `https://api.tinyhuman.xyz`.
 
 ## Setup
 
 - **Gateway**: Neocortex/tinyhuman at `https://api.tinyhuman.xyz`
-- **Model id**: `mk1-2026-02` (see [README.md](README.md))
+- **Model id**: `mk1` (see [README.md](README.md))
 
 ## Benchmark: Dummy latency (placeholder)
 

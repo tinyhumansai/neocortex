@@ -6,7 +6,7 @@
 
 Requests that invoke a model accept an optional **`model`** field (string) in the JSON body. Set it to a supported model id to route that request to the corresponding Neocortex model.
 
-- **Webhook** (`POST /webhook`): send `{"message": "...", "model": "mk1-2026-02"}`. If `model` is omitted, the gateway uses its default model.
+- **Webhook** (`POST /webhook`): send `{"message": "...", "model": "mk1"}`. If `model` is omitted, the gateway uses its default model.
 - Other trigger endpoints (WhatsApp, Linq, pair) use the gateway's default model unless overridden by configuration.
 
 Example:
@@ -15,7 +15,7 @@ Example:
 curl -X POST https://api.tinyhuman.ai/webhook \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_TOKEN" \
-  -d '{"message": "Hello", "model": "mk1-2026-02"}'
+  -d '{"message": "Hello", "model": "mk1"}'
 ```
 
 ## Endpoints
@@ -40,7 +40,7 @@ Each model has a dedicated endpoint to ingest memory data points. Send a JSON bo
 | -------- | ---------------- | ------------------------------------------------------------------------------------------------------------------- |
 | **POST** | `/memory/ingest` | Ingest memory data points for a model. Body: `{"model": "<id>", "data": [{ ... }, ...]}`. Auth: same as `/webhook`. |
 
-See each model's README for supported payload shape (e.g. [mk1-2026-02](mk1-2026-02/README.md#memory-ingestion)).
+See each model's README for supported payload shape (e.g. [mk1](mk1/README.md#memory-ingestion)).
 
 ### Operational
 
