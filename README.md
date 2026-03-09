@@ -1,9 +1,9 @@
 <div align="center">
 <br/>
 
-# Neocortex AI Memory
+<h1>Neocortex AI Memory</h1>
 
-### Your Second Brain
+<h3>Your Second Brain</h3>
 
 <p><b>Human-like AI Memory&nbsp; ◦ &nbsp;1B+ Token Processing&nbsp; ◦ &nbsp;Forgets Noise&nbsp; ◦ &nbsp;Interaction-Aware</b></p>
 
@@ -19,9 +19,9 @@
 
 # 🧠 Introduction to Neocortex
 
-Are you tired of AI memory systems that drown in noise? Traditional AI Memory systems retrieves everything that's _similar_ — but similar doesn't mean important. Your AI ends up stuffed with stale, irrelevant context that degrades every response.
+The human brain is a master of compression. It doesn't try to remember every passing detail; instead, it aggressively prunes noise to maintain a sharp, focused, and easily accessible recall of what truly matters. In contrast, traditional AI memory systems try to remember everything. They retrieve whatever is _similar_—but similar doesn't mean important. The result? Your AI drowns in stale, irrelevant context that degrades every response.
 
-Inspired by how the human brain actually works, **Neocortex** takes a different approach: it **forgets** noise. Just like you don't remember every sentence you've ever read or everything happens every day in your life, Neocortex lets low-value memories naturally decay while reinforcing the knowledge that matters — the things you interact with, recall, and build upon.
+Inspired by how the human brain actually works, **Neocortex** takes a different approach: it **intelligently forgets noise**. Just like you don't remember every sentence you've ever read or everything happens every day in your life, Neocortex lets low-value memories naturally decay while reinforcing the knowledge that matters — the things you interact with, recall, and build upon.
 
 The result: an AI memory system that can chop through over 1 billion tokens, stays lean and focused, and gets smarter with every interaction.
 
