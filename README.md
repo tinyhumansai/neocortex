@@ -2,6 +2,8 @@
 
 <h1>Neocortex AI Memory - Your Second Brain</h1>
 
+<i>NOTE: That this model is currently in closed beta. To get access <a href="mailto:founders@tinyhumans.ai">reach out to us</a></i>
+
 <p><b>Human-like AI Memory&nbsp; ◦ &nbsp;1B+ Token Processing&nbsp; ◦ &nbsp;Forgets Noise&nbsp; ◦ &nbsp;Interaction-Aware</b></p>
 
 <h4>
@@ -20,7 +22,9 @@ Inspired by how the human brain works, **Neocortex** takes a similar approach to
 
 The result? an AI memory system that can chop through over 1 billion tokens, stays lean and focused, and gets smarter with every interaction.
 
-Neocortex ranks extremly high scores on [RAGAS](./benchmarks/01_ragas_sherlock.ipynb), [Babilong](./benchmarks/05_babilong.ipynb), [Vending Bench](./benchmarks/07_vendingbench.ipynb), [LoCoMo](./benchmarks/04_locomo.ipynb) and [HotPotQA](./benchmarks//02_hotpotqa.ipynb)
+<!-- Neocortex ranks extremly high scores on [RAGAS](./benchmarks/01_ragas_sherlock.ipynb), [Babilong](./benchmarks/05_babilong.ipynb), [Vending Bench](./benchmarks/07_vendingbench.ipynb), [LoCoMo](./benchmarks/04_locomo.ipynb) and [HotPotQA](./benchmarks//02_hotpotqa.ipynb) -->
+
+Neocortex ranks extremly high scores on [RAGAS](https://www.ragas.io/), [Babilong](https://github.com/booydar/babilong/), [Vending Bench](https://andonlabs.com/evals/vending-bench-2), [LoCoMo](https://github.com/snap-research/locomo) and [HotPotQA](https://hotpotqa.github.io/)
 
 # 🎯 Core Features
 
@@ -46,8 +50,6 @@ There's no compromise on speed and quality when processing data with Neocortex. 
 
 # 📈 Benchmarks
 
-Neocortex is evaluated across four benchmark suites. See [BENCHMARKS.md](BENCHMARKS.md) for full methodology and results.
-
 ### RAGAS — Retrieval Quality (Sherlock Holmes Corpus)
 
 Standard RAG quality metrics evaluated using [RAGAS](https://docs.ragas.io/). Neocortex leads in **Answer Relevancy (0.97)** and **Context Precision (0.75)**, outperforming FastGraphRAG, Gemini VDB, Mem0, and SuperMemory.
@@ -64,13 +66,13 @@ Accuracy across ordering, state-at-time, recency, interval, and sequence questio
 <img src=".github/images/chart_temporalbench.png" alt="TemporalBench" width="700"/>
 </div>
 
-### BABILong — Needle in a Haystack
+<!-- ### BABILong — Needle in a Haystack
 
 Can the system find specific facts buried in large contexts? Neocortex is the **only method to successfully retrieve needles at 4k context length**, while directfeed (raw context window) scores 0% across all lengths.
 
 <div align="center">
 <img src=".github/images/heatmap_babilong.png" alt="BABILong Heatmap" width="600"/>
-</div>
+</div> -->
 
 ### Vending-Bench — Agentic Decision-Making
 
@@ -87,27 +89,28 @@ An agent manages a simulated vending machine business over 30 days. Neocortex ac
 ### 1. Install
 
 ```bash
-pip install neocortex
+pip install tinyhumansai
 ```
 
-### 2. Configure
+### 2. Configure and Run
 
 ```python
-from neocortex import Neocortex
+import tinyhumansai as api
 
-nc = Neocortex(
-    api_key="your-api-key",
-    model="mk1",
+client = api.TinyHumanMemoryClient("YOUR_APIKEY_HERE")
+
+# Store a single memory
+client.ingest_memory({
+    "key": "user-preference-theme",
+    "content": "User prefers dark mode",
+    "namespace": "preferences",
+    "metadata": {"source": "onboarding"},
+})
+
+# Ask a LLM something from the memory
+response = client.recall_with_llm(
+    prompt="What is the user's preference for theme?",
+    api_key="OPENAI_API_KEY"
 )
-```
-
-### 3. Ingest & Query
-
-```python
-# Add documents
-await nc.insert("Sherlock Holmes lived at 221B Baker Street...")
-
-# Query with human-like memory retrieval
-result = await nc.query("Where did Sherlock Holmes live?")
-print(result.answer)
+print(response.text) # The user prefers dark mode
 ```
