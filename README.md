@@ -2,7 +2,7 @@
 
 <h1>Neocortex AI Memory - Your Second Brain</h1>
 
-<i>NOTE: That this model is currently in closed beta. To get access <a href="mailto:founders@tinyhumans.ai">reach out to us</a></i>
+<i>NOTE: That this model is currently in closed alpha. To get access <a href="mailto:founders@tinyhumans.ai">reach out to us</a></i>
 
 <p><b>Human-like AI Memory&nbsp; ◦ &nbsp;1B+ Token Processing&nbsp; ◦ &nbsp;Forgets Noise&nbsp; ◦ &nbsp;Interaction-Aware</b></p>
 
