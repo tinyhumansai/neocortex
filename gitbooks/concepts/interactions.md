@@ -10,10 +10,10 @@ When knowledge is viewed, referenced, reacted to, or built upon, its importance 
 
 Different types of engagement carry different weight:
 
-- **Views** — The memory was seen or surfaced to a user
-- **Reactions** — A user reacted to or acknowledged the memory
-- **Replies** — The memory was referenced in a conversation
-- **Content creation** — New knowledge was built on top of this memory
+* **Views** — The memory was seen or surfaced to a user
+* **Reactions** — A user reacted to or acknowledged the memory
+* **Replies** — The memory was referenced in a conversation
+* **Content creation** — New knowledge was built on top of this memory
 
 Higher-signal interactions (like building on a memory) reinforce it more than passive ones (like viewing it).
 
@@ -23,6 +23,4 @@ The interaction model means Neocortex **gets smarter over time**. The more your 
 
 A piece of knowledge that gets recalled frequently becomes more durable. A fact that was ingested once and never accessed again naturally fades — exactly like how human memory works.
 
-<div align="center">
-  <img src="../../.github/images/gif/BobMemoryDecayVideo.gif" alt="Interaction-weighted memory" width="700"/>
-</div>
+<div align="center"><img src="../.gitbook/assets/BobMemoryDecayVideo.gif" alt="Interaction-weighted memory" width="700"></div>

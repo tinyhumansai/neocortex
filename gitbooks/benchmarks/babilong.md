@@ -1,4 +1,4 @@
-# BABILong (Needle in a Haystack)
+# BABILong
 
 ## What It Measures
 
@@ -14,17 +14,15 @@ neocortex\_v1, directfeed
 
 ## Results
 
-<div align="center">
-<img src="../../.github/images/heatmap_babilong.png" alt="BABILong Heatmap" width="600"/>
-</div>
+<div align="center"><img src="../.gitbook/assets/heatmap_babilong.png" alt="BABILong Heatmap" width="600"></div>
 
 | Context Length | Neocortex | directfeed |
-| --- | --- | --- |
-| 4k | **33%** | 0% |
-| 8k | 0% | 0% |
-| 16k | 0% | 0% |
-| 128k | 0% | 0% |
-| **Overall** | **11%** | **0%** |
+| -------------- | --------- | ---------- |
+| 4k             | **33%**   | 0%         |
+| 8k             | 0%        | 0%         |
+| 16k            | 0%        | 0%         |
+| 128k           | 0%        | 0%         |
+| **Overall**    | **11%**   | **0%**     |
 
 ## Analysis
 

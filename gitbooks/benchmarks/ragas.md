@@ -1,4 +1,4 @@
-# RAGAS (Sherlock Holmes Corpus)
+# RAGAS
 
 ## What It Measures
 
@@ -14,17 +14,15 @@ neocortex\_v1, fastgraphrag, gemini\_vdb, mem0, supermemory
 
 ## Results
 
-<div align="center">
-<img src="../../.github/images/chart_ragas.png" alt="RAGAS Benchmark Scores" width="700"/>
-</div>
+<div align="center"><img src="../.gitbook/assets/chart_ragas.png" alt="RAGAS Benchmark Scores" width="700"></div>
 
-| Metric | Neocortex | Best Competitor | Competitor |
-| --- | --- | --- | --- |
-| Answer Relevancy | **0.97** | 0.88 | supermemory |
-| Context Precision | **0.75** | 0.76 | supermemory |
-| Faithfulness | 0.73 | **0.79** | gemini\_vdb |
-| Answer Correctness | 0.57 | **0.59** | gemini\_vdb |
-| Context Recall | 0.62 | **0.70** | gemini\_vdb |
+| Metric             | Neocortex | Best Competitor | Competitor  |
+| ------------------ | --------- | --------------- | ----------- |
+| Answer Relevancy   | **0.97**  | 0.88            | supermemory |
+| Context Precision  | **0.75**  | 0.76            | supermemory |
+| Faithfulness       | 0.73      | **0.79**        | gemini\_vdb |
+| Answer Correctness | 0.57      | **0.59**        | gemini\_vdb |
+| Context Recall     | 0.62      | **0.70**        | gemini\_vdb |
 
 ## Analysis
 

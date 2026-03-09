@@ -14,17 +14,15 @@ neocortex\_v1, directfeed, e2graphrag, mem0, supermemory
 
 ## Results
 
-<div align="center">
-<img src="../../.github/images/chart_temporalbench.png" alt="TemporalBench Accuracy" width="700"/>
-</div>
+<div align="center"><img src="../.gitbook/assets/chart_temporalbench.png" alt="TemporalBench Accuracy" width="700"></div>
 
 | Question Type | Neocortex | Best Competitor | Competitor |
-| --- | --- | --- | --- |
-| Recency | **100%** | 80% | directfeed |
-| Interval | 68% | **97%** | directfeed |
-| Ordering | 60% | **80%** | directfeed |
-| State at Time | 60% | **80%** | e2graphrag |
-| Sequence | 30% | **80%** | directfeed |
+| ------------- | --------- | --------------- | ---------- |
+| Recency       | **100%**  | 80%             | directfeed |
+| Interval      | 68%       | **97%**         | directfeed |
+| Ordering      | 60%       | **80%**         | directfeed |
+| State at Time | 60%       | **80%**         | e2graphrag |
+| Sequence      | 30%       | **80%**         | directfeed |
 
 ## Analysis
 
