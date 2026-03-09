@@ -1,5 +1,4 @@
 <div align="center">
-<br/>
 
 <h1>Neocortex AI Memory</h1>
 

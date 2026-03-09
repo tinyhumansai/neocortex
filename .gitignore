@@ -7,3 +7,4 @@ __pycache__
 corpus/
 db/
 results/
+.DS_Store
