@@ -1,0 +1,7 @@
+{
+  "ref": "refs/tags/v0.1.0",
+  "repository": {
+    "name": "sdk-python",
+    "full_name": "your-org/sdk-python"
+  }
+}

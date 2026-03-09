@@ -1,0 +1,30 @@
+name: Publish to PyPI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "packages/sdk-python/**"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: Production
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          python-version: "3.11"
+
+      - name: Build package
+        run: uv build
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
