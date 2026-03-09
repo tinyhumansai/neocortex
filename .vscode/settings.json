@@ -1,0 +1,24 @@
+{
+    "python.analysis.typeCheckingMode": "strict",
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        ".",
+        "-p",
+        "*_test.py"
+    ],
+    "python.testing.pytestEnabled": false,
+    "python.testing.unittestEnabled": true,
+    "python.autoComplete.extraPaths": [
+        "${workspaceFolder}"
+    ],
+    "files.exclude": {
+        "**/.venv": true,
+        "**/.ruff_cache": true,
+        "**/.pytest_cache": true,
+        "**/__pycache__": true
+    },
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}"
+    ]
+}
