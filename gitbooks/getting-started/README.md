@@ -6,21 +6,20 @@ Neocortex offers SDKs and integrations across multiple languages and frameworks.
 
 | SDK | Language | Install | Description |
 | --- | --- | --- | --- |
-| **TinyHumans SDK** | Python | `pip install tinyhumansai` | Cloud API — managed memory layer, no infra needed |
-| **Neocortex GraphRAG** | Python | `pip install neocortex` | Local GraphRAG — full control over the knowledge graph |
-| **TinyHumans TypeScript SDK** | TypeScript | `npm install tinyhumansai` | Cloud API for Node.js and browser environments |
-| **TinyHumans Rust SDK** | Rust | `cargo add tinyhumansai` | Cloud API for Rust applications |
+| **[TinyHumans Python SDK](high-level-sdk.md)** | Python | `pip install tinyhumansai` | Cloud API — managed memory layer, no infra needed |
+| **[TypeScript SDK](typescript-sdk.md)** | TypeScript | `npm install @alphahuman/memory-sdk` | Cloud API for Node.js and browser environments |
+| **[Neocortex GraphRAG](low-level-sdk.md)** | Python | `pip install neocortex` | Local GraphRAG — full control over the knowledge graph |
 
 ## Integrations
 
-| Integration | Description |
-| --- | --- |
-| **LangGraph SDK** | Drop-in memory layer for LangGraph agent workflows |
-| **OpenClaw Plugin** | Plugin for the OpenClaw agent framework |
+| Integration | Install | Description |
+| --- | --- | --- |
+| **[LangGraph](langgraph-sdk.md)** | `pip install alphahuman-langgraph` | Drop-in memory tools for LangGraph agent workflows |
+| **[OpenClaw Plugin](openclaw-plugin.md)** | _Coming soon_ | Plugin for the OpenClaw agent framework |
 
 ## Which should I pick?
 
-**Choose TinyHumans SDK (Python / TypeScript / Rust) if you want:**
+**Choose TinyHumans SDK (Python / TypeScript) if you want:**
 - A managed service with no infrastructure to maintain
 - Simple key-value memory storage with namespaces
 - Built-in LLM recall (OpenAI, Anthropic, Gemini)
