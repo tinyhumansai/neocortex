@@ -1,10 +1,5 @@
 # SDKs & Plugins
 
-[![Discord](https://img.shields.io/badge/Discord-Join%20Chat-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/k23Kn8nK)
-[![Reddit](https://img.shields.io/badge/Reddit-r%2Ftinyhumansai-FF4500?logo=reddit&logoColor=white)](https://www.reddit.com/r/tinyhumansai/)
-[![X](https://img.shields.io/badge/Follow-%40tinyhumansai-000000?logo=x&logoColor=white)](https://x.com/tinyhumansai)
-[![Docs](https://img.shields.io/badge/Docs-GitBook-0A80FF?logo=gitbook&logoColor=white)](https://tinyhumans.gitbook.io/neocortex/)
-
 This folder contains all 3rd-party SDKs and integrations for the Neocortex memory API.
 
 ## SDKs

@@ -2,9 +2,12 @@
 
 <h1>Neocortex AI Memory - Your Second Brain</h1>
 
-<i>NOTE: That this model is currently in closed alpha. To get access <a href="mailto:founders@tinyhumans.ai">reach out to us</a></i>
-
 <p><b>Human-like AI Memory&nbsp; ◦ &nbsp;1B+ Token Processing&nbsp; ◦ &nbsp;Forgets Noise&nbsp; ◦ &nbsp;Interaction-Aware</b></p>
+
+[![Discord](https://img.shields.io/badge/Discord-Join%20Chat-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/k23Kn8nK)
+[![Reddit](https://img.shields.io/badge/Reddit-r%2Ftinyhumansai-FF4500?logo=reddit&logoColor=white)](https://www.reddit.com/r/tinyhumansai/)
+[![X](https://img.shields.io/badge/Follow-%40tinyhumansai-000000?logo=x&logoColor=white)](https://x.com/tinyhumansai)
+[![Docs](https://img.shields.io/badge/Docs-GitBook-0A80FF?logo=gitbook&logoColor=white)](https://tinyhumans.gitbook.io/neocortex/)
 
 <h4>
   <a href="#-benchmarks">Benchmarks</a>&nbsp; • &nbsp;
@@ -13,6 +16,8 @@
 </h4>
 
 </div>
+
+<i>NOTE: That this model is currently in closed alpha. To get access <a href="mailto:founders@tinyhumans.ai">reach out to us</a></i>
 
 <!-- # 🧠 Introduction to Neocortex -->
 
