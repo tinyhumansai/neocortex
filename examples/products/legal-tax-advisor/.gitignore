@@ -1,0 +1,11 @@
+node_modules/
+.next/
+dist/
+.env
+.env.local
+.env*.local
+*.log
+.DS_Store
+chroma-data/
+.cursor/
+.vscode/
