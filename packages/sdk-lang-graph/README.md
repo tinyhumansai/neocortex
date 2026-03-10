@@ -1,11 +1,12 @@
 # alphahuman-langgraph
 
-LangGraph integration for the [Alphahuman Memory API](https://alphahuman.xyz), aligned with the backend API: insert, query, admin/delete, recall, and memories/recall.
+LangGraph integration for the [Alphahuman Memory API](https://alphahuman.xyz).
+Provides `@tool`-decorated functions for use as LangGraph nodes or LLM tool-calling.
 
 ## Requirements
 
 - Python ≥ 3.9
-- `httpx >= 0.25`
+- `alphahuman-memory >= 0.1.0`
 - `langgraph >= 0.2`
 - `langchain-core >= 0.3`
 
@@ -13,25 +14,45 @@ LangGraph integration for the [Alphahuman Memory API](https://alphahuman.xyz), a
 
 ```bash
 pip install alphahuman-langgraph
-# or, if pip is not in PATH:
-python3 -m pip install alphahuman-langgraph
 ```
 
 ## Usage — factory pattern (recommended)
 
-Use `make_memory_tools` to create tools with credentials baked in. Credentials are **not** exposed to the LLM as tool parameters.
+Use `make_memory_tools` to create tools with credentials baked in. Credentials
+are **never** exposed to the LLM as tool parameters, preventing prompt-injection attacks.
 
 ```python
 from langchain_openai import ChatOpenAI
 from alphahuman_langgraph import make_memory_tools
 
 tools = make_memory_tools(token="your-api-key")
+
+# Bind to a model for LLM tool-calling
 model = ChatOpenAI(model="gpt-4o").bind_tools(tools)
+```
+
+## Usage — LangGraph node
+
+```python
+from langgraph.graph import StateGraph, MessagesState
+from alphahuman_langgraph import make_memory_tools
+
+ingest_tool, read_tool, delete_tool = make_memory_tools(token="your-api-key")
+
+def memory_node(state: MessagesState):
+    result = ingest_tool.invoke({
+        "items": [{"key": "fact-1", "content": "User likes Python"}]
+    })
+    return {"messages": [f"Memory ingested: {result}"]}
+
+graph = StateGraph(MessagesState)
+graph.add_node("memory", memory_node)
 ```
 
 ## Usage — environment variables
 
-Set `ALPHAHUMAN_API_KEY` (required) and optionally `ALPHAHUMAN_BASE_URL`, then call `get_tools()`:
+If you prefer to configure via environment, set `ALPHAHUMAN_API_KEY` (required)
+and optionally `ALPHAHUMAN_BASE_URL`, then call `get_tools()`:
 
 ```bash
 export ALPHAHUMAN_API_KEY="your-api-key"
@@ -39,6 +60,7 @@ export ALPHAHUMAN_API_KEY="your-api-key"
 
 ```python
 from alphahuman_langgraph import get_tools
+
 tools = get_tools()
 ```
 
@@ -46,19 +68,11 @@ tools = get_tools()
 
 | Tool | Description |
 |------|-------------|
-| `alphahuman_insert_memory` | Insert a document (title, content, namespace) |
-| `alphahuman_query_memory` | Query memory via RAG (query, namespace?, max_chunks?) |
-| `alphahuman_delete_memory` | Delete memory – optional namespace scope |
-| `alphahuman_recall_memory` | Recall context from Master node |
-| `alphahuman_recall_memories` | Recall memories from Ebbinghaus bank |
+| `alphahuman_ingest_memory` | Upsert one or more memory items |
+| `alphahuman_read_memory` | Read items filtered by key / keys / namespace |
+| `alphahuman_delete_memory` | Delete items by key / keys / delete_all |
 
 ## Error handling
 
-The client raises `AlphahumanError` (from `alphahuman_langgraph.client`) on API failures and `ValueError` on invalid input. These propagate through LangChain/LangGraph.
-
-## Tests
-
-```bash
-python3 -m pip install -e ".[dev]"
-python3 -m pytest tests/ -v
-```
+Tools raise `AlphahumanError` (from `alphahuman_memory`) on API failures and
+`ValueError` on invalid input. Both propagate normally through LangGraph.

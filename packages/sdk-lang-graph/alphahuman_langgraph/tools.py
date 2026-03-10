@@ -1,17 +1,20 @@
 """LangGraph-compatible tools for Alphahuman Memory API.
 
-Aligned with the AlphaHuman backend API: insert, query, admin/delete, recall, memories/recall.
+These tools can be used as LangGraph nodes or bound to LLM tool-calling
+via LangChain's ``@tool`` decorator.
 
-Usage:
+Recommended usage — factory pattern (avoids exposing credentials to the LLM):
 
     from alphahuman_langgraph import make_memory_tools
 
     tools = make_memory_tools(token="your-api-key")
     llm_with_tools = llm.bind_tools(tools)
 
-Or from environment (ALPHAHUMAN_API_KEY, optional ALPHAHUMAN_BASE_URL):
+For quick scripting you can also use the convenience accessor that reads
+``ALPHAHUMAN_API_KEY`` / ``ALPHAHUMAN_BASE_URL`` from the environment:
 
     from alphahuman_langgraph import get_tools
+
     tools = get_tools()
 """
 
@@ -22,7 +25,15 @@ from typing import Any, Optional
 
 from langchain_core.tools import tool
 
-from alphahuman_langgraph.client import AlphahumanMemoryClient, DEFAULT_BASE_URL
+from alphahuman_memory import (
+    AlphahumanConfig,
+    AlphahumanMemoryClient,
+    DeleteMemoryRequest,
+    IngestMemoryRequest,
+    MemoryItem,
+    ReadMemoryRequest,
+)
+from alphahuman_memory.types import DEFAULT_BASE_URL
 
 _TOKEN_ENV = "ALPHAHUMAN_API_KEY"
 _BASE_URL_ENV = "ALPHAHUMAN_BASE_URL"
@@ -34,114 +45,124 @@ def make_memory_tools(
 ) -> list[Any]:
     """Create Alphahuman Memory tools bound to a specific client.
 
-    Credentials are captured at construction and not exposed to the LLM.
+    Credentials are captured at construction time and are never exposed to
+    the LLM as tool parameters, preventing prompt-injection attacks.
 
     Args:
-        token: Bearer token (API key or JWT).
+        token: Bearer token (JWT or API key).
         base_url: Optional API base URL override.
 
     Returns:
-        List of LangChain tools: insert_memory, query_memory, delete_memory,
-        recall_memory, recall_memories.
+        List of three LangChain ``@tool`` callables:
+        ``alphahuman_ingest_memory``, ``alphahuman_read_memory``,
+        ``alphahuman_delete_memory``.
     """
-    client = AlphahumanMemoryClient(token=token, base_url=base_url or DEFAULT_BASE_URL)
+    client = AlphahumanMemoryClient(
+        AlphahumanConfig(token=token, base_url=base_url or DEFAULT_BASE_URL)
+    )
 
     @tool
-    def alphahuman_insert_memory(
-        title: str,
-        content: str,
-        namespace: str,
-        source_type: str = "doc",
-        metadata: Optional[dict[str, Any]] = None,
-    ) -> dict[str, Any]:
-        """Insert a document into Alphahuman Memory.
+    def alphahuman_ingest_memory(items: list[dict[str, Any]]) -> dict[str, Any]:
+        """Ingest (upsert) memory items into the Alphahuman Memory API.
+
+        Each item must have 'key' (str) and 'content' (str). Optional fields:
+        'namespace' (str, default 'default') and 'metadata' (dict).
 
         Args:
-            title: Document title.
-            content: Document content.
-            namespace: Namespace (required).
-            source_type: One of doc, chat, email. Default doc.
-            metadata: Optional metadata dict.
+            items: List of memory items to ingest.
+
+        Returns:
+            Dict with counts: ingested, updated, errors.
         """
-        return client.insert_memory(
-            title=title,
-            content=content,
-            namespace=namespace,
-            source_type=source_type,
-            metadata=metadata,
-        )
+        memory_items = [
+            MemoryItem(
+                key=item["key"],
+                content=item["content"],
+                namespace=item.get("namespace", "default"),
+                metadata=item.get("metadata", {}),
+            )
+            for item in items
+        ]
+        result = client.ingest_memory(IngestMemoryRequest(items=memory_items))
+        return {"ingested": result.ingested, "updated": result.updated, "errors": result.errors}
 
     @tool
-    def alphahuman_query_memory(
-        query: str,
+    def alphahuman_read_memory(
+        key: Optional[str] = None,
+        keys: Optional[list[str]] = None,
         namespace: Optional[str] = None,
-        max_chunks: Optional[int] = None,
     ) -> dict[str, Any]:
-        """Query Alphahuman Memory via RAG.
+        """Read memory items from the Alphahuman Memory API.
+
+        Optionally filter by 'key', 'keys', or 'namespace'.
+        Returns all user memory if no filters are provided.
 
         Args:
-            query: Query string (required).
-            namespace: Optional namespace.
-            max_chunks: Optional limit 1-200.
+            key: Single key to read.
+            keys: List of keys to read.
+            namespace: Namespace scope.
+
+        Returns:
+            Dict with 'items' list and 'count'.
         """
-        return client.query_memory(
-            query=query,
-            namespace=namespace,
-            max_chunks=max_chunks,
-        )
+        result = client.read_memory(ReadMemoryRequest(key=key, keys=keys, namespace=namespace))
+        return {
+            "items": [
+                {
+                    "key": item.key,
+                    "content": item.content,
+                    "namespace": item.namespace,
+                    "metadata": item.metadata,
+                    "created_at": item.created_at,
+                    "updated_at": item.updated_at,
+                }
+                for item in result.items
+            ],
+            "count": result.count,
+        }
 
     @tool
-    def alphahuman_delete_memory(namespace: Optional[str] = None) -> dict[str, Any]:
-        """Delete memory (admin). Optionally scoped by namespace."""
-        return client.delete_memory(namespace=namespace)
-
-    @tool
-    def alphahuman_recall_memory(
+    def alphahuman_delete_memory(
+        key: Optional[str] = None,
+        keys: Optional[list[str]] = None,
         namespace: Optional[str] = None,
-        max_chunks: Optional[int] = None,
-    ) -> dict[str, Any]:
-        """Recall context from Alphahuman Master node.
+        delete_all: bool = False,
+    ) -> dict[str, int]:
+        """Delete memory items from the Alphahuman Memory API.
+
+        Provide 'key' (single), 'keys' (list), or set 'delete_all' to True.
+        Optionally scope by 'namespace'.
 
         Args:
-            namespace: Optional namespace.
-            max_chunks: Optional positive integer.
-        """
-        return client.recall_memory(namespace=namespace, max_chunks=max_chunks)
+            key: Single key to delete.
+            keys: List of keys to delete.
+            namespace: Namespace scope.
+            delete_all: Delete all user memory (use with caution).
 
-    @tool
-    def alphahuman_recall_memories(
-        namespace: Optional[str] = None,
-        top_k: Optional[int] = None,
-        min_retention: Optional[float] = None,
-    ) -> dict[str, Any]:
-        """Recall memories from Ebbinghaus bank.
-
-        Args:
-            namespace: Optional namespace.
-            top_k: Optional positive number.
-            min_retention: Optional non-negative number.
+        Returns:
+            Dict with 'deleted' count.
         """
-        return client.recall_memories(
-            namespace=namespace,
-            top_k=top_k,
-            min_retention=min_retention,
+        result = client.delete_memory(
+            DeleteMemoryRequest(key=key, keys=keys, namespace=namespace, delete_all=delete_all)
         )
+        return {"deleted": result.deleted}
 
-    return [
-        alphahuman_insert_memory,
-        alphahuman_query_memory,
-        alphahuman_delete_memory,
-        alphahuman_recall_memory,
-        alphahuman_recall_memories,
-    ]
+    return [alphahuman_ingest_memory, alphahuman_read_memory, alphahuman_delete_memory]
 
 
 def get_tools() -> list[Any]:
-    """Return memory tools from environment (ALPHAHUMAN_API_KEY, optional ALPHAHUMAN_BASE_URL)."""
+    """Return memory tools configured from environment variables.
+
+    Reads ``ALPHAHUMAN_API_KEY`` (required) and ``ALPHAHUMAN_BASE_URL``
+    (optional) from the environment.
+
+    Raises:
+        ValueError: If ``ALPHAHUMAN_API_KEY`` is not set.
+    """
     token = os.environ.get(_TOKEN_ENV, "")
     if not token:
         raise ValueError(
-            f"Set {_TOKEN_ENV} or use make_memory_tools(token=...)"
+            f"Set the {_TOKEN_ENV} environment variable or use make_memory_tools(token=...)"
         )
     base_url = os.environ.get(_BASE_URL_ENV) or None
     return make_memory_tools(token=token, base_url=base_url)
