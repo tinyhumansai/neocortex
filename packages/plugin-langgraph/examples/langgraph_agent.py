@@ -1,7 +1,7 @@
 """Example: LangGraph agent with TinyHumanStore as the memory backend.
 
 Prerequisites:
-    pip install tinyhumansai[langgraph] langchain-openai python-dotenv
+    pip install neocortex-langgraph[examples] langchain-openai
 
 Environment variables:
     TINYHUMANS_TOKEN  — your TinyHumans API token
@@ -22,7 +22,7 @@ from langgraph.graph import StateGraph, MessagesState, START, END
 from langgraph.store.base import BaseStore
 
 from tinyhumansai import TinyHumanMemoryClient
-from tinyhumansai.integrations import TinyHumanStore
+from neocortex_langgraph import TinyHumanStore
 
 # --- Initialise the memory store ---
 

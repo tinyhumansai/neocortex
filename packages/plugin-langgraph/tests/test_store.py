@@ -41,7 +41,7 @@ def mock_client():
 
 @pytest.fixture()
 def store(mock_client):
-    from tinyhumansai.integrations.langgraph_store import TinyHumanStore
+    from neocortex_langgraph.store import TinyHumanStore
 
     return TinyHumanStore(client=mock_client)
 
@@ -209,19 +209,19 @@ def test_namespace_roundtrip(store):
 
 
 def test_parse_value_dict():
-    from tinyhumansai.integrations.langgraph_store import TinyHumanStore
+    from neocortex_langgraph.store import TinyHumanStore
 
     assert TinyHumanStore._parse_value('{"a":1}') == {"a": 1}
 
 
 def test_parse_value_non_dict():
-    from tinyhumansai.integrations.langgraph_store import TinyHumanStore
+    from neocortex_langgraph.store import TinyHumanStore
 
     assert TinyHumanStore._parse_value('"hello"') == {"value": "hello"}
 
 
 def test_parse_value_invalid_json():
-    from tinyhumansai.integrations.langgraph_store import TinyHumanStore
+    from neocortex_langgraph.store import TinyHumanStore
 
     assert TinyHumanStore._parse_value("not json") == {"value": "not json"}
 
