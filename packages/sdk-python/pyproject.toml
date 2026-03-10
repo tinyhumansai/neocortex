@@ -12,10 +12,7 @@ requires-python = ">=3.9"
 dependencies = ["httpx>=0.25"]
 
 [project.optional-dependencies]
-langchain = ["langchain-core>=0.3"]
-langgraph = ["langgraph>=0.2", "langchain-core>=0.3"]
 dev = ["pytest", "pytest-asyncio", "mypy", "ruff"]
-examples = ["python-dotenv>=1.0"]
 
 [project.scripts]
 run-act-publish = "scripts.run_act_publish:main"
