@@ -1,6 +1,6 @@
 # @alphahuman/memory-sdk
 
-TypeScript / JavaScript SDK for the [Alphahuman Memory API](https://alphahuman.xyz).
+TypeScript / JavaScript SDK for the [Alphahuman Memory API](https://alphahuman.xyz), aligned with the backend API: insert, query, admin/delete, recall, and memories/recall.
 
 ## Requirements
 
@@ -19,28 +19,30 @@ import { AlphahumanMemoryClient } from '@alphahuman/memory-sdk';
 
 const client = new AlphahumanMemoryClient({ token: 'your-api-key' });
 
-// Ingest (upsert) memory
-const ingestResult = await client.ingestMemory({
-  items: [
-    {
-      key: 'user-preference-theme',
-      content: 'User prefers dark mode',
-      namespace: 'preferences',
-      metadata: { source: 'onboarding' },
-    },
-  ],
+// Insert (ingest) a document into memory
+const insertResult = await client.insertMemory({
+  title: 'User preference',
+  content: 'User prefers dark mode',
+  namespace: 'preferences',
 });
-console.log(ingestResult.data); // { ingested: 1, updated: 0, errors: 0 }
+console.log(insertResult.data); // { status, stats, usage? }
 
-// Read memory
-const readResult = await client.readMemory({ namespace: 'preferences' });
-console.log(readResult.data.items);
+// Query memory via RAG
+const queryResult = await client.queryMemory({
+  query: 'What does the user prefer?',
+  namespace: 'preferences',
+  maxChunks: 10,
+});
+console.log(queryResult.data.context, queryResult.data.response);
 
-// Delete by key
-await client.deleteMemory({ key: 'user-preference-theme', namespace: 'preferences' });
+// Recall context from Master node
+const recallResult = await client.recallMemory({ namespace: 'preferences', maxChunks: 10 });
 
-// Delete all user memory
-await client.deleteMemory({ deleteAll: true });
+// Recall memories from Ebbinghaus bank
+const memoriesResult = await client.recallMemories({ namespace: 'preferences', topK: 5 });
+
+// Delete memory (admin)
+await client.deleteMemory({ namespace: 'preferences' });
 ```
 
 ## API reference
@@ -49,59 +51,94 @@ await client.deleteMemory({ deleteAll: true });
 
 | Param | Type | Required | Description |
 |-------|------|----------|-------------|
-| `config.token` | `string` | ✓ | JWT or API key |
-| `config.baseUrl` | `string` | | Override API URL. If not set, uses `ALPHAHUMAN_BASE_URL` env (e.g. from `.env`) or default `https://staging-api.alphahuman.xyz` |
+| `config.token` | `string` | ✓ | API key or JWT |
+| `config.baseUrl` | `string` | | Override API URL. If not set, uses `ALPHAHUMAN_BASE_URL` env or default `https://staging-api.alphahuman.xyz` |
 
-### `client.ingestMemory(request)`
+### `client.insertMemory(params)`
 
-Upserts memory items. Items are deduplicated by `(namespace, key)`. If a
-matching item already exists, its `content` and `metadata` are updated.
+Insert a document into memory. **POST /v1/memory/insert**
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `items` | `MemoryItem[]` | ✓ | One or more items to ingest |
+| `title` | `string` | ✓ | Document title |
+| `content` | `string` | ✓ | Document content |
+| `namespace` | `string` | ✓ | Namespace |
+| `sourceType` | `'doc' \| 'chat' \| 'email'` | | Default `'doc'` |
+| `metadata` | `object` | | Optional metadata |
+| `priority` | `'high' \| 'medium' \| 'low'` | | Optional priority |
+| `createdAt` | `number` | | Unix timestamp (seconds) |
+| `updatedAt` | `number` | | Unix timestamp (seconds) |
+| `documentId` | `string` | | Optional document ID |
 
-Returns `IngestMemoryResponse` with `{ ingested, updated, errors }` counts.
+Returns `InsertMemoryResponse` with `data: { status, stats, usage? }`.
 
-### `client.readMemory(request?)`
+### `client.queryMemory(params)`
 
-Read memory items. All filter fields are optional; omitting all returns
-every item for the authenticated user.
+Query memory via RAG. **POST /v1/memory/query**
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `query` | `string` | ✓ | Query string |
+| `includeReferences` | `boolean` | | Include references in response |
+| `namespace` | `string` | | Scope to namespace |
+| `maxChunks` | `number` | | 1–200 |
+| `documentIds` | `string[]` | | Filter by document IDs |
+| `llmQuery` | `string` | | Optional LLM query |
+
+Returns `QueryMemoryResponse` with `data: { context?, usage?, cached, llmContextMessage?, response? }`.
+
+### `client.deleteMemory(params?)`
+
+Delete memory (admin). **POST /v1/memory/admin/delete**
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `key` | `string` | Exact key match |
-| `keys` | `string[]` | Match any of the given keys |
-| `namespace` | `string` | Scope to a namespace |
+| `namespace` | `string` | Optional namespace to scope deletion |
 
-Returns `ReadMemoryResponse` with `{ items, count }`.
+Returns `DeleteMemoryResponse` with `data: { status, userId, namespace?, nodesDeleted, message }`.
 
-### `client.deleteMemory(request)`
+### `client.recallMemory(params?)`
 
-Delete memory. At least one of `key`, `keys`, or `deleteAll` must be set.
+Recall context from Master node. **POST /v1/memory/recall**
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `key` | `string` | Delete a single key |
-| `keys` | `string[]` | Delete multiple keys |
-| `namespace` | `string` | Scope deletion to a namespace |
-| `deleteAll` | `boolean` | Delete all user memory |
+| `namespace` | `string` | Optional namespace |
+| `maxChunks` | `number` | Positive integer |
 
-Returns `DeleteMemoryResponse` with `{ deleted }` count.
+Returns `RecallMemoryResponse` with `data: { context?, usage?, cached, response?, latencySeconds?, counts? }`.
+
+### `client.recallMemories(params?)`
+
+Recall memories from Ebbinghaus bank. **POST /v1/memory/memories/recall**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `namespace` | `string` | Optional namespace |
+| `topK` | `number` | Positive number |
+| `minRetention` | `number` | Non-negative number |
+| `asOf` | `number` | Timestamp |
+
+Returns `RecallMemoriesResponse` with `data: { memories }`.
 
 ## Error handling
 
-All API errors throw `AlphahumanError` which extends `Error` and includes
-`status` (HTTP status code) and `body` (parsed response, if available).
+All API errors throw `AlphahumanError` (extends `Error`) with `status` (HTTP status code) and `body` (parsed response when available).
 
 ```typescript
 import { AlphahumanError } from '@alphahuman/memory-sdk';
 
 try {
-  await client.readMemory();
+  await client.queryMemory({ query: 'hello' });
 } catch (err) {
   if (err instanceof AlphahumanError) {
     console.error(err.status, err.message);
   }
 }
+```
+
+## Tests
+
+```bash
+npm test
 ```
