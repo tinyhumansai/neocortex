@@ -1,26 +1,17 @@
-<div align="center">
+![Neocortex](.github/images/art.png)
 
-<h1>Neocortex AI Memory 🧠 - Your Second Brain</h1>
+# Neocortex AI Memory 🧠 - Your Second Brain
 
-<p><b>Human-like AI Memory&nbsp; ◦ &nbsp;10Mn+ Token Processing&nbsp; ◦ &nbsp;Upto 4000 tok/s&nbsp; ◦ &nbsp;0.1$/Mn tokens</b></p>
+**Human-like AI Memory  ◦  10Mn+ Token Processing  ◦  Upto 4000 tok/s  ◦  0.1$/Mn tokens**
 
-[![Discord](https://img.shields.io/badge/Discord-Join%20Chat-5865F2?logo=discord&logoColor=white)](https://discord.com/invite/k23Kn8nK)
-[![Reddit](https://img.shields.io/badge/Reddit-r%2Ftinyhumansai-FF4500?logo=reddit&logoColor=white)](https://www.reddit.com/r/tinyhumansai/)
-[![X](https://img.shields.io/badge/Follow-%40tinyhumansai-000000?logo=x&logoColor=white)](https://x.com/tinyhumansai)
-[![Docs](https://img.shields.io/badge/Docs-GitBook-0A80FF?logo=gitbook&logoColor=white)](https://tinyhumans.gitbook.io/neocortex/)
+[Discord](https://discord.com/invite/k23Kn8nK)
+[Reddit](https://www.reddit.com/r/tinyhumansai/)
+[X](https://x.com/tinyhumansai)
+[Docs](https://tinyhumans.gitbook.io/neocortex/)
 
-<h4>
-  <a href="./benchmarks/README.md">Benchmarks</a>&nbsp; • &nbsp;
-  <a href="#-getting-started">Getting Started</a>&nbsp; • &nbsp;
-  <a href="https://tinyhumans.gitbook.io/neocortex/">Documentation</a>&nbsp; • &nbsp;
-  <a href="https://tinyhumans.ai">Get your API key</a>&nbsp;
-</h4>
+#### [Benchmarks](./benchmarks/README.md)  •   [Getting Started](#-getting-started)  •   [Documentation](https://tinyhumans.gitbook.io/neocortex/)  •   [Get your API key](https://tinyhumans.ai) 
 
-</div>
-
-<i>NOTE: That this model is currently in closed alpha. To get access <a href="mailto:founders@tinyhumans.ai">reach out to us</a></i>
-
-<!-- # 🧠 Introduction to Neocortex -->
+_NOTE: That this model is currently in closed alpha. To get access [reach out to us](mailto:founders@tinyhumans.ai)_
 
 The human brain is a master at compression. It doesn't try to remember every passing detail; instead, it aggressively prunes noise to maintain a sharp, focused, and easily accessible recall of what truly matters. In contrast, traditional AI memory systems try to remember everything. They retrieve whatever is _similar_—but similar doesn't mean important. The result? Your AI drowns in stale, irrelevant context that degrades every response.
 
@@ -28,13 +19,11 @@ Inspired by how the human brain works, **Neocortex** takes a similar approach to
 
 The result? an AI memory system that can chop through over 10 million tokens accurately at speeds of upto 4000 tokens/second, stays lean and focused, and gets smarter with every interaction.
 
-<!-- Neocortex ranks extremely high scores on [RAGAS](./benchmarks/01_ragas_sherlock.ipynb), [Babilong](./benchmarks/05_babilong.ipynb), [Vending Bench](./benchmarks/07_vendingbench.ipynb), [LoCoMo](./benchmarks/04_locomo.ipynb) and [HotPotQA](./benchmarks//02_hotpotqa.ipynb) -->
-
 Neocortex ranks extremely high scores on [RAGAS](https://www.ragas.io/), [Babilong](https://github.com/booydar/babilong/), [Vending Bench](https://andonlabs.com/evals/vending-bench-2), [LoCoMo](https://github.com/snap-research/locomo) and [HotPotQA](https://hotpotqa.github.io/)
 
-[![Star History Chart](https://api.star-history.com/image?repos=tinyhumansai/neocortex&type=date&legend=top-left)](https://www.star-history.com/?repos=tinyhumansai%2Fneocortex&type=date&legend=top-left)
+[Star History Chart](https://www.star-history.com/?repos=tinyhumansai%2Fneocortex&type=date&legend=top-left)
 
-<div align="center"><i>Like contributing towards AGI 🧠? Give this repo a star and spread the love ❤️</i></div>
+_Like contributing towards AGI 🧠? Give this repo a star and spread the love ❤️_
 
 # 🎯 Core Features
 
@@ -42,17 +31,9 @@ Neocortex ranks extremely high scores on [RAGAS](https://www.ragas.io/), [Babilo
 
 Memories that aren't accessed naturally decay over time. Frequently recalled knowledge becomes more durable. No manual cleanup needed — the system stays lean on its own.
 
-<div align="center">
-  <img src=".github/images/gif/AppleEmailGraph.gif" alt="Memory Decay Simulation" width="700"/>
-</div>
-
 ## Interaction-Aware
 
 Not all memories are equal. Views, reactions, replies, and content creation all signal what matters. Knowledge people engage with rises to the top; ignored information fades away.
-
-<div align="center">
-  <img src=".github/images/gif/BobMemoryDecayVideo.gif" alt="Interaction Graph" width="700"/>
-</div>
 
 ## Low Latency, Low Cost, High Quality
 
@@ -64,33 +45,19 @@ There's no compromise on speed and quality when processing data with Neocortex. 
 
 Standard RAG quality metrics evaluated using [RAGAS](https://docs.ragas.io/). Neocortex leads in **Answer Relevancy (0.97)** and **Context Precision (0.75)**, outperforming FastGraphRAG, Gemini VDB, Mem0, and SuperMemory.
 
-<div align="center">
-<img src=".github/images/chart_ragas.png" alt="RAGAS Benchmark" width="700"/>
-</div>
+![ragas](.github/images/chart_ragas.png)
 
 ### TemporalBench — Temporal Reasoning
 
 Accuracy across ordering, state-at-time, recency, interval, and sequence questions. Neocortex achieves **100% on recency questions** — correctly surfacing the most recent events thanks to its time-decay memory model.
 
-<div align="center">
-<img src=".github/images/chart_temporalbench.png" alt="TemporalBench" width="700"/>
-</div>
-
-<!-- ### BABILong — Needle in a Haystack
-
-Can the system find specific facts buried in large contexts? Neocortex is the **only method to successfully retrieve needles at 4k context length**, while directfeed (raw context window) scores 0% across all lengths.
-
-<div align="center">
-<img src=".github/images/heatmap_babilong.png" alt="BABILong Heatmap" width="600"/>
-</div> -->
+![chart_temporalbench](.github/images/chart_temporalbench.png)
 
 ### Vending-Bench — Agentic Decision-Making
 
 An agent manages a simulated vending machine business over 30 days. Neocortex achieves the **highest cumulative P&L (~$295 by day 30)** — better memory leads to better decisions over time.
 
-<div align="center">
-<img src=".github/images/chart_vendingbench.png" alt="Vending-Bench P&L" width="700"/>
-</div>
+![chart_vendingbench](.github/images/chart_vendingbench.png)
 
 ---
 
@@ -98,7 +65,7 @@ An agent manages a simulated vending machine business over 30 days. Neocortex ac
 
 Neocortex ships with SDKs for [Python](./packages/sdk-python), [TypeScript/JavaScript](./packages/sdk-typescript), [Go](./packages/sdk-golang), [Rust](./packages/sdk-rust), [Dart](./packages/sdk-dart), [C++](./packages/sdk-cpp), [C#](./packages/sdk-csharp), and [Java](./packages/sdk-java), plus plugins for [LangGraph](./packages/plugin-langgraph), [OpenClaw](./packages/plugin-openclaw), [ElevenLabs](./packages/plugin-elevenlabs), [CrewAI](./packages/plugin-crewai), [Raycast](./packages/plugin-raycast), [Agno](./packages/plugin-agno) [Pipecat](./packages/plugin-pipecat), [Mastra](./packages/plugin-mastra), [Autogen](./packages/plugin-autogen) and more.
 
-See [`packages/README.md`](./packages/README.md) for details about all the SDKs/Plugins available to use along with documentation and examples.
+See `[packages/README.md](./packages/README.md)` for details about all the SDKs/Plugins available to use along with documentation and examples.
 
 Below is a simple quickstart example on getting started with Python.
 
