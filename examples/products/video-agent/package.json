@@ -1,0 +1,78 @@
+{
+    "name": "video-agent",
+    "version": "1.0.0",
+    "description": "Cluely-like AI meeting assistant for Mac and Windows",
+    "main": "dist-electron/electron/main.js",
+    "scripts": {
+        "dev": "concurrently -k \"npm run dev:next\" \"npm run dev:electron\"",
+        "dev:next": "npm --prefix renderer run dev",
+        "dev:electron": "wait-on http://localhost:3000/dashboard/ && npm run build:electron && electron dist-electron/electron/main.js",
+        "build": "npm run build:next && npm run build:electron",
+        "build:next": "npm --prefix renderer run build",
+        "build:electron": "tsc -p tsconfig.electron.json",
+        "package": "npm run build && electron-builder",
+        "package:mac": "npm run build && electron-builder --mac",
+        "package:win": "npm run build && electron-builder --win",
+        "typecheck": "tsc --noEmit && npm --prefix renderer exec tsc -- --noEmit"
+    },
+    "dependencies": {
+        "@google/generative-ai": "^0.15.0",
+        "dotenv": "^17.3.1",
+        "electron-store": "^8.2.0",
+        "mammoth": "^1.8.0",
+        "node-record-lpcm16": "^1.0.1",
+        "openai": "^4.52.0",
+        "pdf-parse": "^1.1.1"
+    },
+    "devDependencies": {
+        "@types/node": "^20.14.0",
+        "@types/pdf-parse": "^1.1.4",
+        "concurrently": "^8.2.2",
+        "electron": "^31.0.0",
+        "electron-builder": "^24.13.3",
+        "typescript": "^5.5.4",
+        "wait-on": "^7.2.0"
+    },
+    "build": {
+        "appId": "xyz.vezures.video-agent",
+        "productName": "VideoAgent",
+        "directories": {
+            "output": "release"
+        },
+        "files": [
+            "dist-electron/**/*",
+            "renderer/out/**/*",
+            "package.json"
+        ],
+        "extraResources": [
+            {
+                "from": "renderer/out",
+                "to": "renderer/out"
+            }
+        ],
+        "mac": {
+            "target": [
+                {
+                    "target": "dmg",
+                    "arch": [
+                        "x64",
+                        "arm64"
+                    ]
+                }
+            ],
+            "icon": "build/icon.icns",
+            "entitlements": "build/entitlements.mac.plist",
+            "entitlementsInherit": "build/entitlements.mac.plist",
+            "hardenedRuntime": true,
+            "gatekeeperAssess": false
+        },
+        "win": {
+            "target": "nsis",
+            "icon": "build/icon.ico"
+        },
+        "nsis": {
+            "oneClick": false,
+            "allowToChangeInstallationDirectory": true
+        }
+    }
+}

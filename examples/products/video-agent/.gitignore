@@ -1,0 +1,62 @@
+### Node ###
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+### Logs ###
+logs
+*.log
+*.log.*
+
+### OS ###
+.DS_Store
+Thumbs.db
+
+### Env files ###
+.env
+.env.*
+
+### Build output ###
+dist
+dist-*
+out
+release
+build
+
+### Electron specific ###
+dist-electron
+*.asar
+*.asar.unpacked
+
+# Electron Forge / Builder / Packager artifacts
+installer/
+Makefile
+make/
+out/
+app/
+app-builds/
+
+### Testing ###
+coverage
+.nyc_output
+
+### IDE & Editor ###
+.vscode/
+.idea/
+*.iml
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+### Misc ###
+.eslintcache
+.cache
+.parcel-cache
+*.tgz
