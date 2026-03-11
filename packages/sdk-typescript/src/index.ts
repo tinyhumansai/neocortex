@@ -1,9 +1,9 @@
 // Alphahuman Memory SDK for TypeScript
-// Provides ingestMemory(), readMemory(), and deleteMemory() for the Alphahuman Memory API.
+// Aligned with AlphaHuman backend API: insert, query, admin/delete, recall, memories/recall.
 
 const DEFAULT_BASE_URL = 'https://staging-api.alphahuman.xyz';
 
-/** Resolve ALPHAHUMAN_BASE_URL from env when available (e.g. Node). No @types/node required. */
+/** Resolve ALPHAHUMAN_BASE_URL from env when available (e.g. Node). */
 function getEnvBaseUrl(): string | undefined {
   try {
     const g = typeof globalThis !== 'undefined' ? globalThis : (undefined as unknown as Record<string, unknown>);
@@ -14,89 +14,160 @@ function getEnvBaseUrl(): string | undefined {
   }
 }
 
-// ---------- Types ----------
+// ---------- Config ----------
 
 export interface AlphahumanConfig {
-  /** Bearer token (JWT or API key) for authentication */
+  /** Bearer token (API key or JWT) for authentication */
   token: string;
   /** Base URL of the Alphahuman backend. If omitted, uses ALPHAHUMAN_BASE_URL env or default staging URL */
   baseUrl?: string;
 }
 
-export interface MemoryItem {
-  /** Unique key within the namespace (used for upsert / dedup) */
-  key: string;
-  /** Memory content text */
-  content: string;
-  /** Namespace to scope this item (default: "default") */
-  namespace?: string;
-  /** Arbitrary metadata */
-  metadata?: Record<string, unknown>;
-}
+// ---------- Insert (ingest) ----------
 
-export interface ReadMemoryItem {
-  key: string;
+export interface InsertMemoryParams {
+  /** Document title */
+  title: string;
+  /** Document content */
   content: string;
+  /** Namespace (required) */
   namespace: string;
-  metadata: Record<string, unknown>;
-  createdAt: string;
-  updatedAt: string;
+  sourceType?: 'doc' | 'chat' | 'email';
+  metadata?: Record<string, unknown>;
+  priority?: 'high' | 'medium' | 'low';
+  createdAt?: number;
+  updatedAt?: number;
+  documentId?: string;
 }
 
-export interface IngestMemoryRequest {
-  items: MemoryItem[];
-}
-
-export interface IngestMemoryResponse {
+export interface InsertMemoryResponse {
   success: boolean;
   data: {
-    ingested: number;
-    updated: number;
-    errors: number;
+    status: string;
+    stats: Record<string, unknown>;
+    usage?: {
+      llm_input_tokens: number;
+      llm_output_tokens: number;
+      embedding_tokens: number;
+      cost_usd: number;
+    };
   };
 }
 
-export interface ReadMemoryRequest {
-  /** Single key to read */
-  key?: string;
-  /** Array of keys to read */
-  keys?: string[];
-  /** Namespace scope (default: "default") */
+// ---------- Query ----------
+
+export interface QueryMemoryParams {
+  /** Query string (required) */
+  query: string;
+  includeReferences?: boolean;
   namespace?: string;
+  maxChunks?: number;
+  documentIds?: string[];
+  llmQuery?: string;
 }
 
-export interface ReadMemoryResponse {
+export interface QueryContextOut {
+  entities: Array<Record<string, unknown>>;
+  relations: Array<Record<string, unknown>>;
+  chunks: Array<Record<string, unknown>>;
+}
+
+export interface QueryMemoryResponse {
   success: boolean;
   data: {
-    items: ReadMemoryItem[];
-    count: number;
+    context?: QueryContextOut;
+    usage?: {
+      llm_input_tokens: number;
+      llm_output_tokens: number;
+      embedding_tokens: number;
+      cost_usd: number;
+    };
+    cached: boolean;
+    llmContextMessage?: string;
+    response?: string;
   };
 }
 
-export interface DeleteMemoryRequest {
-  /** Single key to delete */
-  key?: string;
-  /** Array of keys to delete */
-  keys?: string[];
-  /** Namespace scope (default: "default") */
+// ---------- Delete (admin) ----------
+
+export interface DeleteMemoryParams {
+  /** Optional namespace to scope deletion */
   namespace?: string;
-  /** Delete all memory for the user (optionally scoped by namespace) */
-  deleteAll?: boolean;
 }
 
 export interface DeleteMemoryResponse {
   success: boolean;
   data: {
-    deleted: number;
+    status: string;
+    userId: string;
+    namespace?: string;
+    nodesDeleted: number;
+    message: string;
   };
 }
+
+// ---------- Recall ----------
+
+export interface RecallMemoryParams {
+  namespace?: string;
+  maxChunks?: number;
+}
+
+export interface RecallMemoryResponse {
+  success: boolean;
+  data: {
+    context?: QueryContextOut;
+    usage?: {
+      llm_input_tokens: number;
+      llm_output_tokens: number;
+      embedding_tokens: number;
+      cost_usd: number;
+    };
+    cached: boolean;
+    llmContextMessage?: string;
+    response?: string;
+    latencySeconds?: number;
+    counts?: {
+      numEntities: number;
+      numRelations: number;
+      numChunks: number;
+    };
+  };
+}
+
+// ---------- Memories recall (Ebbinghaus) ----------
+
+export interface RecallMemoriesParams {
+  namespace?: string;
+  topK?: number;
+  minRetention?: number;
+  asOf?: number;
+}
+
+export interface MemoryItemRecalled {
+  type: string;
+  id: string;
+  content: string;
+  score: number;
+  retention: number;
+  last_accessed_at?: string;
+  access_count: number;
+  stability_days: number;
+}
+
+export interface RecallMemoriesResponse {
+  success: boolean;
+  data: {
+    memories: MemoryItemRecalled[];
+  };
+}
+
+// ---------- Error ----------
 
 export interface ErrorResponse {
   success: false;
   error: string;
 }
-
-// ---------- Error ----------
 
 export class AlphahumanError extends Error {
   public readonly status: number;
@@ -123,54 +194,100 @@ export class AlphahumanMemoryClient {
     this.token = config.token;
   }
 
-  /** Ingest (upsert) one or more memory items. */
-  async ingestMemory(request: IngestMemoryRequest): Promise<IngestMemoryResponse> {
-    if (!request.items || request.items.length === 0) {
-      throw new Error('items must be a non-empty array');
+  /** Insert (ingest) a document into memory. POST /v1/memory/insert */
+  async insertMemory(params: InsertMemoryParams): Promise<InsertMemoryResponse> {
+    if (!params.title || typeof params.title !== 'string') {
+      throw new Error('title is required and must be a string');
     }
-    return this.post<IngestMemoryResponse>('/v1/memory', request);
+    if (!params.content || typeof params.content !== 'string') {
+      throw new Error('content is required and must be a string');
+    }
+    if (!params.namespace || typeof params.namespace !== 'string') {
+      throw new Error('namespace is required and must be a string');
+    }
+    const body = {
+      title: params.title,
+      content: params.content,
+      namespace: params.namespace,
+      sourceType: params.sourceType ?? 'doc',
+      metadata: params.metadata,
+      priority: params.priority,
+      createdAt: params.createdAt,
+      updatedAt: params.updatedAt,
+      documentId: params.documentId,
+    };
+    return this.post<InsertMemoryResponse>('/v1/memory/insert', body);
   }
 
-  /** Read memory items by key, keys, or namespace. Returns all user memory if no filters. */
-  async readMemory(request: ReadMemoryRequest = {}): Promise<ReadMemoryResponse> {
-    const params = new URLSearchParams();
-    if (request.key) params.set('key', request.key);
-    if (request.keys && request.keys.length > 0) {
-      for (const k of request.keys) params.append('keys[]', k);
+  /** Query memory via RAG. POST /v1/memory/query */
+  async queryMemory(params: QueryMemoryParams): Promise<QueryMemoryResponse> {
+    if (!params.query || typeof params.query !== 'string') {
+      throw new Error('query is required and must be a string');
     }
-    if (request.namespace) params.set('namespace', request.namespace);
-    const qs = params.toString();
-    const path = qs ? `/v1/memory?${qs}` : '/v1/memory';
-    return this.get<ReadMemoryResponse>(path);
+    if (
+      params.maxChunks !== undefined &&
+      (typeof params.maxChunks !== 'number' || params.maxChunks < 1 || params.maxChunks > 200)
+    ) {
+      throw new Error('maxChunks must be between 1 and 200');
+    }
+    const body = {
+      query: params.query,
+      includeReferences: params.includeReferences,
+      namespace: params.namespace,
+      maxChunks: params.maxChunks,
+      documentIds: params.documentIds,
+      llmQuery: params.llmQuery,
+    };
+    return this.post<QueryMemoryResponse>('/v1/memory/query', body);
   }
 
-  /** Delete memory items by key, keys array, or deleteAll flag. */
-  async deleteMemory(request: DeleteMemoryRequest): Promise<DeleteMemoryResponse> {
-    const hasKey = typeof request.key === 'string' && request.key.length > 0;
-    const hasKeys = Array.isArray(request.keys) && request.keys.length > 0;
-    if (!hasKey && !hasKeys && !request.deleteAll) {
-      throw new Error('Provide "key", "keys", or set "deleteAll" to true');
-    }
-    return this.send<DeleteMemoryResponse>('DELETE', '/v1/memory', request);
-  }
-
-  private async get<T>(path: string): Promise<T> {
-    const url = `${this.baseUrl}${path}`;
-    const res = await fetch(url, {
-      method: 'GET',
-      headers: { Authorization: `Bearer ${this.token}` },
+  /** Delete memory (admin). POST /v1/memory/admin/delete */
+  async deleteMemory(params: DeleteMemoryParams = {}): Promise<DeleteMemoryResponse> {
+    return this.post<DeleteMemoryResponse>('/v1/memory/admin/delete', {
+      namespace: params.namespace,
     });
-    return this.handleResponse<T>(res);
+  }
+
+  /** Recall context from Master node. POST /v1/memory/recall */
+  async recallMemory(params: RecallMemoryParams = {}): Promise<RecallMemoryResponse> {
+    if (
+      params.maxChunks !== undefined &&
+      (typeof params.maxChunks !== 'number' || !Number.isInteger(params.maxChunks) || params.maxChunks <= 0)
+    ) {
+      throw new Error('maxChunks must be a positive integer');
+    }
+    return this.post<RecallMemoryResponse>('/v1/memory/recall', {
+      namespace: params.namespace,
+      maxChunks: params.maxChunks,
+    });
+  }
+
+  /** Recall memories from Ebbinghaus bank. POST /v1/memory/memories/recall */
+  async recallMemories(params: RecallMemoriesParams = {}): Promise<RecallMemoriesResponse> {
+    if (
+      params.topK !== undefined &&
+      (typeof params.topK !== 'number' || !Number.isFinite(params.topK) || params.topK <= 0)
+    ) {
+      throw new Error('topK must be a positive number');
+    }
+    if (
+      params.minRetention !== undefined &&
+      (typeof params.minRetention !== 'number' || !Number.isFinite(params.minRetention) || params.minRetention < 0)
+    ) {
+      throw new Error('minRetention must be a non-negative number');
+    }
+    return this.post<RecallMemoriesResponse>('/v1/memory/memories/recall', {
+      namespace: params.namespace,
+      topK: params.topK,
+      minRetention: params.minRetention,
+      asOf: params.asOf,
+    });
   }
 
   private async post<T>(path: string, body: unknown): Promise<T> {
-    return this.send<T>('POST', path, body);
-  }
-
-  private async send<T>(method: string, path: string, body: unknown): Promise<T> {
     const url = `${this.baseUrl}${path}`;
     const res = await fetch(url, {
-      method,
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.token}`,
@@ -184,12 +301,12 @@ export class AlphahumanMemoryClient {
     const text = await res.text();
     let json: unknown;
     try {
-      json = JSON.parse(text);
+      json = text ? JSON.parse(text) : {};
     } catch {
       throw new AlphahumanError(
         `HTTP ${res.status}: non-JSON response`,
         res.status,
-        text || undefined,
+        text || undefined
       );
     }
     if (!res.ok) {
