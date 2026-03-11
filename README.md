@@ -1,5 +1,6 @@
 ![Neocortex](.github/images/art.png)
 
+<div align="center">
 # Neocortex AI Memory 🧠 - Your Second Brain
 
 **Human-like AI Memory  ◦  10Mn+ Token Processing  ◦  Upto 4000 tok/s  ◦  0.1$/Mn tokens**
@@ -13,6 +14,8 @@
 
 _NOTE: That this model is currently in closed alpha. To get access [reach out to us](mailto:founders@tinyhumans.ai)_
 
+</div>
+
 The human brain is a master at compression. It doesn't try to remember every passing detail; instead, it aggressively prunes noise to maintain a sharp, focused, and easily accessible recall of what truly matters. In contrast, traditional AI memory systems try to remember everything. They retrieve whatever is _similar_—but similar doesn't mean important. The result? Your AI drowns in stale, irrelevant context that degrades every response.
 
 Inspired by how the human brain works, **Neocortex** takes a similar approach to AI memory: it **intelligently forgets noise**. Just like you don't remember every sentence you've ever read or everything happens every day in your life, Neocortex lets low-value memories naturally decay while reinforcing the knowledge that matters — the things you interact with, recall, and build upon.
@@ -21,7 +24,7 @@ The result? an AI memory system that can chop through over 10 million tokens acc
 
 Neocortex ranks extremely high scores on [RAGAS](https://www.ragas.io/), [Babilong](https://github.com/booydar/babilong/), [Vending Bench](https://andonlabs.com/evals/vending-bench-2), [LoCoMo](https://github.com/snap-research/locomo) and [HotPotQA](https://hotpotqa.github.io/)
 
-[Star History Chart](https://www.star-history.com/?repos=tinyhumansai%2Fneocortex&type=date&legend=top-left)
+[![Star History Chart](https://api.star-history.com/image?repos=tinyhumansai/neocortex&type=date&legend=top-left)](https://www.star-history.com/?repos=tinyhumansai%2Fneocortex&type=date&legend=top-left)
 
 _Like contributing towards AGI 🧠? Give this repo a star and spread the love ❤️_
 
