@@ -1,0 +1,19 @@
+[package]
+name = "alphahuman-memory-sdk"
+version = "0.1.0"
+edition = "2021"
+description = "Rust SDK for Alphahuman Memory API - insert, query, delete, recall"
+license = "MIT"
+repository = "https://github.com/tinyhumansai/sdk-rust"
+readme = "README.md"
+
+[dependencies]
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "1.0"
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+
+[dev-dependencies]
+mockito = "1"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "test-util"] }
