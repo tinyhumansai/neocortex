@@ -1,5 +1,5 @@
 [package]
-name = "tinyhuman-neocortex-sdk"
+name = "tinyhumansai"
 version = "0.1.0"
 edition = "2021"
 description = "Rust SDK for TinyHumans Neocortex API - insert, query, delete, recall"

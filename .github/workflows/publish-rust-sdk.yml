@@ -24,19 +24,15 @@ jobs:
           workspace: packages/sdk-rust
 
       - name: Check formatting
-        run: cargo fmt --all -- --check
-        working-directory: packages/sdk-rust
+        run: cd packages/sdk-rust && cargo fmt --all -- --check
 
       - name: Run clippy
-        run: cargo clippy --all-targets -- -D warnings
-        working-directory: packages/sdk-rust
+        run: cd packages/sdk-rust && cargo clippy --all-targets -- -D warnings
 
       - name: Run tests
-        run: cargo test
-        working-directory: packages/sdk-rust
+        run: cd packages/sdk-rust && cargo test
 
       - name: Publish to crates.io
-        run: cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
-        working-directory: packages/sdk-rust
+        run: cd packages/sdk-rust && cargo publish --token ${{ secrets.CARGO_REGISTRY_TOKEN }}
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}

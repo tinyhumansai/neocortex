@@ -4,8 +4,7 @@
 # act expects secrets in KEY=value format; this script converts secrets.json to that.
 #
 # Usage:
-#   ./act-publish-rust-sdk.sh              # simulate workflow_dispatch (manual trigger)
-#   ./act-publish-rust-sdk.sh release       # simulate release published
+#   ./act-publish-rust-sdk.sh    # simulate push to main (triggers publish)
 
 set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -30,14 +29,7 @@ jq -r 'to_entries | map("\(.key)=\(.value)") | .[]' "$SECRETS_JSON" > "$SECRETS_
 
 cd "$REPO_ROOT"
 
-EVENT="${1:-workflow_dispatch}"
-if [[ "$EVENT" == "release" ]]; then
-  act release \
-    -W "$WORKFLOW" \
-    --secret-file "$SECRETS_FILE" \
-    -e "$SCRIPT_DIR/release-event.json"
-else
-  act workflow_dispatch \
-    -W "$WORKFLOW" \
-    --secret-file "$SECRETS_FILE"
-fi
+act push \
+  -W "$WORKFLOW" \
+  --secret-file "$SECRETS_FILE" \
+  -e "$SCRIPT_DIR/push-event.json"
