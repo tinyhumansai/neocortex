@@ -12,6 +12,26 @@ pip install tinyhumansai
 
 Requires Python 3.9+. The only runtime dependency is [httpx](https://www.python-httpx.org/).
 
+## Running locally
+
+From the package directory (`packages/sdk-python`), install the project and optional dependency groups with [uv](https://docs.astral.sh/uv/):
+
+```bash
+uv sync --group dev --group examples
+```
+
+- **`--group dev`** — test and lint tools (pytest, pytest-asyncio, mypy, ruff).
+- **`--group examples`** — `python-dotenv` for running the example script.
+
+Then run the example:
+
+```bash
+# Copy .env.example to .env and set TINYHUMANS_TOKEN, TINYHUMANS_MODEL_ID, OPENAI_API_KEY (for recall_with_llm).
+uv run python example.py
+```
+
+To install only the package and examples (no dev tools): `uv sync --group examples`.
+
 ## Quick start
 
 ```python

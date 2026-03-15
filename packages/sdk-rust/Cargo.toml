@@ -1,10 +1,10 @@
 [package]
-name = "alphahuman-memory-sdk"
+name = "tinyhuman-neocortex-sdk"
 version = "0.1.0"
 edition = "2021"
-description = "Rust SDK for Alphahuman Memory API - insert, query, delete, recall"
+description = "Rust SDK for TinyHumans Neocortex API - insert, query, delete, recall"
 license = "MIT"
-repository = "https://github.com/tinyhumansai/sdk-rust"
+repository = "https://github.com/tinyhumansai/neocortex/tree/main/packages/sdk-rust"
 readme = "README.md"
 
 [dependencies]

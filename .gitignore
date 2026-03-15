@@ -8,3 +8,4 @@ corpus/
 db/
 results/
 .DS_Store
+.github/scripts/secrets.json

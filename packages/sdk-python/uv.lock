@@ -441,7 +441,7 @@ dependencies = [
     { name = "httpx" },
 ]
 
-[package.optional-dependencies]
+[package.dev-dependencies]
 dev = [
     { name = "mypy" },
     { name = "pytest", version = "8.4.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },
@@ -455,15 +455,16 @@ examples = [
 ]
 
 [package.metadata]
-requires-dist = [
-    { name = "httpx", specifier = ">=0.25" },
-    { name = "mypy", marker = "extra == 'dev'" },
-    { name = "pytest", marker = "extra == 'dev'" },
-    { name = "pytest-asyncio", marker = "extra == 'dev'" },
-    { name = "python-dotenv", marker = "extra == 'examples'", specifier = ">=1.0" },
-    { name = "ruff", marker = "extra == 'dev'" },
+requires-dist = [{ name = "httpx", specifier = ">=0.25" }]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "mypy" },
+    { name = "pytest" },
+    { name = "pytest-asyncio" },
+    { name = "ruff" },
 ]
-provides-extras = ["dev", "examples"]
+examples = [{ name = "python-dotenv", specifier = ">=1.0" }]
 
 [[package]]
 name = "tomli"

@@ -76,14 +76,14 @@ class TinyHumanMemoryClient:
 
     Args:
         token: API token.
-        model_id: Model identifier sent with every request.
+        model_id: Model identifier sent with every request. Defaults to "neocortex-mk1".
         base_url: Optional API base URL override.
     """
 
     def __init__(
         self,
         token: str,
-        model_id: str,
+        model_id: str = "neocortex-mk1",
         base_url: Optional[str] = None,
     ) -> None:
         if not token or not token.strip():
