@@ -1,23 +1,23 @@
-//! Integration tests for AlphahumanMemoryClient using mockito.
+//! Integration tests for TinyHumanMemoryClient using mockito.
 
-use alphahuman_memory_sdk::{
-    AlphahumanConfig, AlphahumanMemoryClient, AlphahumanError, DeleteMemoryParams,
+use tinyhumansai::{
+    TinyHumanConfig, TinyHumanMemoryClient, TinyHumanError, DeleteMemoryParams,
     InsertMemoryParams, QueryMemoryParams, RecallMemoryParams, RecallMemoriesParams,
 };
 use mockito::Server;
 
 #[tokio::test]
 async fn client_requires_token() {
-    assert!(AlphahumanMemoryClient::new(AlphahumanConfig::new("")).is_err());
-    assert!(AlphahumanMemoryClient::new(AlphahumanConfig::new("   ")).is_err());
+    assert!(TinyHumanMemoryClient::new(TinyHumanConfig::new("")).is_err());
+    assert!(TinyHumanMemoryClient::new(TinyHumanConfig::new("   ")).is_err());
 }
 
 #[tokio::test]
 async fn insert_memory_validates_required() {
     let server = Server::new_async().await;
     let url = server.url();
-    let client = AlphahumanMemoryClient::new(
-        AlphahumanConfig::new("token").with_base_url(url),
+    let client = TinyHumanMemoryClient::new(
+        TinyHumanConfig::new("token").with_base_url(url),
     )
     .unwrap();
 
@@ -49,8 +49,8 @@ async fn insert_memory_posts_correctly() {
         .create_async()
         .await;
 
-    let client = AlphahumanMemoryClient::new(
-        AlphahumanConfig::new("test-token").with_base_url(server.url()),
+    let client = TinyHumanMemoryClient::new(
+        TinyHumanConfig::new("test-token").with_base_url(server.url()),
     )
     .unwrap();
 
@@ -69,8 +69,8 @@ async fn insert_memory_posts_correctly() {
 #[tokio::test]
 async fn query_memory_validates_query() {
     let server = Server::new_async().await;
-    let client = AlphahumanMemoryClient::new(
-        AlphahumanConfig::new("token").with_base_url(server.url()),
+    let client = TinyHumanMemoryClient::new(
+        TinyHumanConfig::new("token").with_base_url(server.url()),
     )
     .unwrap();
     let params = QueryMemoryParams {
@@ -83,8 +83,8 @@ async fn query_memory_validates_query() {
 #[tokio::test]
 async fn query_memory_validates_max_chunks() {
     let server = Server::new_async().await;
-    let client = AlphahumanMemoryClient::new(
-        AlphahumanConfig::new("token").with_base_url(server.url()),
+    let client = TinyHumanMemoryClient::new(
+        TinyHumanConfig::new("token").with_base_url(server.url()),
     )
     .unwrap();
     let p0 = QueryMemoryParams {
@@ -112,8 +112,8 @@ async fn delete_memory_posts_correctly() {
         .create_async()
         .await;
 
-    let client = AlphahumanMemoryClient::new(
-        AlphahumanConfig::new("token").with_base_url(server.url()),
+    let client = TinyHumanMemoryClient::new(
+        TinyHumanConfig::new("token").with_base_url(server.url()),
     )
     .unwrap();
     let res = client
@@ -138,8 +138,8 @@ async fn recall_memory_posts_correctly() {
         .create_async()
         .await;
 
-    let client = AlphahumanMemoryClient::new(
-        AlphahumanConfig::new("token").with_base_url(server.url()),
+    let client = TinyHumanMemoryClient::new(
+        TinyHumanConfig::new("token").with_base_url(server.url()),
     )
     .unwrap();
     let res = client
@@ -165,8 +165,8 @@ async fn recall_memories_posts_correctly() {
         .create_async()
         .await;
 
-    let client = AlphahumanMemoryClient::new(
-        AlphahumanConfig::new("token").with_base_url(server.url()),
+    let client = TinyHumanMemoryClient::new(
+        TinyHumanConfig::new("token").with_base_url(server.url()),
     )
     .unwrap();
     let res = client
@@ -183,7 +183,7 @@ async fn recall_memories_posts_correctly() {
 }
 
 #[tokio::test]
-async fn api_error_returns_alphahuman_error() {
+async fn api_error_returns_tinyhuman_error() {
     let mut server = Server::new_async().await;
     server
         .mock("POST", "/v1/memory/insert")
@@ -193,8 +193,8 @@ async fn api_error_returns_alphahuman_error() {
         .create_async()
         .await;
 
-    let client = AlphahumanMemoryClient::new(
-        AlphahumanConfig::new("token").with_base_url(server.url()),
+    let client = TinyHumanMemoryClient::new(
+        TinyHumanConfig::new("token").with_base_url(server.url()),
     )
     .unwrap();
     let params = InsertMemoryParams {
@@ -205,7 +205,7 @@ async fn api_error_returns_alphahuman_error() {
     };
     let err = client.insert_memory(params).await.unwrap_err();
     match &err {
-        AlphahumanError::Api { message, status, .. } => {
+        TinyHumanError::Api { message, status, .. } => {
             assert_eq!(*status, 400);
             assert!(message.contains("Bad request"));
         }
