@@ -29,9 +29,13 @@ Neocortex ranks extremely high scores on [RAGAS](https://www.ragas.io/), [Babilo
 
 Memories that aren't accessed naturally decay over time. Frequently recalled knowledge becomes more durable. No manual cleanup needed — the system stays lean on its own.
 
+![Memory decay over time](.github/images/gif/BobMemoryDecayVideo.gif)
+
 ## Interaction-Aware
 
 Not all memories are equal. Views, reactions, replies, and content creation all signal what matters. Knowledge people engage with rises to the top; ignored information fades away.
+
+![Interaction graph highlighting important knowledge](.github/images/gif/AppleEmailGraph.gif)
 
 ## Low Latency, Low Cost, High Quality
 
