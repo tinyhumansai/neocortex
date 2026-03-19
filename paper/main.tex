@@ -62,24 +62,23 @@ state-event ledger, retention-aware forgetting, and interval-based thought
 synthesis. It implements an artificial consciousness loop---what to
 reinforce, forget, and promote to durable state---under strict latency and
 token budgets. Memory is substrate for continuity, not the end goal.
+
+\smallskip\noindent
+\textbf{Key observations.} In practice the loop supports \emph{real-time}
+thought generation and streaming speech while recall and memory updates run
+concurrently; in representative sessions, a coherent user-specific model of
+context, preferences, and narrative can emerge within minutes---not after a
+long cold start---as a concrete step toward mapping a user's consciousness
+at interaction scale.
 \end{minipage}
 }
 
 \end{abstract}
-\vspace{-0.5em}
-\begingroup
-\setlength{\abovecaptionskip}{6pt}
-\setlength{\belowcaptionskip}{0pt}
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=\linewidth,height=0.36\textheight,keepaspectratio]{figures/consciousness-architecture.png}
-  \caption{Three external inputs feed \textbf{memory}, \textbf{model weights / transformer}, and \textbf{recall} (with \textbf{user-specific weights} and a \textbf{reinforcement module}), all inside the dotted \textbf{inference} bundle. Dashed path: write-back into memory.}
-  \label{fig:consciousness-architecture}
-\end{figure}
-\endgroup
+% \vspace{-0.5em}
+
 % Start the body on a fresh page so the first long paragraph is not split
 % awkwardly under the figure (avoids mid-sentence page breaks at the header).
-\clearpage
+% \clearpage
 
 \section{Introduction}
 
@@ -211,28 +210,44 @@ that acts as a unified agent. In biological systems, this coherence is
 not produced by a single neuron, but by layered circuits that compress,
 filter, and synchronize information across time.
 
-Purkinje cells provide a useful computational analogy for this
-coordination role. As the principal output neurons of the cerebellar
-cortex, they integrate massive parallel input, then emit sparse,
-inhibitory control signals that shape downstream behavior. Their
-architecture highlights three design principles relevant to AI memory:
-\textbf{(i)} high-dimensional input integration, \textbf{(ii)} selective
-gating of action, and \textbf{(iii)} temporal tuning through repeated
-feedback (see Figure~\ref{fig:purkinje-cell-diagram}).
+Purkinje cells provide a useful computational analogy for how
+\textit{background activity} can coexist with \textit{coordinated control}.
+As the principal output neurons of the cerebellar cortex, they integrate
+massive parallel input; critically, they also exhibit \textbf{ongoing,
+partly stochastic simple-spike firing}---high-rate baseline activity and
+intermittent modulation that does not reduce to ``one external stimulus,
+one discrete output.'' That endogenous drive is part of why the cerebellum
+supports fine timing and internally generated adjustments, not purely
+reactive, step-by-step responses.
+
+For systems that treat ambient \emph{noise} and \emph{conscious thoughts}
+as first-class inputs (Figure~\ref{fig:consciousness-architecture}), the
+lesson is not only integration and gating, but \textbf{permission for
+spontaneous initiation}: ongoing, intermittently triggered internal
+activity can surface as endogenous thoughts or micro-actions, which are
+then amplified or suppressed by learned feedback. Three design principles
+carry over: \textbf{(i)} high-dimensional input integration,
+\textbf{(ii)} time-varying, partly stochastic output that can qualify or
+initiate behavior without a single explicit user prompt, and
+\textbf{(iii)} selective inhibitory gating and calibration through
+interaction (see Figure~\ref{fig:purkinje-cell-diagram}).
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.75\linewidth]{figures/purkinje-cell.png}
-\caption{Purkinje cell diagram used as a biological reference for
-integration and gating.}
+\caption{Purkinje cells as biological reference: parallel integration,
+ongoing spontaneous firing, and inhibitory gating of downstream pathways.}
 \label{fig:purkinje-cell-diagram}
 \end{figure}
 
 This motivates a memory controller that does more than retrieve nearest
 neighbors. A robust system should aggregate semantic, episodic, and
-temporal evidence, then gate what enters active context. In other words,
-conscious-like behavior is approached not by storing everything, but by
-learning which memories should influence the current decision boundary.
+temporal evidence, then gate what enters active context---including
+candidates surfaced by \emph{internally generated} activity, not only
+by user-issued prompts. In other words, conscious-like behavior is
+approached not by storing everything, but by learning which memories (and
+which spontaneous internal candidates) should influence the current
+decision boundary.
 
 \subsection{Ebbinghaus Forgetting Curve}
 
@@ -379,13 +394,24 @@ continuous cognition. Periodic recall, lightweight prompting, and explicit
 write-back of thoughts and weights maintain an evolving internal model
 without a large model invocation at every interaction.
 
-\section{Results}
+\section{Implementation \& Results}
 
 We implement Neocortex as a custom memory architecture coupled with a lightweight LLM under the
-periodic consciousness loop described above. Source code is available on GitHub at
-\url{https://github.com/tinyhumans/neocortex}.
+periodic consciousness loop described above. We then modify the inference layer of an open source LLM to allow it to use the Neocortex memory
+architecture.
 
-During the entire implementation of Neocortex we do not use any LLMs for the ingestion and recall phases. We only use a lightweight LLM for the thought synthesis and action decision phases thereby allowing us to test with large amounts of context/data.
+\begingroup
+\setlength{\abovecaptionskip}{6pt}
+\setlength{\belowcaptionskip}{0pt}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth,height=0.36\textheight,keepaspectratio]{figures/consciousness-architecture.png}
+  \refstepcounter{figure}%
+  \label{fig:consciousness-architecture}
+\end{figure}
+\endgroup
+
+We do not use any LLMs for the ingestion and recall phases. We only use a lightweight LLM for the thought synthesis (consciousness loop) and action decision phases thereby allowing us to test with large amounts of context/data.
 
 We then proceed to evaluate the performance of Neocortex on a bunch of benchmarks that test it's ability to reason and make decisions whilst at the same time testing against a bunch of memory/retrieval benchmarks.
 
@@ -425,7 +451,8 @@ thought write-back) remains ongoing. The next version of this paper will add:
 This paper argues that artificial consciousness is the target, and that
 long-horizon adaptive memory is a prerequisite layer rather than the final
 objective. Insights from
-Purkinje-style gating, Ebbinghaus-style decay, and conscious versus
+Purkinje-style spontaneous activity and inhibitory gating,
+Ebbinghaus-style decay, and conscious versus
 subconscious processing suggest three requirements for more human-like
 behavior: selective integration, principled forgetting, and continuous
 background consolidation.
