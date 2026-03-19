@@ -1,19 +1,23 @@
-.PHONY: setup build clean arxiv html markdown
+.PHONY: all setup build clean arxiv html markdown
+
+all: build html markdown
 
 setup:
 	./scripts/setup.sh
 
 build:
 	./scripts/build.sh
-	echo "Build complete: $ROOT_DIR/out/main.pdf"
+	echo "Build complete: $$ROOT_DIR/out/main.pdf"
 
 html:
 	./scripts/render_html.sh
-	echo "HTML render complete: $ROOT_DIR/out/main.html"
+	echo "HTML render complete: $$ROOT_DIR/out/main.html"
 
 markdown:
 	./scripts/render_markdown.sh
-	echo "Markdown render complete: $ROOT_DIR/out/main.md"
+	cp ./out/main.md ./README.md
+	echo "Markdown render complete: $$ROOT_DIR/out/main.md"
+	echo "README updated: ./README.md"
 
 clean:
 	./scripts/clean.sh

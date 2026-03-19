@@ -1,720 +1,524 @@
-<!doctype html>
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="generator" content="pandoc" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, user-scalable=yes"
-    />
-    <title>main</title>
-    <style>
-      /* Default styles provided by pandoc.
-       * See https://pandoc.org/MANUAL.html#variables-for-html for config info.
-       */
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>main</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
       html {
-        color: #1a1a1a;
-        background-color: #fdfdfd;
+        background-color: white;
       }
       body {
-        margin: 0 auto;
-        max-width: 36em;
-        padding-left: 50px;
-        padding-right: 50px;
-        padding-top: 50px;
-        padding-bottom: 50px;
-        hyphens: auto;
-        overflow-wrap: break-word;
-        text-rendering: optimizeLegibility;
-        font-kerning: normal;
-      }
-      @media (max-width: 600px) {
-        body {
-          font-size: 0.9em;
-          padding: 12px;
-        }
-        h1 {
-          font-size: 1.8em;
-        }
-      }
-      @media print {
-        html {
-          background-color: white;
-        }
-        body {
-          background-color: transparent;
-          color: black;
-          font-size: 12pt;
-        }
-        p,
-        h2,
-        h3 {
-          orphans: 3;
-          widows: 3;
-        }
-        h2,
-        h3,
-        h4 {
-          page-break-after: avoid;
-        }
-      }
-      p {
-        margin: 1em 0;
-      }
-      a {
-        color: #1a1a1a;
-      }
-      a:visited {
-        color: #1a1a1a;
-      }
-      img {
-        max-width: 100%;
-      }
-      svg {
-        height: auto;
-        max-width: 100%;
-      }
-      h1,
-      h2,
-      h3,
-      h4,
-      h5,
-      h6 {
-        margin-top: 1.4em;
-      }
-      h5,
-      h6 {
-        font-size: 1em;
-        font-style: italic;
-      }
-      h6 {
-        font-weight: normal;
-      }
-      ol,
-      ul {
-        padding-left: 1.7em;
-        margin-top: 1em;
-      }
-      li > ol,
-      li > ul {
-        margin-top: 0;
-      }
-      blockquote {
-        margin: 1em 0 1em 1.7em;
-        padding-left: 1em;
-        border-left: 2px solid #e6e6e6;
-        color: #606060;
-      }
-      code {
-        white-space: pre-wrap;
-        font-family: Menlo, Monaco, Consolas, "Lucida Console", monospace;
-        font-size: 85%;
-        margin: 0;
-        hyphens: manual;
-      }
-      pre {
-        margin: 1em 0;
-        overflow: auto;
-      }
-      pre code {
-        padding: 0;
-        overflow: visible;
-        overflow-wrap: normal;
-      }
-      .sourceCode {
         background-color: transparent;
-        overflow: visible;
+        color: black;
+        font-size: 12pt;
       }
-      hr {
-        border: none;
-        border-top: 1px solid #1a1a1a;
-        height: 1px;
-        margin: 1em 0;
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
       }
-      table {
-        margin: 1em 0;
-        border-collapse: collapse;
-        width: 100%;
-        overflow-x: auto;
-        display: block;
-        font-variant-numeric: lining-nums tabular-nums;
+      h2, h3, h4 {
+        page-break-after: avoid;
       }
-      table caption {
-        margin-bottom: 0.75em;
-      }
-      tbody {
-        margin-top: 0.5em;
-        border-top: 1px solid #1a1a1a;
-        border-bottom: 1px solid #1a1a1a;
-      }
-      th {
-        border-top: 1px solid #1a1a1a;
-        padding: 0.25em 0.5em 0.25em 0.5em;
-      }
-      td {
-        padding: 0.125em 0.5em 0.25em 0.5em;
-      }
-      header {
-        margin-bottom: 4em;
-        text-align: center;
-      }
-      #TOC li {
-        list-style: none;
-      }
-      #TOC ul {
-        padding-left: 1.3em;
-      }
-      #TOC > ul {
-        padding-left: 0;
-      }
-      #TOC a:not(:hover) {
-        text-decoration: none;
-      }
-      span.smallcaps {
-        font-variant: small-caps;
-      }
-      div.columns {
-        display: flex;
-        gap: min(4vw, 1.5em);
-      }
-      div.column {
-        flex: auto;
-        overflow-x: auto;
-      }
-      div.hanging-indent {
-        margin-left: 1.5em;
-        text-indent: -1.5em;
-      }
-      /* The extra [class] is a hack that increases specificity enough to
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
        override a similar rule in reveal.js */
-      ul.task-list[class] {
-        list-style: none;
-      }
-      ul.task-list li input[type="checkbox"] {
-        font-size: inherit;
-        width: 0.8em;
-        margin: 0 0.8em 0.2em -1.6em;
-        vertical-align: middle;
-      }
-    </style>
-  </head>
-  <body>
-    <h1
-      id="neocortex-a-surprise-weighted-forgetting-aware-long-term-memory-pipeline-for-retrieval-augmented-language-systems"
-    >
-      NeoCortex: A Surprise-Weighted, Forgetting-Aware Long-Term Memory Pipeline
-      for Retrieval-Augmented Language Systems
-    </h1>
-    <p>
-      Large language models remain fundamentally limited by bounded context
-      windows and weak persistence across interactions. While
-      retrieval-augmented generation improves factual access to external
-      corpora, most systems still lack a unified account of how memory should be
-      written, retained, reinforced, and forgotten over time. We present , a
-      high-level memory pipeline for long-term AI systems that combines four
-      complementary memory mechanisms: (1) over chunks, entities, and relations,
-      (2) an append-only for deterministic state reconstruction, (3) that
-      reinforces content through user and workspace engagement, and (4) that
-      decay stale memory while boosting informative novelty. The proposed
-      architecture is inspired by cognitive theories of memory retention and
-      prediction error, as well as recent work on long-term memory for language
-      models. NeoCortex separates write-time structuring from recall-time
-      routing, enabling both open-ended semantic retrieval and deterministic
-      resolution of state-style queries such as location, ownership, and
-      transitions. We argue that this design improves retrieval efficiency,
-      personalization, interpretability, and token economy by prioritizing
-      memory that is recent, reinforced, and behavior-changing rather than
-      merely semantically similar.
-    </p>
-    <h2 id="introduction">Introduction</h2>
-    <p>
-      Contemporary language systems are highly capable within a bounded context
-      window, yet they remain weak at persistent memory. Standard
-      retrieval-augmented generation (RAG) addresses this limitation by
-      retrieving passages from external stores, but naive retrieval often treats
-      memory as a flat collection of text chunks. This makes it difficult to
-      distinguish between broad semantic context, explicit state transitions,
-      user-specific salience, and stale or redundant facts.
-    </p>
-    <p>
-      Human memory offers a useful conceptual alternative. Memory is not merely
-      stored and retrieved; it is reinforced through use, decays over time, and
-      is selectively updated when new experiences are surprising or
-      contradictory. Recent work in long-term memory for language models has
-      begun to move in this direction, including forgetting-aware memory
-      updates, episodic segmentation, graph-based retrieval, and persistent
-      neural memory modules. However, these ideas are often studied separately.
-    </p>
-    <p>
-      This paper introduces , a product-level memory architecture that unifies
-      these strands into a single operational pipeline. NeoCortex continuously
-      ingests new experience into structured memory and recalls context through
-      a blend of semantic relevance, recency, interaction history, and
-      surprise-weighted salience. At write time, the system parses documents
-      into chunks, extracts entities and relations, persists them in
-      graph/vector memory, and appends explicit state transitions to an event
-      ledger. At recall time, the system routes queries either to broad semantic
-      retrieval or to a deterministic state resolver when the question targets
-      ordered state transitions. Memory is further modulated by reinforcement
-      through access patterns and by Ebbinghaus-style forgetting dynamics.
-    </p>
-    <p>
-      Our main claim is that long-term AI memory should be treated as a rather
-      than a passive retrieval index. In particular, efficient token use
-      requires not only better retrieval, but also mechanisms for forgetting
-      noise, amplifying informative novelty, and separating semantic context
-      from ordered state.
-    </p>
-    <h2 id="related-work">Related Work</h2>
-    <h3 id="long-term-memory-for-language">Long-term memory for language</h3>
-    <p>models</p>
-    <p>
-      Several recent systems address persistent memory in LLMs. MemoryBank
-      augments conversational agents with a long-term memory store and a
-      forgetting-aware update mechanism inspired by the Ebbinghaus forgetting
-      curve. Its core contribution is the explicit treatment of memory retention
-      as a dynamic process rather than static storage.
-    </p>
-    <p>
-      Titans introduces a neural long-term memory module that complements
-      short-term attention, framing attention as short-term memory and
-      persistent neural memory as a longer-lived store. The later MIRAS
-      framework generalizes this view by casting sequence models as associative
-      memory systems with explicit retention and attentional bias mechanisms.
-    </p>
-    <p>
-      These approaches motivate the idea that memory should not be identified
-      with the context window alone. Instead, memory should be structured,
-      persistent, and updated through principled retention mechanisms.
-    </p>
-    <h3 id="episodic-segmentation-and">Episodic segmentation and</h3>
-    <p>surprise</p>
-    <p>
-      EM-LLM shows that long-context performance benefits from segmenting
-      experience into events using Bayesian surprise and graph-theoretic
-      boundary refinement. This is highly relevant to systems that must
-      distinguish routine background information from important shifts in world
-      state.
-    </p>
-    <p>
-      In cognitive science and neuroscience, prediction error has long been
-      linked to memory updating, event segmentation, and adaptive learning.
-      Unexpected events can either strengthen encoding or trigger the formation
-      of a new memory boundary. This motivates the use of surprise as a
-      write-time salience signal in memory systems.
-    </p>
-    <h3 id="graph-based-memory-and">Graph-based memory and</h3>
-    <p>retrieval</p>
-    <p>
-      GraphRAG and HippoRAG demonstrate that graph structure can improve
-      retrieval beyond flat vector similarity. GraphRAG builds entity-centric
-      knowledge graphs and supports more global, query-focused reasoning over
-      corpora. HippoRAG combines graph structure with personalized PageRank to
-      mimic aspects of long-term associative recall.
-    </p>
-    <p>
-      These systems support the NeoCortex design choice to maintain a coherence
-      graph over entities, relations, mentions, and chunks, rather than relying
-      only on chunk embeddings.
-    </p>
-    <h3 id="forgetting-and">Forgetting and</h3>
-    <p>retention</p>
-    <p>
-      The Ebbinghaus forgetting curve remains a foundational model for memory
-      decay, though later work suggests that the precise functional form of
-      forgetting can vary. For AI systems, the key principle is operational:
-      memory strength should decrease with age unless reinforced, while repeated
-      retrieval or interaction should slow future decay.
-    </p>
-    <h2 id="problem-formulation">Problem Formulation</h2>
-    <p>
-      We consider a language system that must answer user queries over an
-      evolving corpus of documents and interactions. Let the memory store at
-      time (t) be
-    </p>
-    <p>[ _t = { _t, _t, _t, _t }, ]</p>
-    <p>where:</p>
-    <ul>
-      <li><p>(_t) is a chunk store with text and embeddings,</p></li>
-      <li>
-        <p>(_t) is a coherence graph over entities, relations, and mentions,</p>
-      </li>
-      <li><p>(_t) is an append-only state event ledger,</p></li>
-      <li>
-        <p>
-          (_t) is an interaction history over users, workspaces, and entities.
-          The system must support two broad classes of queries:
-        </p>
-      </li>
-    </ul>
-    <p>{.}</p>
-    <ul>
-      <li>
-        <p>
-          , which benefit from retrieving relevant chunks, entities, and
-          relations.
-        </p>
-      </li>
-      <li>
-        <p>
-          , which require reconstruction of ordered facts such as current
-          holder, prior holder, location, movement, or transfer history. The
-          challenge is to retrieve a compact, high-value context under a token
-          budget while preserving correctness and supporting continual updates.
-        </p>
-      </li>
-    </ul>
-    <h2 id="neocortex-architecture">NeoCortex Architecture</h2>
-    <h3 id="end-to-end-design">End-to-end design</h3>
-    <p>NeoCortex continuously performs two processes:</p>
-    <p>{.}</p>
-    <ul>
-      <li><p>of new experience into structured memory.</p></li>
-      <li>
-        <p>
-          of context for downstream response generation. The architecture
-          separates write-time structuring from recall-time retrieval. This
-          separation is important because many retrieval failures originate
-          upstream: if memory is not encoded with entity links, state events, or
-          salience metadata, it cannot later be selectively recalled.
-        </p>
-      </li>
-    </ul>
-    <h3 id="memory-layers">Memory layers</h3>
-    <p>NeoCortex contains four complementary memory layers.</p>
-    <h4 id="coherence-memory">Coherence memory</h4>
-    <p>
-      Coherence memory stores semantic and relational context over documents,
-      chunks, entities, and relations. It supports open-ended retrieval where
-      the answer may require broad contextual grounding rather than a single
-      explicit state fact.
-    </p>
-    <h4 id="state-ledger-memory">State ledger memory</h4>
-    <p>
-      The state ledger is an append-only event stream derived from chunk text
-      and relation extraction. It records explicit transitions such as movement,
-      possession, handoff, and spatial relations. This layer is used for
-      deterministic state reconstruction.
-    </p>
-    <h4 id="interaction-memory">Interaction memory</h4>
-    <p>
-      Interaction memory captures user or workspace engagement with entities and
-      documents. Interaction strength is encoded through actions such as
-      <code>view</code>, <code>read</code>, <code>react</code>,
-      <code>engage</code>, and <code>create</code>. Retrieved items are
-      reinforced through access count and last-accessed metadata.
-    </p>
-    <h4 id="forgetting-and-surprise">Forgetting and surprise</h4>
-    <p>dynamics</p>
-    <p>
-      A retention model reduces the salience of stale, unreinforced memory. A
-      surprise model boosts non-redundant, behavior-changing content relative to
-      routine or repeated facts.
-    </p>
-    <h2 id="ingestion-pipeline">Ingestion Pipeline</h2>
-    <h3 id="parse-and-chunk">Parse and chunk</h3>
-    <p>
-      Incoming documents are first normalized and partitioned into bounded
-      chunks. Chunking is necessary for embedding, retrieval, citation, and
-      provenance tracking. Each chunk preserves local order and source metadata.
-    </p>
-    <h3 id="entity-and-relation">Entity and relation</h3>
-    <p>extraction</p>
-    <p>
-      From each chunk, NeoCortex extracts entities and relations. These are
-      linked into a coherence graph with mention-level metadata such as
-      frequency, position, and source support. Embeddings are stored for chunks,
-      entities, and possibly relations.
-    </p>
-    <h3 id="graph-persistence">Graph persistence</h3>
-    <p>
-      The system upserts graph structure and chunk metadata into graph/vector
-      storage. This enables retrieval paths that use both semantic similarity
-      and graph connectivity.
-    </p>
-    <h3 id="state-event-ledger">State event ledger</h3>
-    <p>construction</p>
-    <p>
-      In parallel with graph persistence, the system appends state events to a
-      ledger. Each event contains:
-    </p>
-    <ul>
-      <li><p>source document and chunk identifiers,</p></li>
-      <li><p>sentence order and optional timestamps,</p></li>
-      <li><p>normalized event type,</p></li>
-      <li><p>involved entities,</p></li>
-      <li><p>qualifiers and confidence,</p></li>
-      <li>
-        <p>
-          summary text for inspection. This makes state-style queries auditable
-          and order-sensitive.
-        </p>
-      </li>
-    </ul>
-    <h3 id="surprise-scoring">Surprise scoring</h3>
-    <p>
-      Optionally, each new chunk is compared against a baseline neighborhood in
-      memory. If the mismatch is high, the system assigns a larger
-      <code>prediction\_error</code>; if the new information contradicts prior
-      memory, the associated reward can be negative. This value is stored as
-      <code>reward\_weight</code> and later used to modulate salience during
-      retrieval.
-    </p>
-    <h2 id="recall-and-routing">Recall and Routing</h2>
-    <h3 id="query-routing">Query routing</h3>
-    <p>
-      Given a query (q), NeoCortex first decides whether the question is best
-      handled by:
-    </p>
-    <ul>
-      <li><p>a , or</p></li>
-      <li>
-        <p>
-          a . Queries that ask for current location, previous location, holder,
-          transfer history, or spatial status are routed to the state resolver.
-          Queries asking for themes, context, explanations, or broader summaries
-          are routed to semantic retrieval.
-        </p>
-      </li>
-    </ul>
-    <h3 id="semantic-recall">Semantic recall</h3>
-    <p>
-      Semantic recall retrieves chunks, entities, and relations using a blended
-      score:
-    </p>
-    <p>[ (m q) = (m, q)</p>
-    <p>(m)</p>
-    <p>(m)</p>
-    <p>(m), ]</p>
-    <p>
-      where ((m, q)) is semantic relevance, ((m)) captures recency and
-      reinforcement, ((m)) captures user or workspace importance, and ((m))
-      prioritizes informative deltas.
-    </p>
-    <h3 id="deterministic-state">Deterministic state</h3>
-    <p>resolution</p>
-    <p>
-      For state-style questions, the resolver reconstructs answers from ordered
-      events in the ledger. This can bypass free-form generation when a
-      deterministic answer exists, reducing hallucination risk and token usage.
-    </p>
-    <h2 id="forgetting-and-1">Forgetting and</h2>
-    <p>Reinforcement</p>
-    <p>
-      NeoCortex models retention using an Ebbinghaus-style decay process. Let
-      (a_m) denote the age in days of memory item (m), and let (n_m) denote its
-      reinforcement count. Stability is defined as
-    </p>
-    <p>[ S_m = S_0 ( 1 + (1 + n_m) ), ]</p>
-    <p>
-      where (S_0) is the base stability and () is a growth factor. Retention is
-      then
-    </p>
-    <p>[ R_m = (-a_m / S_m). ]</p>
-    <p>A configurable floor can clamp very low values to zero.</p>
-    <p>This formalism captures two desired behaviors:</p>
-    <p>{.}</p>
-    <ul>
-      <li><p>recently accessed memory decays more slowly;</p></li>
-      <li>
-        <p>
-          stale, unreinforced memory contributes less unless reactivated. Each
-          successful retrieval can update <code>last\_accessed\_at</code> and
-          increment <code>access\_count</code>, creating a closed loop:
-        </p>
-      </li>
-    </ul>
-    <p>[ . ]</p>
-    <h2 id="surprise-weighted">Surprise-Weighted</h2>
-    <p>Memory</p>
-    <p>
-      Pure recency and frequency are insufficient because they overvalue
-      repeated background facts. NeoCortex therefore incorporates a
-      surprise-weighted factor derived from prediction error.
-    </p>
-    <p>
-      Let (m) be a newly ingested chunk and ((m)) its nearest prior memory
-      neighborhood. A prediction-error proxy can be defined as the mismatch
-      between the new chunk and its expected baseline:
-    </p>
-    <p>[ _m = 1 - (m, (m)), ]</p>
-    <p>
-      optionally augmented with graph-overlap disagreement or contradiction
-      penalties. The stored salience factor can then be written as
-    </p>
-    <p>[ W_m = f(_m, c_m), ]</p>
-    <p>
-      where (c_m) captures contradiction or reward sign. High-surprise content
-      receives a larger weight during future retrieval, while contradictory
-      information can either suppress older beliefs or trigger state updates in
-      the ledger.
-    </p>
-    <p>
-      Conceptually, this mechanism promotes memory that changes the system' s
-      world model rather than memory that merely repeats what is already known.
-    </p>
-    <h2 id="why-a-state-ledger">Why a State Ledger</h2>
-    <p>Matters</p>
-    <p>
-      Many practical questions are poorly served by flat retrieval. Consider
-      queries such as:
-    </p>
-    <ul>
-      <li><p>Who currently holds asset (x)?</p></li>
-      <li><p>Where was object (y) before it moved to room (z)?</p></li>
-      <li>
-        <p>
-          Which entity interacted most recently with node (u)? These are not
-          just retrieval tasks. They require ordered state reconstruction over
-          transitions. By maintaining an append-only ledger, NeoCortex supports
-          deterministic resolution, provenance inspection, and conflict
-          handling.
-        </p>
-      </li>
-    </ul>
-    <p>This design also separates two forms of truth:</p>
-    <ul>
-      <li><p>, which emerges from broad supporting context;</p></li>
-      <li>
-        <p>
-          , which is reconstructed from ordered transitions. That distinction
-          improves interpretability and reduces over-reliance on free-form
-          synthesis.
-        </p>
-      </li>
-    </ul>
-    <h2 id="token-efficiency-and-product">Token Efficiency and Product</h2>
-    <p>Implications</p>
-    <p>
-      The core product claim of NeoCortex is that better memory is also better
-      token economy. Systems consume too many tokens not only because context
-      windows are small, but because they lack mechanisms to suppress noise and
-      preserve only what remains behaviorally useful.
-    </p>
-    <p>NeoCortex improves token efficiency in three ways:</p>
-    <p>{.}</p>
-    <ul>
-      <li>
-        <p>through chunking, entity extraction, and event normalization.</p>
-      </li>
-      <li>
-        <p>
-          through retention-aware, interaction-aware, and surprise-aware
-          retrieval.
-        </p>
-      </li>
-      <li>
-        <p>
-          for state-style questions that do not require broad generative
-          reasoning. This reframes memory from a storage problem into a .
-        </p>
-      </li>
-    </ul>
-    <h2 id="limitations-and-open">Limitations and Open</h2>
-    <p>Questions</p>
-    <p>
-      NeoCortex is a systems architecture rather than a single end-to-end
-      trained model, and several issues remain open.
-    </p>
-    <p>
-      First, surprise estimation is only as good as the baseline against which
-      novelty is measured. Poor nearest-neighbor memory can misestimate
-      importance.
-    </p>
-    <p>
-      Second, event extraction for the state ledger may introduce schema errors
-      or miss implicit transitions.
-    </p>
-    <p>
-      Third, retention parameters such as the base stability and growth factor
-      are application-dependent and may require calibration.
-    </p>
-    <p>
-      Fourth, user interaction is an imperfect signal of importance. Frequently
-      accessed information is not always the most correct or most valuable.
-    </p>
-    <p>
-      These challenges suggest future work on learned routing, contradiction
-      management, uncertainty estimation, and offline memory consolidation.
-    </p>
-    <h2 id="conclusion">Conclusion</h2>
-    <p>
-      We presented NeoCortex, a high-level memory pipeline for long-term AI
-      systems that integrates coherence memory, state-ledger memory, interaction
-      reinforcement, and forgetting plus surprise dynamics. The architecture is
-      motivated by both recent memory-augmented language-model research and
-      cognitive theories of retention and prediction error. The central idea is
-      that memory should be written in structured form, recalled through routed
-      mechanisms, strengthened through use, and allowed to forget when it no
-      longer matters. We argue that such systems are better aligned with both
-      practical retrieval needs and efficient token use, because they prioritize
-      what is recent, reinforced, and informative rather than treating all
-      stored text as equally valuable.
-    </p>
-    <h2 id="references">References</h2>
-    <p>
-      {[}1{]} Wanjun Zhong, Lianghong Guo, Qiqi Gao, He Ye, and Yanlin Wang.
-      <em>MemoryBank: Enhancing Large Language Models with Long-Term Memory</em
-      >. arXiv:2305.10250, 2023.
-    </p>
-    <p>
-      {[}2{]} Ali Behrouz, Peilin Zhong, and Vahab Mirrokni.
-      <em>Titans: Learning to Memorize at Test Time</em>. arXiv:2501.00663,
-      2025.
-    </p>
-    <p>
-      {[}3{]} Ali Behrouz, Meisam Razaviyayn, Peilin Zhong, and Vahab Mirrokni.
-      <em
-        >It's All Connected: A Journey Through Test-Time Memorization,
-        Attentional Bias, Retention, and Online Optimization</em
-      >. arXiv:2504.13173, 2025.
-    </p>
-    <p>
-      {[}4{]} Zafeirios Fountas, Martin A. Benfeghoul, Adnan Oomerjee, Fenia
-      Christopoulou, Gerasimos Lampouras, Haitham Bou-Ammar, and Jun Wang.
-      <em>Human-like Episodic Memory for Infinite Context LLMs</em>.
-      arXiv:2407.09450, 2024.
-    </p>
-    <p>
-      {[}5{]} Bernal Jiménez Gutiérrez, Yiheng Shu, Yu Gu, Michihiro Yasunaga,
-      and Yu Su.
-      <em
-        >HippoRAG: Neurobiologically Inspired Long-Term Memory for Large
-        Language Models</em
-      >. arXiv:2405.14831, 2024.
-    </p>
-    <p>
-      {[}6{]} Darren Edge, Ha Trinh, Newman Cheng, Joshua Bradley, Alex Chao,
-      Apurva Mody, Steven Truitt, and Jonathan Larson.
-      <em
-        >From Local to Global: A Graph RAG Approach to Query-Focused
-        Summarization</em
-      >. arXiv:2404.16130, 2024.
-    </p>
-    <p>
-      {[}7{]} Yaxiong Wu, Xinyue Wang, Yue Zhang, and others.
-      <em
-        >From Human Memory to AI Memory: A Survey on Memory Mechanisms in the
-        Era of LLMs</em
-      >. arXiv:2504.15965, 2025.
-    </p>
-    <p>
-      {[}8{]} Stephan Lewandowsky, Sergio E. Hartwig, and colleagues.
-      <em>Replication and Analysis of Ebbinghaus' Forgetting Curve</em>. PLOS
-      ONE, 2015.
-    </p>
-    <p>
-      {[}9{]} Anne Clewett and colleagues.
-      <em
-        >Predictions Transform Memories: How Expected Versus Unexpected Events
-        Shape Memory</em
-      >. Neuroscience and Biobehavioral Reviews, 2024.
-    </p>
-    <p>
-      {[}10{]} Kim and colleagues.
-      <em
-        >Prediction Error Determines How Memories Are Organized in the Brain</em
-      >. eLife, 2024.
-    </p>
-  </body>
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+<h1
+id="neocortexlarge-artificial-consciousness-with-a-surprise-weighted-context-system">Neocortex\\large
+artificial consciousness with a surprise-weighted context system</h1>
+<p>{ {0.82}</p>
+<p>Current Large Language Models (LLMs) do not have consciousness or
+intrinsic intellect; they generate text based on training data by
+modeling language patterns rather than experiencing understanding.
+Furthermore, current LLMs are limited by bounded context windows;
+increasing them requires exponentially more compute and memory. While
+RAGs (Retrieval Augmented Generation) improve factual access to external
+corpora, they are not smart enough in simulating an artificial
+consciousness. \\</p>
+<p>The human brain is an incredibly power-efficient, parallel
+noise-cutting engine. Inspired by this, We design Neocortex, a
+contextual memory system that implements memory at inference time. It
+unifies coherence memory, a state event ledger, interaction memory and
+forgetting/surprise dynamics, to create a powerful, compute-efficient,
+artificial consciousness. }</p>
+<h2 id="introduction">Introduction</h2>
+<p>Modern LLMs can reason impressively within a single prompt, but
+building long-horizon systems remains hard. Despite steady progress in
+reasoning, LLMs are still constrained by finite context windows and weak
+persistence across interactions. Reasoning-oriented LLMs can allocate
+more computation to multi-step deliberation, yet they remain highly
+sensitive to what is placed into context, and naive RAG retrieval often
+treats memory as a flat collection of text chunks. Simply scaling
+context windows is expensive: attention and KV-cache costs grow rapidly
+with sequence length, and longer prompts can reduce accuracy by
+injecting irrelevant material, diluting key evidence, and increasing the
+chance that the model attends to the wrong details. Practical
+long-horizon systems therefore need memory mechanisms that select,
+structure, and refresh context rather than simply making the window
+bigger.</p>
+<p>In parallel, a growing ecosystem of memory tooling has emerged that
+is already highly efficient at storing and retrieving information for
+LLM applications. Systems such as MemGPT, mem0, and Supermemory maintain
+external memory stores and retrieval policies that can prioritize
+memories by time/recency, entities and user profiles, interaction
+history, or task-specific reasoning needs. These approaches demonstrate
+that the core bottleneck is often not storage, but selecting the right
+facts at the right time under tight latency and token budgets.</p>
+<p>The human brain faces an extreme noise problem: it continuously
+receives high-volume, ambiguous, and often redundant signals, yet it
+filters and compresses them into a small set of salient memories that
+influence future behavior. Many current LLM memory systems can store and
+retrieve efficiently, but they struggle to consistently infer and
+surface <em>importance</em>---what should be reinforced, what should be
+forgotten, and what should be promoted to durable state---especially
+when signals are subtle, long-range, or conflicting. Human memory offers
+a useful conceptual alternative: it is reinforced through use, decays
+over time, and is selectively updated when new experiences are
+surprising or contradictory, motivating forgetting-aware updates,
+episodic segmentation, graph-based retrieval, and persistent memory
+modules.</p>
+<p>This paper introduces , a product-level memory architecture that
+unifies these strands into a single operational pipeline. Neocortex
+continuously ingests new experience into structured memory and recalls
+context through a blend of semantic relevance, recency, interaction
+history, and surprise-weighted salience. At write time, the system
+parses documents into chunks, extracts entities and relations, persists
+them in graph/vector memory, and appends explicit state transitions to
+an event ledger. At recall time, the system routes queries either to
+broad semantic retrieval or to a deterministic state resolver when the
+question targets ordered state transitions. Memory is further modulated
+by reinforcement through access patterns and by Ebbinghaus-style
+forgetting dynamics.</p>
+<p>Our main claim is that long-term AI memory should be treated as a
+rather than a passive retrieval index. In particular, efficient token
+use requires not only better retrieval, but also mechanisms for
+forgetting noise, amplifying informative novelty, and separating
+semantic context from ordered state.</p>
+<h2 id="understanding-the-human-brain">Understanding the human
+brain</h2>
+<h3 id="purkinje-cells">Purkinje cells</h3>
+<h3 id="ebbinghaus-forgetting-curve">Ebbinghaus forgetting curve</h3>
+<h2 id="related-work">Related Work</h2>
+<h3 id="long-term-memory-for-language">Long-term memory for
+language</h3>
+<p>models</p>
+<p>Several recent systems address persistent memory in LLMs. MemoryBank
+augments conversational agents with a long-term memory store and a
+forgetting-aware update mechanism inspired by the Ebbinghaus forgetting
+curve. Its core contribution is the explicit treatment of memory
+retention as a dynamic process rather than static storage.</p>
+<p>Titans introduces a neural long-term memory module that complements
+short-term attention, framing attention as short-term memory and
+persistent neural memory as a longer-lived store. The later MIRAS
+framework generalizes this view by casting sequence models as
+associative memory systems with explicit retention and attentional bias
+mechanisms.</p>
+<p>These approaches motivate the idea that memory should not be
+identified with the context window alone. Instead, memory should be
+structured, persistent, and updated through principled retention
+mechanisms.</p>
+<h3 id="episodic-segmentation-and">Episodic segmentation and</h3>
+<p>surprise</p>
+<p>EM-LLM shows that long-context performance benefits from segmenting
+experience into events using Bayesian surprise and graph-theoretic
+boundary refinement. This is highly relevant to systems that must
+distinguish routine background information from important shifts in
+world state.</p>
+<p>In cognitive science and neuroscience, prediction error has long been
+linked to memory updating, event segmentation, and adaptive learning.
+Unexpected events can either strengthen encoding or trigger the
+formation of a new memory boundary. This motivates the use of surprise
+as a write-time salience signal in memory systems.</p>
+<h3 id="graph-based-memory-and">Graph-based memory and</h3>
+<p>retrieval</p>
+<p>GraphRAG and HippoRAG demonstrate that graph structure can improve
+retrieval beyond flat vector similarity. GraphRAG builds entity-centric
+knowledge graphs and supports more global, query-focused reasoning over
+corpora. HippoRAG combines graph structure with personalized PageRank to
+mimic aspects of long-term associative recall.</p>
+<p>These systems support the Neocortex design choice to maintain a
+coherence graph over entities, relations, mentions, and chunks, rather
+than relying only on chunk embeddings.</p>
+<h3 id="forgetting-and">Forgetting and</h3>
+<p>retention</p>
+<p>The Ebbinghaus forgetting curve remains a foundational model for
+memory decay, though later work suggests that the precise functional
+form of forgetting can vary. For AI systems, the key principle is
+operational: memory strength should decrease with age unless reinforced,
+while repeated retrieval or interaction should slow future decay.</p>
+<h2 id="problem-formulation">Problem Formulation</h2>
+<p>We consider a language system that must answer user queries over an
+evolving corpus of documents and interactions. Let the memory store at
+time (t) be</p>
+<p>[ _t = { _t, _t, _t, _t }, ]</p>
+<p>where:</p>
+<ul>
+<li><p>(_t) is a chunk store with text and embeddings,</p></li>
+<li><p>(_t) is a coherence graph over entities, relations, and
+mentions,</p></li>
+<li><p>(_t) is an append-only state event ledger,</p></li>
+<li><p>(_t) is an interaction history over users, workspaces, and
+entities. The system must support two broad classes of queries:</p></li>
+</ul>
+<p>{.}</p>
+<ul>
+<li><p>, which benefit from retrieving relevant chunks, entities, and
+relations.</p></li>
+<li><p>, which require reconstruction of ordered facts such as current
+holder, prior holder, location, movement, or transfer history. The
+challenge is to retrieve a compact, high-value context under a token
+budget while preserving correctness and supporting continual
+updates.</p></li>
+</ul>
+<h2 id="neocortex-architecture">Neocortex Architecture</h2>
+<h3 id="end-to-end-design">End-to-end design</h3>
+<p>Neocortex continuously performs two processes:</p>
+<p>{.}</p>
+<ul>
+<li><p>of new experience into structured memory.</p></li>
+<li><p>of context for downstream response generation. The architecture
+separates write-time structuring from recall-time retrieval. This
+separation is important because many retrieval failures originate
+upstream: if memory is not encoded with entity links, state events, or
+salience metadata, it cannot later be selectively recalled.</p></li>
+</ul>
+<h3 id="memory-layers">Memory layers</h3>
+<p>Neocortex contains four complementary memory layers.</p>
+<h4 id="coherence-memory">Coherence memory</h4>
+<p>Coherence memory stores semantic and relational context over
+documents, chunks, entities, and relations. It supports open-ended
+retrieval where the answer may require broad contextual grounding rather
+than a single explicit state fact.</p>
+<h4 id="state-ledger-memory">State ledger memory</h4>
+<p>The state ledger is an append-only event stream derived from chunk
+text and relation extraction. It records explicit transitions such as
+movement, possession, handoff, and spatial relations. This layer is used
+for deterministic state reconstruction.</p>
+<h4 id="interaction-memory">Interaction memory</h4>
+<p>Interaction memory captures user or workspace engagement with
+entities and documents. Interaction strength is encoded through actions
+such as <code>view</code>, <code>read</code>, <code>react</code>,
+<code>engage</code>, and <code>create</code>. Retrieved items are
+reinforced through access count and last-accessed metadata.</p>
+<h4 id="forgetting-and-surprise">Forgetting and surprise</h4>
+<p>dynamics</p>
+<p>A retention model reduces the salience of stale, unreinforced memory.
+A surprise model boosts non-redundant, behavior-changing content
+relative to routine or repeated facts.</p>
+<h2 id="ingestion-pipeline">Ingestion Pipeline</h2>
+<h3 id="parse-and-chunk">Parse and chunk</h3>
+<p>Incoming documents are first normalized and partitioned into bounded
+chunks. Chunking is necessary for embedding, retrieval, citation, and
+provenance tracking. Each chunk preserves local order and source
+metadata.</p>
+<h3 id="entity-and-relation">Entity and relation</h3>
+<p>extraction</p>
+<p>From each chunk, Neocortex extracts entities and relations. These are
+linked into a coherence graph with mention-level metadata such as
+frequency, position, and source support. Embeddings are stored for
+chunks, entities, and possibly relations.</p>
+<h3 id="graph-persistence">Graph persistence</h3>
+<p>The system upserts graph structure and chunk metadata into
+graph/vector storage. This enables retrieval paths that use both
+semantic similarity and graph connectivity.</p>
+<h3 id="state-event-ledger">State event ledger</h3>
+<p>construction</p>
+<p>In parallel with graph persistence, the system appends state events
+to a ledger. Each event contains:</p>
+<ul>
+<li><p>source document and chunk identifiers,</p></li>
+<li><p>sentence order and optional timestamps,</p></li>
+<li><p>normalized event type,</p></li>
+<li><p>involved entities,</p></li>
+<li><p>qualifiers and confidence,</p></li>
+<li><p>summary text for inspection. This makes state-style queries
+auditable and order-sensitive.</p></li>
+</ul>
+<h3 id="surprise-scoring">Surprise scoring</h3>
+<p>Optionally, each new chunk is compared against a baseline
+neighborhood in memory. If the mismatch is high, the system assigns a
+larger <code>prediction\_error</code>; if the new information
+contradicts prior memory, the associated reward can be negative. This
+value is stored as <code>reward\_weight</code> and later used to
+modulate salience during retrieval.</p>
+<h2 id="recall-and-routing">Recall and Routing</h2>
+<h3 id="query-routing">Query routing</h3>
+<p>Given a query (q), Neocortex first decides whether the question is
+best handled by:</p>
+<ul>
+<li><p>a , or</p></li>
+<li><p>a . Queries that ask for current location, previous location,
+holder, transfer history, or spatial status are routed to the state
+resolver. Queries asking for themes, context, explanations, or broader
+summaries are routed to semantic retrieval.</p></li>
+</ul>
+<h3 id="semantic-recall">Semantic recall</h3>
+<p>Semantic recall retrieves chunks, entities, and relations using a
+blended score:</p>
+<p>[ (m q) = (m, q)</p>
+<p>(m)</p>
+<p>(m)</p>
+<p>(m), ]</p>
+<p>where ((m, q)) is semantic relevance, ((m)) captures recency and
+reinforcement, ((m)) captures user or workspace importance, and ((m))
+prioritizes informative deltas.</p>
+<h3 id="deterministic-state">Deterministic state</h3>
+<p>resolution</p>
+<p>For state-style questions, the resolver reconstructs answers from
+ordered events in the ledger. This can bypass free-form generation when
+a deterministic answer exists, reducing hallucination risk and token
+usage.</p>
+<h2 id="forgetting-and-1">Forgetting and</h2>
+<p>Reinforcement</p>
+<p>Neocortex models retention using an Ebbinghaus-style decay process.
+Let (a_m) denote the age in days of memory item (m), and let (n_m)
+denote its reinforcement count. Stability is defined as</p>
+<p>[ S_m = S_0 ( 1 + (1 + n_m) ), ]</p>
+<p>where (S_0) is the base stability and () is a growth factor.
+Retention is then</p>
+<p>[ R_m = (-a_m / S_m). ]</p>
+<p>A configurable floor can clamp very low values to zero.</p>
+<p>This formalism captures two desired behaviors:</p>
+<p>{.}</p>
+<ul>
+<li><p>recently accessed memory decays more slowly;</p></li>
+<li><p>stale, unreinforced memory contributes less unless reactivated.
+Each successful retrieval can update <code>last\_accessed\_at</code> and
+increment <code>access\_count</code>, creating a closed loop:</p></li>
+</ul>
+<p>[ . ]</p>
+<h2 id="surprise-weighted">Surprise-Weighted</h2>
+<p>Memory</p>
+<p>Pure recency and frequency are insufficient because they overvalue
+repeated background facts. Neocortex therefore incorporates a
+surprise-weighted factor derived from prediction error.</p>
+<p>Let (m) be a newly ingested chunk and ((m)) its nearest prior memory
+neighborhood. A prediction-error proxy can be defined as the mismatch
+between the new chunk and its expected baseline:</p>
+<p>[ _m = 1 - (m, (m)), ]</p>
+<p>optionally augmented with graph-overlap disagreement or contradiction
+penalties. The stored salience factor can then be written as</p>
+<p>[ W_m = f(_m, c_m), ]</p>
+<p>where (c_m) captures contradiction or reward sign. High-surprise
+content receives a larger weight during future retrieval, while
+contradictory information can either suppress older beliefs or trigger
+state updates in the ledger.</p>
+<p>Conceptually, this mechanism promotes memory that changes the system'
+s world model rather than memory that merely repeats what is already
+known.</p>
+<h2 id="why-a-state-ledger">Why a State Ledger</h2>
+<p>Matters</p>
+<p>Many practical questions are poorly served by flat retrieval.
+Consider queries such as:</p>
+<ul>
+<li><p>Who currently holds asset (x)?</p></li>
+<li><p>Where was object (y) before it moved to room (z)?</p></li>
+<li><p>Which entity interacted most recently with node (u)? These are
+not just retrieval tasks. They require ordered state reconstruction over
+transitions. By maintaining an append-only ledger, Neocortex supports
+deterministic resolution, provenance inspection, and conflict
+handling.</p></li>
+</ul>
+<p>This design also separates two forms of truth:</p>
+<ul>
+<li><p>, which emerges from broad supporting context;</p></li>
+<li><p>, which is reconstructed from ordered transitions. That
+distinction improves interpretability and reduces over-reliance on
+free-form synthesis.</p></li>
+</ul>
+<h2 id="token-efficiency-and-product">Token Efficiency and Product</h2>
+<p>Implications</p>
+<p>The core product claim of Neocortex is that better memory is also
+better token economy. Systems consume too many tokens not only because
+context windows are small, but because they lack mechanisms to suppress
+noise and preserve only what remains behaviorally useful.</p>
+<p>Neocortex improves token efficiency in three ways:</p>
+<p>{.}</p>
+<ul>
+<li><p>through chunking, entity extraction, and event
+normalization.</p></li>
+<li><p>through retention-aware, interaction-aware, and surprise-aware
+retrieval.</p></li>
+<li><p>for state-style questions that do not require broad generative
+reasoning. This reframes memory from a storage problem into a .</p></li>
+</ul>
+<h2 id="limitations-and-open">Limitations and Open</h2>
+<p>Questions</p>
+<p>Neocortex is a systems architecture rather than a single end-to-end
+trained model, and several issues remain open.</p>
+<p>First, surprise estimation is only as good as the baseline against
+which novelty is measured. Poor nearest-neighbor memory can misestimate
+importance.</p>
+<p>Second, event extraction for the state ledger may introduce schema
+errors or miss implicit transitions.</p>
+<p>Third, retention parameters such as the base stability and growth
+factor are application-dependent and may require calibration.</p>
+<p>Fourth, user interaction is an imperfect signal of importance.
+Frequently accessed information is not always the most correct or most
+valuable.</p>
+<p>These challenges suggest future work on learned routing,
+contradiction management, uncertainty estimation, and offline memory
+consolidation.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>We presented Neocortex, a high-level memory pipeline for long-term AI
+systems that integrates coherence memory, state-ledger memory,
+interaction reinforcement, and forgetting plus surprise dynamics. The
+architecture is motivated by both recent memory-augmented language-model
+research and cognitive theories of retention and prediction error. The
+central idea is that memory should be written in structured form,
+recalled through routed mechanisms, strengthened through use, and
+allowed to forget when it no longer matters. We argue that such systems
+are better aligned with both practical retrieval needs and efficient
+token use, because they prioritize what is recent, reinforced, and
+informative rather than treating all stored text as equally
+valuable.</p>
+</body>
 </html>
