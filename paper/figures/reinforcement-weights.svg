@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 308" width="880" height="308">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 300" width="880" height="300">
   <defs>
     <style type="text/css"><![CDATA[
       .bg { fill: #ffffff; }
@@ -19,10 +19,10 @@
       .wtxt-strong { font-family: sans-serif; font-size: 10px; font-weight: 700; fill: #065f46; }
     ]]></style>
   </defs>
-  <rect class="bg" width="880" height="318"/>
+  <rect class="bg" width="880" height="300"/>
 
-  <line class="panel-line" x1="293" y1="48" x2="293" y2="300"/>
-  <line class="panel-line" x1="587" y1="48" x2="587" y2="300"/>
+  <line class="panel-line" x1="293" y1="48" x2="293" y2="288"/>
+  <line class="panel-line" x1="587" y1="48" x2="587" y2="288"/>
 
   <!-- Panel 1: Before -->
   <text x="146" y="22" text-anchor="middle" class="ptitle">Before recall</text>
@@ -51,13 +51,10 @@
   <text x="32" y="101" text-anchor="middle" class="wtxt">0.07</text>
   <circle class="node-fill" cx="82" cy="256" r="21"/>
   <text x="82" y="259" text-anchor="middle" class="wtxt">0.11</text>
-  <text x="82" y="291" text-anchor="middle" class="wtxt-sm">branch A</text>
   <circle class="node-fill" cx="152" cy="248" r="21"/>
   <text x="152" y="251" text-anchor="middle" class="wtxt">0.10</text>
-  <text x="152" y="270" text-anchor="middle" class="wtxt-sm">branch B</text>
   <circle class="node-fill" cx="268" cy="108" r="21"/>
   <text x="268" y="111" text-anchor="middle" class="wtxt">0.13</text>
-  <text x="268" y="137" text-anchor="middle" class="wtxt-sm">dead end</text>
 
   <!-- Panel 2: Recall -->
   <text x="439" y="22" text-anchor="middle" class="ptitle">Recall highlights path</text>
@@ -99,8 +96,8 @@
   <text x="535" y="75" text-anchor="middle" class="wtxt">0.08</text>
 
   <!-- Panel 3: After -->
-  <text x="732" y="22" text-anchor="middle" class="ptitle">After reweighting</text>
-  <text x="732" y="36" text-anchor="middle" class="psub">Reinforced memory; branches stay weak</text>
+  <text x="732" y="22" text-anchor="middle" class="ptitle">After loop</text>
+  <text x="732" y="36" text-anchor="middle" class="psub">Reinforced trace; off-path nodes stay weak</text>
 
   <path class="edge" d="M 629.8 158.4 L 622.2 119.6"/>
   <path class="edge" d="M 690.1 177.2 L 673.9 234.8"/>
@@ -116,13 +113,10 @@
   <text x="618" y="101" text-anchor="middle" class="wtxt">0.07</text>
   <circle class="node-fill" cx="668" cy="256" r="21"/>
   <text x="668" y="259" text-anchor="middle" class="wtxt">0.11</text>
-  <text x="668" y="291" text-anchor="middle" class="wtxt-sm">unchanged</text>
   <circle class="node-fill" cx="738" cy="248" r="21"/>
   <text x="738" y="251" text-anchor="middle" class="wtxt">0.10</text>
-  <text x="738" y="270" text-anchor="middle" class="wtxt-sm">unchanged</text>
   <circle class="node-fill" cx="854" cy="108" r="21"/>
   <text x="854" y="111" text-anchor="middle" class="wtxt">0.13</text>
-  <text x="854" y="137" text-anchor="middle" class="wtxt-sm">unchanged</text>
 
   <circle class="node-strong" cx="634" cy="180" r="21"/>
   <text x="634" y="183" text-anchor="middle" class="wtxt-strong">0.88</text>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 368" width="900" height="368">
+  <defs>
+    <style type="text/css"><![CDATA[
+      .bg { fill: #ffffff; }
+      .frame-dash { fill: none; stroke: #2563eb; stroke-width: 2; stroke-dasharray: 7 5; }
+      .inp { fill: #f8fafc; stroke: #64748b; stroke-width: 1.75; }
+      .blk-loop { fill: #fffbeb; stroke: #334155; stroke-width: 2; }
+      .blk-mem { fill: #eff6ff; stroke: #2563eb; stroke-width: 2; }
+      .blk-recall { fill: #fefce8; stroke: #ca8a04; stroke-width: 2; }
+      .blk-llm { fill: #ecfdf5; stroke: #059669; stroke-width: 2; }
+      .arrow { fill: none; stroke: #334155; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#mArrow); }
+      .arrow-in { fill: none; stroke: #0f172a; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; marker-end: url(#mArrowIn); }
+      .arrow-feed { fill: none; stroke: #64748b; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 6 5; marker-end: url(#mArrowGray); }
+      .t-title { font-family: ui-sans-serif, system-ui, sans-serif; font-size: 13px; font-weight: 700; fill: #1e3a8a; }
+      .t-in { font-family: ui-sans-serif, system-ui, sans-serif; font-size: 9px; font-weight: 600; fill: #334155; text-anchor: middle; }
+      .t-in-cap { font-family: ui-sans-serif, system-ui, sans-serif; font-size: 8px; font-weight: 700; fill: #64748b; text-anchor: middle; }
+      .t-blk { font-family: ui-sans-serif, system-ui, sans-serif; font-size: 12px; font-weight: 700; fill: #0f172a; text-anchor: middle; }
+      .t-sm { font-family: ui-sans-serif, system-ui, sans-serif; font-size: 9.5px; fill: #475569; text-anchor: middle; }
+      .t-llm { font-family: ui-sans-serif, system-ui, sans-serif; font-size: 8.5px; font-weight: 600; fill: #047857; text-anchor: middle; }
+      .t-legend { font-family: ui-sans-serif, system-ui, sans-serif; font-size: 8.5px; fill: #64748b; text-anchor: middle; font-style: italic; }
+      .t-lbl { font-family: ui-sans-serif, system-ui, sans-serif; font-size: 8.5px; font-weight: 600; fill: #64748b; }
+    ]]></style>
+    <marker id="mArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+    </marker>
+    <marker id="mArrowIn" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0f172a"/>
+    </marker>
+    <marker id="mArrowGray" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#64748b"/>
+    </marker>
+  </defs>
+  <rect class="bg" width="900" height="368"/>
+
+  <rect class="frame-dash" x="14" y="22" width="872" height="318" rx="8"/>
+  <text x="450" y="42" text-anchor="middle" class="t-title">Neocortex architecture (high level)</text>
+  <text x="450" y="58" text-anchor="middle" class="t-in-cap">Three inputs (from outside)</text>
+
+  <!-- External inputs -->
+  <rect class="inp" x="36" y="66" width="138" height="28" rx="5"/>
+  <text x="105" y="84" class="t-in">User data (noise)</text>
+
+  <rect class="inp" x="198" y="66" width="128" height="28" rx="5"/>
+  <text x="262" y="84" class="t-in">User prompts</text>
+
+  <rect class="inp" x="348" y="66" width="158" height="28" rx="5"/>
+  <text x="427" y="84" class="t-in">Conscious thoughts</text>
+
+  <!-- Input arrows: noise to Memory, prompts to LLM, thoughts to Recall -->
+  <path class="arrow-in" d="M 105 94 L 105 104 L 407 104 L 407 110"/>
+  <path class="arrow-in" d="M 262 94 L 262 275 L 278 275"/>
+  <path class="arrow-in" d="M 427 94 L 427 100 L 575 100 L 575 190 L 407 190"/>
+
+  <!-- Consciousness loop -->
+  <rect class="blk-loop" x="28" y="110" width="218" height="196" rx="10"/>
+  <text x="137" y="188" class="t-blk">Consciousness loop</text>
+  <text x="137" y="210" class="t-sm">Timer-driven interval</text>
+  <text x="137" y="226" class="t-sm">ingest &#183; recall &#183; act &#183; update</text>
+  <text x="137" y="250" class="t-sm">Coordinates the three blocks</text>
+
+  <!-- Memory, Recall, LLM -->
+  <rect class="blk-mem" x="278" y="110" width="258" height="68" rx="8"/>
+  <text x="407" y="138" class="t-blk">Memory</text>
+  <text x="407" y="156" class="t-sm">Persistent stores &#183; read / write</text>
+  <text x="407" y="170" class="t-sm">reinforcement &amp; decay</text>
+
+  <rect class="blk-recall" x="278" y="190" width="258" height="68" rx="8"/>
+  <text x="407" y="218" class="t-blk">Recall</text>
+  <text x="407" y="236" class="t-sm">Build salient context packet</text>
+  <text x="407" y="250" class="t-sm">for the model</text>
+
+  <rect class="blk-llm" x="278" y="272" width="578" height="54" rx="8"/>
+  <text x="567" y="296" class="t-blk">LLM / inference</text>
+  <text x="567" y="314" class="t-llm">Most Neocortex code: routing, prompts, policies</text>
+
+  <!-- Loop drives memory + recall; stack flows down -->
+  <path class="arrow" d="M 246 146 L 272 146"/>
+  <path class="arrow" d="M 246 224 L 272 224"/>
+  <path class="arrow" d="M 407 178 L 407 188"/>
+  <path class="arrow" d="M 407 258 L 407 270"/>
+
+  <!-- Write-back (right margin) -->
+  <path class="arrow-feed" d="M 848 299 L 868 299 L 868 146 L 538 146"/>
+  <text x="888" y="224" class="t-lbl" text-anchor="end">write-back</text>
+
+  <text x="450" y="338" text-anchor="middle" class="t-legend">Solid black: external inputs &#183; Gray: control/read per interval &#183; Dashed: thoughts/weights into memory</text>
+</svg>

@@ -42,30 +42,44 @@
 \begin{document}
 \maketitle
 \begin{abstract}
+\vspace{-0.2em}
 {\small
-\begin{minipage}{0.82\textwidth}
+\begin{minipage}{\linewidth}
+\setlength{\parskip}{0.35em}
 \noindent
-Large Language Models (LLMs) can reason well inside a single prompt, but
-they struggle with long-horizon state: context windows are finite, token
-budgets are expensive, and naive retrieval pipelines often surface noisy
-evidence. Retrieval-Augmented Generation (RAG) improves factual access to
-external corpora, but typical deployments still treat memory as static text
-lookup instead of an adaptive process.
-\\\\
-\noindent
-Inspired by biological memory principles, we present \textbf{Neocortex}, a
-multi-store memory architecture for inference-time adaptation. Neocortex
-combines semantic and graph retrieval, an ordered state-event ledger,
-retention-aware forgetting, and interval-based thought synthesis. The core
-goal is to support an artificial consciousness loop: maintain coherent
-long-term identity and decision continuity under strict latency and context
-constraints by deciding what to reinforce, what to forget, and what to
-promote to durable state. In this framing, memory is not the end goal; it is
-the prerequisite substrate for consciousness-like behavior.
+Large Language Models already perform well; Retrieval-Augmented Generation
+(RAG) improves them further via external grounding. Neither is conscious or
+instinct-like: behavior stays \emph{reactive} and \emph{task-framed}, while
+retrieved context is easily \textbf{polluted} and systems stay
+\textbf{narrow} relative to open-ended, long-horizon coherence. They excel at
+explicit logical reasoning yet still fail at \textbf{sustained, open-world
+judgment} when evidence is partial and goals are implicit or shifting.
+
+\smallskip\noindent
+We present \textbf{Neocortex}, a multi-store memory architecture for
+inference-time adaptation: semantic and graph retrieval, an ordered
+state-event ledger, retention-aware forgetting, and interval-based thought
+synthesis. It implements an artificial consciousness loop---what to
+reinforce, forget, and promote to durable state---under strict latency and
+token budgets. Memory is substrate for continuity, not the end goal.
 \end{minipage}
 }
 
 \end{abstract}
+\vspace{-0.5em}
+\begingroup
+\setlength{\abovecaptionskip}{6pt}
+\setlength{\belowcaptionskip}{0pt}
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\linewidth,height=0.36\textheight,keepaspectratio]{figures/consciousness-architecture.png}
+  \caption{Three external inputs---\textbf{user data (noise)}, \textbf{user prompts}, and \textbf{conscious thoughts}---feed \textbf{memory}, \textbf{LLM/inference}, and \textbf{recall} respectively; the \textbf{consciousness loop} coordinates the stack each interval. Dashed path: write-back into memory; most code sits in inference.}
+  \label{fig:consciousness-architecture}
+\end{figure}
+\endgroup
+% Start the body on a fresh page so the first long paragraph is not split
+% awkwardly under the figure (avoids mid-sentence page breaks at the header).
+\clearpage
 
 \section{Introduction}
 
@@ -118,7 +132,9 @@ integration with gating, retention with controlled decay, and background
 consolidation over time.
 
 This paper introduces \textbf{Neocortex}, a product-level architecture for
-artificial consciousness that uses adaptive memory as its substrate. It
+artificial consciousness that uses adaptive memory as its substrate.
+Figure~\ref{fig:consciousness-architecture} summarizes the repeating interval
+at a high level. It
 unifies these strands into a single operational
 pipeline. Neocortex continuously ingests new experience into structured
 memory and recalls context through a blend of semantic relevance,
@@ -139,8 +155,7 @@ informative novelty, and separating semantic context from ordered state so
 that stable internal state can emerge across time.
 
 The rest of this paper follows a simple progression: related work,
-biological design motivation, the Neocortex control loop, implementation
-details, and current evaluation status.
+biological design motivation, the Neocortex control loop, and results.
 
 \section{Related Work}
 
@@ -364,58 +379,16 @@ continuous cognition. Periodic recall, lightweight prompting, and explicit
 write-back of thoughts and weights maintain an evolving internal model
 without a large model invocation at every interaction.
 
-\section{Implementation}
-\subsection{System Architecture}
-
-Neocortex is implemented as a \textbf{four-store memory stack} plus a
-periodic control loop:
-\textbf{(1)} vector memory for semantic similarity,
-\textbf{(2)} graph memory for entity and relation traversal,
-\textbf{(3)} interaction memory for user/session history, and
-\textbf{(4)} an ordered event ledger for deterministic state transitions.
-
-This split is intentional. Different query types require different memory
-operations; forcing all workloads through one index increases both latency
-and error rate.
-
-\subsection{Write Path}
-
-On ingestion, documents and interaction events are normalized, chunked, and
-enriched with entity and relation extraction. Each artifact is written to
-one or more stores depending on its structure:
-\textbf{semantic facts} to vector memory,
-\textbf{entity links} to graph memory, and
-\textbf{state changes} (for example ``status changed from X to Y at time T'')
-to the event ledger.
-
-Before persistence, lightweight noise filters remove low-information
-artifacts (repetition, boilerplate, and weakly actionable fragments). This
-prevents long-term memory pollution and lowers downstream retrieval cost.
-
-\subsection{Recall Path and Routing}
-
-At recall time, the system first classifies query intent:
-\textbf{semantic lookup} or \textbf{state resolution}. Semantic lookups route
-to vector and graph retrieval with salience scoring. State-resolution queries
-route to the event ledger, where ordering and timestamp constraints are
-resolved deterministically.
-
-This routing avoids a common failure mode in generic RAG systems where
-ordered state questions are answered from semantically similar but
-chronologically incorrect passages.
-
-\subsection{Retention and Reweighting}
-
-Every recall cycle updates memory weights using reinforcement and decay:
-frequently useful items gain strength, stale or misleading items lose
-strength. Surprise signals (new contradictions, unresolved risks, abrupt
-state changes) receive temporary priority boosts for subsequent cycles.
-
-Operationally, this implements an always-on maintenance process that keeps
-the active memory frontier compact without discarding durable high-value
-facts.
-
 \section{Results}
+
+We implement Neocortex as a custom memory architecture coupled with a lightweight LLM under the
+periodic consciousness loop described above. Source code is available on GitHub at
+\url{https://github.com/tinyhumans/neocortex}.
+
+During the entire implementation of Neocortex we do not use any LLMs for the ingestion and recall phases. We only use a lightweight LLM for the thought synthesis and action decision phases thereby allowing us to test with large amounts of context/data.
+
+We then proceed to evaluate the performance of Neocortex on a bunch of benchmarks that test it's ability to reason and make decisions whilst at the same time testing against a bunch of memory/retrieval benchmarks.
+
 \subsection{Current Evaluation Status}
 
 This draft focuses on architecture and consciousness-loop behavior. At this
