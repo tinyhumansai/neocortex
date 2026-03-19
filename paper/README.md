@@ -93,7 +93,7 @@ After establishing the biological motivation and memory foundations, we now desc
 The consciousness loop in Neocortex runs in **four phases**: **(1)** ingest, **(2)** interval-based recall and thought synthesis, **(3)** action decision, and **(4)** memory updates. The system accumulates rich context about a user or entity over long horizons, then transforms that context into compact internal thoughts that persist and compete for recall in later cycles.
 
 <figure id="fig:consciousness-loop" data-latex-placement="H">
-
+<img src="figures/consciousness-loop.png" style="width:98.0%" />
 <figcaption>Control loop: ingest, periodic recall and thought synthesis, action decision, then memory reweighting and persistence of new thoughts.</figcaption>
 </figure>
 

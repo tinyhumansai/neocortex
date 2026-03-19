@@ -16,8 +16,6 @@
 \usepackage{microtype}      % microtypography
 \usepackage{graphicx}
 \usepackage{float}
-\usepackage{tikz}
-\usetikzlibrary{arrows.meta}
 \graphicspath{ {./images/} }
 \AtBeginDocument{
   \newgeometry{
@@ -253,45 +251,18 @@ consolidation over time.
 After establishing the biological motivation and memory foundations, we
 now describe the key concept of this paper. Building an artificial consciousness.
 
-The consciousness loop in Neocortex runs in \textbf{four phases}:
+The consciousness loop runs in \textbf{four phases}:
 \textbf{(1)} ingest, \textbf{(2)} interval-based recall and thought
 synthesis, \textbf{(3)} action decision, and \textbf{(4)} memory updates.
 The system accumulates rich context about a user or entity over long
 horizons, then transforms that context into compact internal thoughts that
 persist and compete for recall in later cycles.
 
-% Vector sketch (optional): figures/consciousness-loop.svg
+% Source diagram: figures/consciousness-loop.svg (export PNG:
+% ./scripts/export-svgs-to-png.sh or make figures-png).
 \begin{figure}[H]
 \centering
-\resizebox{0.98\linewidth}{!}{%
-\begin{tikzpicture}[
-  font=\footnotesize,
-  box/.style={rectangle, draw=black!55, line width=0.7pt, rounded corners=4pt,
-    fill=black!4, align=center, inner sep=5pt, text width=2.6cm, minimum height=2.1cm},
-  arr/.style={-{Stealth[length=2.2mm]}, draw=black!40, line width=0.9pt}
-]
-  \node[box] (n1) at (0,3.1)
-    {\normalsize\bfseries 1.\ Ingest\\[3pt]
-     \scriptsize Contextual data to memory stores\\
-     \scriptsize (noise filtering)};
-  \node[box] (n2) at (3.5,0)
-    {\normalsize\bfseries 2.\ Recall \& thoughts\\[3pt]
-     \scriptsize Interval recall, lightweight LLM\\
-     \scriptsize Thought production};
-  \node[box] (n3) at (0,-3.1)
-    {\normalsize\bfseries 3.\ Action decision\\[3pt]
-     \scriptsize Act externally or stay passive};
-  \node[box] (n4) at (-3.5,0)
-    {\normalsize\bfseries 4.\ Memory update\\[3pt]
-     \scriptsize Reweight recalled items\\
-     \scriptsize Persist thoughts into context memory};
-  \node[font=\small\bfseries] at (0,0) {Consciousness loop};
-  \draw[arr] (n1.east) .. controls (2.2,2.2) and (2.2,1.2) .. (n2.north);
-  \draw[arr] (n2.south) .. controls (2.2,-1.2) and (1.2,-2.2) .. (n3.east);
-  \draw[arr] (n3.west) .. controls (-1.2,-2.2) and (-2.2,-1.2) .. (n4.south);
-  \draw[arr] (n4.north) .. controls (-2.2,1.2) and (-1.2,2.2) .. (n1.west);
-\end{tikzpicture}%
-}
+\includegraphics[width=0.98\linewidth]{figures/consciousness-loop.png}
 \caption{Control loop: ingest, periodic recall and thought synthesis, action
 decision, then memory reweighting and persistence of new thoughts.}
 \label{fig:consciousness-loop}
@@ -310,14 +281,14 @@ mapped into memory stores (semantic vectors, entity/relation graphs, and
 state-transition events). This allows later recall to query the same
 underlying history from multiple perspectives: ``what is relevant,'' ``who
 and what are connected,'' and ``what changed over time.''
-Critically, this phase is not a pure accumulation step: Neocortex also
+Critically, this phase is not a pure accumulation step: the system also
 applies early noise-forgetting heuristics so low-signal, repetitive, or
 non-actionable fragments do not dominate long-term memory.
 
 \subsection{Phase 2: Interval-Based Recall and Thought Synthesis}
 
 The second phase runs at regular intervals, independent of user prompts.
-During each cycle, Neocortex recalls a small, high-salience memory set
+During each cycle, the system recalls a small, high-salience memory set
 using recency, relevance, interaction frequency, and surprise-weighted
 signals. Rather than sending the full memory graph to a heavy model, the
 system passes this compact recall packet to a lightweight LLM prompt.
@@ -353,8 +324,8 @@ consolidation: the internal model shifts before the next interval begins.
 This four-phase pattern---ingest, recall and think, decide on action, then
 update memory---separates expensive context accumulation from cheap
 continuous cognition. Periodic recall, lightweight prompting, and explicit
-write-back of thoughts and weights let Neocortex maintain an evolving
-internal model without a large model invocation at every interaction.
+write-back of thoughts and weights maintain an evolving internal model
+without a large model invocation at every interaction.
 
 \section{Implementation}
 \section{Results}
