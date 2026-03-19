@@ -18,7 +18,6 @@ Building Artificial Consciousness with a High-Throughput Context System
   - [Purkinje Cells](#purkinje-cells)
   - [Ebbinghaus Forgetting Curve](#ebbinghaus-forgetting-curve)
   - [Conscious and Subconscious Processing](#conscious-and-subconscious-processing)
-  - [Conclusion](#conclusion)
 - [Consciousness Loop](#consciousness-loop)
   - [Phase 1: Large-Scale Contextual Ingestion](#phase-1-large-scale-contextual-ingestion)
   - [Phase 2: Interval-Based Recall and Thought Synthesis](#phase-2-interval-based-recall-and-thought-synthesis)
@@ -34,7 +33,7 @@ Building Artificial Consciousness with a High-Throughput Context System
   - [Current Evaluation Status](#current-evaluation-status)
   - [Observed Behavior](#observed-behavior)
   - [Limitations and Next Measurement Steps](#limitations-and-next-measurement-steps)
-- [Conclusion](#conclusion-1)
+- [Conclusion](#conclusion)
 
 # Abstract
 
@@ -49,6 +48,8 @@ Modern LLMs can reason impressively within a single prompt, but building long-ho
 In parallel, a growing ecosystem of memory tooling has emerged that is already highly efficient at storing and retrieving information for LLM applications. Systems such as MemGPT, mem0, and Supermemory maintain external memory stores and retrieval policies that can prioritize memories by time/recency, entities and user profiles, interaction history, or task-specific reasoning needs. These approaches demonstrate that the core bottleneck is often not storage, but selecting the right facts at the right time under tight latency and token budgets.
 
 The human brain faces an extreme noise problem: it continuously receives high-volume, ambiguous, and often redundant signals, yet it filters and compresses them into a small set of salient memories that influence future behavior. Many current LLM memory systems can store and retrieve efficiently, but they struggle to consistently infer and surface *importance*—what should be reinforced, what should be forgotten, and what should be promoted to durable state—especially when signals are subtle, long-range, or conflicting. Human memory offers a useful conceptual alternative: it is reinforced through use, decays over time, and is selectively updated when new experiences are surprising or contradictory, motivating forgetting-aware updates, episodic segmentation, graph-based retrieval, and persistent memory modules.
+
+Viewed against this biological backdrop, current LLM systems often remain non-human-like in memory behavior for three interrelated reasons. First, they frequently lack strong **selective gating**, so too much irrelevant context enters the active reasoning path. Second, they lack robust **adaptive forgetting**, so memory either accumulates noise or loses important details without principled reinforcement. Third, they typically lack an **always-on subconscious loop** that continuously consolidates, reweights, and organizes experience between explicit tasks. Any path toward more human-like memory therefore requires all three: integration with gating, retention with controlled decay, and background consolidation over time.
 
 This paper introduces **Neocortex**, a product-level architecture for artificial consciousness that uses adaptive memory as its substrate. It unifies these strands into a single operational pipeline. Neocortex continuously ingests new experience into structured memory and recalls context through a blend of semantic relevance, recency, interaction history, and surprise-weighted salience. At write time, the system parses documents into chunks, extracts entities and relations, persists them in graph/vector memory, and appends explicit state transitions to an event ledger. At recall time, the system routes queries either to broad semantic retrieval or to a deterministic state resolver when the question targets ordered state transitions. Memory is further modulated by reinforcement through access patterns and by Ebbinghaus-style forgetting dynamics.
 
@@ -110,28 +111,20 @@ Another useful cognitive distinction is between conscious and subconscious proce
 
 In human cognition, much of memory organization happens in this always-on background mode rather than only during active reasoning. For memory systems, this suggests that high-quality recall depends not only on query-time retrieval, but also on continuous offline maintenance: reinforcement of recurring signals, decay of stale noise, and periodic synthesis of latent patterns that may become relevant later.
 
-## Conclusion
-
-Taken together, these findings highlight three reasons current LLM systems remain non-human-like in memory behavior.
-
-First, they often lack strong **selective gating**, so too much irrelevant context enters the active reasoning path. Second, they lack robust **adaptive forgetting**, so memory either accumulates noise or loses important details without principled reinforcement. Third, they typically lack an **always-on subconscious loop** that continuously consolidates, reweights, and organizes experience between explicit tasks.
-
-Any path toward more human-like memory therefore requires all three: integration with gating, retention with controlled decay, and background consolidation over time.
-
 # Consciousness Loop
 
 After the biological motivation, we now describe the core operational mechanism: a recurring control loop that continuously updates memory and policy state.
 
-The consciousness loop runs in **four phases**: **(1)** ingest, **(2)** interval-based recall and thought synthesis, **(3)** action decision, and **(4)** memory updates. The system accumulates rich context about a user or entity over long horizons, then transforms that context into compact internal thoughts that persist and compete for recall in later cycles.
+In production, sources arrive first as **noise**: high-volume, redundant, and weakly structured streams that are not yet safe to recall verbatim. **Ingest** (phase 1) digests that firehose—filtering, deduplicating, and normalizing—so only curated context lands in memory stores for later phases. The loop then runs in **four phases**: **(1)** ingest, **(2)** interval-based recall and thought synthesis, **(3)** action decision, and **(4)** memory updates. The system accumulates rich context about a user or entity over long horizons, then transforms that context into compact internal thoughts that persist and compete for recall in later cycles.
 
 <figure id="fig:consciousness-loop" data-latex-placement="H">
 <img src="figures/consciousness-loop.png" style="width:98.0%" />
-<figcaption>Control loop: ingest, periodic recall and thought synthesis, action decision, then memory reweighting and persistence of new thoughts.</figcaption>
+<figcaption>Control loop: raw <em>noise</em> feeds ingest, which filters and structures data for recall and thought synthesis; action may emit side effects into the <em>real world</em> (email, APIs, UI), while memory reweighting feeds back into recall—not into ingest or the raw-noise path.</figcaption>
 </figure>
 
 ## Phase 1: Large-Scale Contextual Ingestion
 
-The first phase continuously ingests heterogeneous signals that describe the entity’s world state and behavior. In practice, this includes email threads, direct messages, documents, notes, tickets, logs, and other structured or semi-structured artifacts that can provide identity, intent, preference, and temporal context.
+The first phase sits immediately downstream of noisy raw input: it continuously ingests heterogeneous signals that describe the entity’s world state and behavior. In practice, this includes email threads, direct messages, documents, notes, tickets, logs, and other structured or semi-structured artifacts that can provide identity, intent, preference, and temporal context.
 
 At write time, raw inputs are normalized, segmented into chunks, and mapped into memory stores (semantic vectors, entity/relation graphs, and state-transition events). This allows later recall to query the same underlying history from multiple perspectives: “what is relevant,” “who and what are connected,” and “what changed over time.” Critically, this phase is not a pure accumulation step: the system also applies early noise-forgetting heuristics so low-signal, repetitive, or non-actionable fragments do not dominate long-term memory.
 
@@ -147,7 +140,14 @@ The third phase evaluates whether the system should **take external action** or 
 
 ## Phase 4: Memory Update and Thought Persistence
 
-The fourth phase closes the cycle by **reweighting** every memory item that participated in this recall round: items that proved useful gain reinforcement (stronger future recall), while items that contributed little or misled decay faster. The new thoughts from Phase 2 are **inserted into persistent context memory** as durable artifacts, so they can be retrieved in future cycles alongside raw ingested data. Together, reweighting and thought insertion implement subconscious consolidation: the internal model shifts before the next interval begins.
+The fourth phase closes the cycle by **reweighting** every memory item that participated in this recall round: items that proved useful gain reinforcement (stronger future recall), while items that contributed little or misled decay faster. Figure <a href="#fig:reinforcement-weights" data-reference-type="ref" data-reference="fig:reinforcement-weights">4</a> shows a concrete picture: a memory graph contains many low-weight links and alternate routes; recall highlights one *path* through that graph; after Phase 4 updates, weights along the activated trace jump so that trace is much less likely to be forgotten, while competing branches remain comparatively weak.
+
+<figure id="fig:reinforcement-weights" data-latex-placement="H">
+<img src="figures/reinforcement-weights.png" />
+<figcaption>Reinforcement of weights in Phase 4 (toy subgraph): before recall, scattered weak branches; middle, recall selects one path; after reweighting, only that trace is strongly reinforced.</figcaption>
+</figure>
+
+The new thoughts from Phase 2 are **inserted into persistent context memory** as durable artifacts, so they can be retrieved in future cycles alongside raw ingested data. Together, reweighting and thought insertion implement subconscious consolidation: the internal model shifts before the next interval begins.
 
 ## Why This Loop Matters
 

@@ -105,6 +105,18 @@ and is selectively updated when new experiences are surprising or
 contradictory, motivating forgetting-aware updates, episodic
 segmentation, graph-based retrieval, and persistent memory modules.
 
+Viewed against this biological backdrop, current LLM systems often remain
+non-human-like in memory behavior for three interrelated reasons. First,
+they frequently lack strong \textbf{selective gating}, so too much
+irrelevant context enters the active reasoning path. Second, they lack
+robust \textbf{adaptive forgetting}, so memory either accumulates noise or
+loses important details without principled reinforcement. Third, they
+typically lack an \textbf{always-on subconscious loop} that continuously
+consolidates, reweights, and organizes experience between explicit tasks.
+Any path toward more human-like memory therefore requires all three:
+integration with gating, retention with controlled decay, and background
+consolidation over time.
+
 This paper introduces \textbf{Neocortex}, a product-level architecture for
 artificial consciousness that uses adaptive memory as its substrate. It
 unifies these strands into a single operational
@@ -247,51 +259,40 @@ on query-time retrieval, but also on continuous offline maintenance:
 reinforcement of recurring signals, decay of stale noise, and periodic
 synthesis of latent patterns that may become relevant later.
 
-\subsection{Conclusion}
-
-Taken together, these findings highlight three reasons current LLM
-systems remain non-human-like in memory behavior.
-
-First, they often lack
-strong \textbf{selective gating}, so too much irrelevant context enters
-the active reasoning path. Second, they lack robust \textbf{adaptive
-forgetting}, so memory either accumulates noise or loses important
-details without principled reinforcement. Third, they typically lack an
-\textbf{always-on subconscious loop} that continuously consolidates,
-reweights, and organizes experience between explicit tasks.
-
-Any path
-toward more human-like memory therefore requires all three: integration
-with gating, retention with controlled decay, and background
-consolidation over time.
-
 \section{Consciousness Loop}
 
 After the biological motivation, we now describe the core operational
 mechanism: a recurring control loop that continuously updates memory and
 policy state.
 
-The consciousness loop runs in \textbf{four phases}:
+In production, sources arrive first as \textbf{noise}: high-volume,
+redundant, and weakly structured streams that are not yet safe to recall
+verbatim. \textbf{Ingest} (phase~1) digests that firehose---filtering,
+deduplicating, and normalizing---so only curated context lands in memory
+stores for later phases. The loop then runs in \textbf{four phases}:
 \textbf{(1)} ingest, \textbf{(2)} interval-based recall and thought
 synthesis, \textbf{(3)} action decision, and \textbf{(4)} memory updates.
 The system accumulates rich context about a user or entity over long
 horizons, then transforms that context into compact internal thoughts that
 persist and compete for recall in later cycles.
 
-% Source diagram: figures/consciousness-loop.svg (export PNG:
-% ./scripts/export-svgs-to-png.sh or make figures-png).
+% Source diagram: figures/consciousness-loop.svg (export PNG, e.g.\
+% \texttt{rsvg-convert -w 1440 -o figures/consciousness-loop.png figures/consciousness-loop.svg}).
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.98\linewidth]{figures/consciousness-loop.png}
-\caption{Control loop: ingest, periodic recall and thought synthesis, action
-decision, then memory reweighting and persistence of new thoughts.}
+\caption{Control loop: raw \emph{noise} feeds ingest, which filters and
+structures data for recall and thought synthesis; action may emit side
+effects into the \emph{real world} (email, APIs, UI), while memory
+reweighting feeds back into recall---not into ingest or the raw-noise path.}
 \label{fig:consciousness-loop}
 \end{figure}
 
 \subsection{Phase 1: Large-Scale Contextual Ingestion}
 
-The first phase continuously ingests heterogeneous signals that describe
-the entity's world state and behavior. In practice, this includes email
+The first phase sits immediately downstream of noisy raw input: it
+continuously ingests heterogeneous signals that describe the entity's
+world state and behavior. In practice, this includes email
 threads, direct messages, documents, notes, tickets, logs, and other
 structured or semi-structured artifacts that can provide identity,
 intent, preference, and temporal context.
@@ -333,7 +334,23 @@ updates only.
 The fourth phase closes the cycle by \textbf{reweighting} every memory
 item that participated in this recall round: items that proved useful
 gain reinforcement (stronger future recall), while items that contributed
-little or misled decay faster. The new thoughts from Phase~2 are
+little or misled decay faster.
+Figure~\ref{fig:reinforcement-weights} shows a concrete picture: a memory
+graph contains many low-weight links and alternate routes; recall
+highlights one \emph{path} through that graph; after Phase~4 updates,
+weights along the activated trace jump so that trace is much less likely
+to be forgotten, while competing branches remain comparatively weak.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{figures/reinforcement-weights.png}
+\caption{Reinforcement of weights in Phase~4 (toy subgraph): before recall,
+scattered weak branches; middle, recall selects one path; after
+reweighting, only that trace is strongly reinforced.}
+\label{fig:reinforcement-weights}
+\end{figure}
+
+The new thoughts from Phase~2 are
 \textbf{inserted into persistent context memory} as durable artifacts, so
 they can be retrieved in future cycles alongside raw ingested data.
 Together, reweighting and thought insertion implement subconscious
