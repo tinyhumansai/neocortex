@@ -1,16 +1,46 @@
-# Neocortex - WIP/Draft
+# Neocortex (Draft)
 
-Artificial consciousness with a high throughput context system
+Building Artificial Consciousness with a High-Throughput Context System
 
 ### Authors
 
 - <a href="mailto:enamakel@tinyhumans.ai">Steven Enamakel (Tiny Humans)</a>
 
+### Table of contents
+
+- [Abstract](#abstract)
+- [Introduction](#introduction)
+- [Related Work](#related-work)
+  - [Titans and MIRAS: Long-Term Memory for Language Models](#titans-and-miras-long-term-memory-for-language-models)
+  - [GraphRAG and Graph-Based Memory and Retrieval](#graphrag-and-graph-based-memory-and-retrieval)
+  - [MemoryBank: Retention-Aware Memory for Language Models](#memorybank-retention-aware-memory-for-language-models)
+- [Understanding the Human Brain](#understanding-the-human-brain)
+  - [Purkinje Cells](#purkinje-cells)
+  - [Ebbinghaus Forgetting Curve](#ebbinghaus-forgetting-curve)
+  - [Conscious and Subconscious Processing](#conscious-and-subconscious-processing)
+  - [Conclusion](#conclusion)
+- [Consciousness Loop](#consciousness-loop)
+  - [Phase 1: Large-Scale Contextual Ingestion](#phase-1-large-scale-contextual-ingestion)
+  - [Phase 2: Interval-Based Recall and Thought Synthesis](#phase-2-interval-based-recall-and-thought-synthesis)
+  - [Phase 3: Action Decision](#phase-3-action-decision)
+  - [Phase 4: Memory Update and Thought Persistence](#phase-4-memory-update-and-thought-persistence)
+  - [Why This Loop Matters](#why-this-loop-matters)
+- [Implementation](#implementation)
+  - [System Architecture](#system-architecture)
+  - [Write Path](#write-path)
+  - [Recall Path and Routing](#recall-path-and-routing)
+  - [Retention and Reweighting](#retention-and-reweighting)
+- [Results](#results)
+  - [Current Evaluation Status](#current-evaluation-status)
+  - [Observed Behavior](#observed-behavior)
+  - [Limitations and Next Measurement Steps](#limitations-and-next-measurement-steps)
+- [Conclusion](#conclusion-1)
+
 # Abstract
 
-Current Large Language Models (LLMs) do not have consciousness or intrinsic intellect; they generate text based on training data by modeling language patterns rather than experiencing understanding. Furthermore, current LLMs are limited by bounded context windows; increasing them requires exponentially more compute and memory. While RAGs (Retrieval Augmented Generation) improve factual access to external corpora, they are not smart enough in simulating an artificial consciousness.
+Large Language Models (LLMs) can reason well inside a single prompt, but they struggle with long-horizon state: context windows are finite, token budgets are expensive, and naive retrieval pipelines often surface noisy evidence. Retrieval-Augmented Generation (RAG) improves factual access to external corpora, but typical deployments still treat memory as static text lookup instead of an adaptive process.
 
-The human brain is an incredibly power-efficient, parallel noise-cutting engine. Inspired by this, We design Neocortex, a contextual memory system that implements memory at inference time. It unifies coherence memory, a state event ledger, interaction memory and forgetting/surprise dynamics, to create a powerful, compute-efficient, artificial consciousness.
+Inspired by biological memory principles, we present **Neocortex**, a multi-store memory architecture for inference-time adaptation. Neocortex combines semantic and graph retrieval, an ordered state-event ledger, retention-aware forgetting, and interval-based thought synthesis. The core goal is to support an artificial consciousness loop: maintain coherent long-term identity and decision continuity under strict latency and context constraints by deciding what to reinforce, what to forget, and what to promote to durable state. In this framing, memory is not the end goal; it is the prerequisite substrate for consciousness-like behavior.
 
 # Introduction
 
@@ -20,9 +50,11 @@ In parallel, a growing ecosystem of memory tooling has emerged that is already h
 
 The human brain faces an extreme noise problem: it continuously receives high-volume, ambiguous, and often redundant signals, yet it filters and compresses them into a small set of salient memories that influence future behavior. Many current LLM memory systems can store and retrieve efficiently, but they struggle to consistently infer and surface *importance*—what should be reinforced, what should be forgotten, and what should be promoted to durable state—especially when signals are subtle, long-range, or conflicting. Human memory offers a useful conceptual alternative: it is reinforced through use, decays over time, and is selectively updated when new experiences are surprising or contradictory, motivating forgetting-aware updates, episodic segmentation, graph-based retrieval, and persistent memory modules.
 
-This paper introduces **Neocortex**, a product-level memory architecture that unifies these strands into a single operational pipeline. Neocortex continuously ingests new experience into structured memory and recalls context through a blend of semantic relevance, recency, interaction history, and surprise-weighted salience. At write time, the system parses documents into chunks, extracts entities and relations, persists them in graph/vector memory, and appends explicit state transitions to an event ledger. At recall time, the system routes queries either to broad semantic retrieval or to a deterministic state resolver when the question targets ordered state transitions. Memory is further modulated by reinforcement through access patterns and by Ebbinghaus-style forgetting dynamics.
+This paper introduces **Neocortex**, a product-level architecture for artificial consciousness that uses adaptive memory as its substrate. It unifies these strands into a single operational pipeline. Neocortex continuously ingests new experience into structured memory and recalls context through a blend of semantic relevance, recency, interaction history, and surprise-weighted salience. At write time, the system parses documents into chunks, extracts entities and relations, persists them in graph/vector memory, and appends explicit state transitions to an event ledger. At recall time, the system routes queries either to broad semantic retrieval or to a deterministic state resolver when the question targets ordered state transitions. Memory is further modulated by reinforcement through access patterns and by Ebbinghaus-style forgetting dynamics.
 
-Our main claim is that long-term AI memory should be treated as a **multi-store adaptive system** rather than a passive retrieval index. In particular, efficient token use requires not only better retrieval, but also mechanisms for forgetting noise, amplifying informative novelty, and separating semantic context from ordered state.
+Our main claim is that artificial consciousness requires a **multi-store adaptive memory substrate** rather than a passive retrieval index. In particular, efficient token use requires not only better retrieval, but also mechanisms for forgetting noise, amplifying informative novelty, and separating semantic context from ordered state so that stable internal state can emerge across time.
+
+The rest of this paper follows a simple progression: related work, biological design motivation, the Neocortex control loop, implementation details, and current evaluation status.
 
 # Related Work
 
@@ -88,7 +120,7 @@ Any path toward more human-like memory therefore requires all three: integration
 
 # Consciousness Loop
 
-After establishing the biological motivation and memory foundations, we now describe the key concept of this paper. Building an artificial consciousness.
+After the biological motivation, we now describe the core operational mechanism: a recurring control loop that continuously updates memory and policy state.
 
 The consciousness loop runs in **four phases**: **(1)** ingest, **(2)** interval-based recall and thought synthesis, **(3)** action decision, and **(4)** memory updates. The system accumulates rich context about a user or entity over long horizons, then transforms that context into compact internal thoughts that persist and compete for recall in later cycles.
 
@@ -123,15 +155,53 @@ This four-phase pattern—ingest, recall and think, decide on action, then updat
 
 # Implementation
 
+## System Architecture
+
+Neocortex is implemented as a **four-store memory stack** plus a periodic control loop: **(1)** vector memory for semantic similarity, **(2)** graph memory for entity and relation traversal, **(3)** interaction memory for user/session history, and **(4)** an ordered event ledger for deterministic state transitions.
+
+This split is intentional. Different query types require different memory operations; forcing all workloads through one index increases both latency and error rate.
+
+## Write Path
+
+On ingestion, documents and interaction events are normalized, chunked, and enriched with entity and relation extraction. Each artifact is written to one or more stores depending on its structure: **semantic facts** to vector memory, **entity links** to graph memory, and **state changes** (for example “status changed from X to Y at time T”) to the event ledger.
+
+Before persistence, lightweight noise filters remove low-information artifacts (repetition, boilerplate, and weakly actionable fragments). This prevents long-term memory pollution and lowers downstream retrieval cost.
+
+## Recall Path and Routing
+
+At recall time, the system first classifies query intent: **semantic lookup** or **state resolution**. Semantic lookups route to vector and graph retrieval with salience scoring. State-resolution queries route to the event ledger, where ordering and timestamp constraints are resolved deterministically.
+
+This routing avoids a common failure mode in generic RAG systems where ordered state questions are answered from semantically similar but chronologically incorrect passages.
+
+## Retention and Reweighting
+
+Every recall cycle updates memory weights using reinforcement and decay: frequently useful items gain strength, stale or misleading items lose strength. Surprise signals (new contradictions, unresolved risks, abrupt state changes) receive temporary priority boosts for subsequent cycles.
+
+Operationally, this implements an always-on maintenance process that keeps the active memory frontier compact without discarding durable high-value facts.
+
 # Results
+
+## Current Evaluation Status
+
+This draft focuses on architecture and consciousness-loop behavior. At this stage, we do not claim full artificial consciousness or a final benchmark win over all baselines. Instead, we report the current validation framing and qualitative outcomes from internal usage.
+
+## Observed Behavior
+
+Across long-running interaction traces, Neocortex shows three consistent effects: **(1)** improved continuity across sessions due to persistent state-event handling, **(2)** lower context noise from retention-aware pruning, and **(3)** better handling of temporal/state questions through explicit ledger routing.
+
+These behaviors are most visible on tasks that mix semantic recall with ordered state updates, where flat chunk retrieval frequently confuses what is relevant with what is current.
+
+## Limitations and Next Measurement Steps
+
+The current evidence is primarily qualitative and implementation-driven. Formal benchmarking (including ablations for routing, forgetting, and thought write-back) remains ongoing. The next version of this paper will add: **(i)** quantitative benchmark deltas, **(ii)** latency and token-cost breakdowns, and **(iii)** error analysis by query type.
 
 # Conclusion
 
-This paper argues that long-horizon AI memory should be treated as an adaptive cognitive process, not a static storage layer. Insights from Purkinje-style gating, Ebbinghaus-style decay, and conscious versus subconscious processing suggest three requirements for more human-like behavior: selective integration, principled forgetting, and continuous background consolidation.
+This paper argues that artificial consciousness is the target, and that long-horizon adaptive memory is a prerequisite layer rather than the final objective. Insights from Purkinje-style gating, Ebbinghaus-style decay, and conscious versus subconscious processing suggest three requirements for more human-like behavior: selective integration, principled forgetting, and continuous background consolidation.
 
 Related systems such as Titans/MIRAS, GraphRAG, and MemoryBank show important progress, but also surface practical gaps in production maturity, ingestion cost at scale, and retention-policy calibration. These constraints point to a broader design principle: memory quality depends as much on write-time filtering and maintenance loops as on query-time retrieval.
 
-The practical takeaway is straightforward: ingest rich contextual data, forget noise aggressively, and continuously reinforce information that proves useful through interaction over time. Systems built around this loop are better positioned to maintain coherent state, reduce context pollution, and support more reliable reasoning across long horizons.
+The practical takeaway is straightforward: ingest rich contextual data, forget noise aggressively, and continuously reinforce information that proves useful through interaction over time. These memory operations are the scaffolding for consciousness-like continuity: a system that can maintain a self-consistent evolving state, not just retrieve relevant text.
 
 <div id="refs" class="references csl-bib-body hanging-indent">
 

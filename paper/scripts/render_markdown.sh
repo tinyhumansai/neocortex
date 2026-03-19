@@ -77,6 +77,14 @@ pandoc \
     printf '%s\n' "$AUTHORS_HTML" | sed 's/^/- /'
     echo
   fi
+  echo "### Table of contents"
+  echo
+  TOC_FLAGS=()
+  if [ -s "$TMP_ABSTRACT_MD" ]; then
+    TOC_FLAGS+=(--include-abstract)
+  fi
+  python3 "$ROOT_DIR/scripts/markdown_toc.py" "${TOC_FLAGS[@]}" "$TMP_MD"
+  echo
   if [ -s "$TMP_ABSTRACT_MD" ]; then
     echo "# Abstract"
     echo
