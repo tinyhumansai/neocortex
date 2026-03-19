@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 520" width="720" height="520">
+  <defs>
+    <style type="text/css"><![CDATA[
+      .box { fill: #f8fafc; stroke: #334155; stroke-width: 2; }
+      .arrow { fill: none; stroke: #64748b; stroke-width: 2.5; marker-end: url(#m); }
+      .title { font-family: sans-serif; font-size: 15px; font-weight: 700; fill: #0f172a; }
+      .sub { font-family: sans-serif; font-size: 12px; fill: #475569; }
+      .cap { font-family: sans-serif; font-size: 14px; font-weight: 600; fill: #0f172a; }
+    ]]></style>
+    <marker id="m" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#64748b"/>
+    </marker>
+  </defs>
+  <path class="arrow" d="M 420 118 Q 500 150 500 200"/>
+  <path class="arrow" d="M 580 292 Q 520 340 420 380"/>
+  <path class="arrow" d="M 300 380 Q 200 340 140 300"/>
+  <path class="arrow" d="M 140 200 Q 200 120 300 79"/>
+
+  <rect class="box" x="250" y="40" width="220" height="78" rx="10"/>
+  <text x="360" y="68" text-anchor="middle" class="title">1. Ingest</text>
+  <text x="360" y="88" text-anchor="middle" class="sub">Contextual data to memory stores</text>
+  <text x="360" y="105" text-anchor="middle" class="sub">(noise filtering)</text>
+
+  <rect class="box" x="470" y="200" width="220" height="92" rx="10"/>
+  <text x="580" y="232" text-anchor="middle" class="title">2. Recall and thoughts</text>
+  <text x="580" y="252" text-anchor="middle" class="sub">Interval recall, lightweight LLM</text>
+  <text x="580" y="270" text-anchor="middle" class="sub">Thought production</text>
+
+  <rect class="box" x="250" y="380" width="220" height="78" rx="10"/>
+  <text x="360" y="412" text-anchor="middle" class="title">3. Action decision</text>
+  <text x="360" y="432" text-anchor="middle" class="sub">Act externally or stay passive</text>
+
+  <rect class="box" x="30" y="200" width="220" height="100" rx="10"/>
+  <text x="140" y="232" text-anchor="middle" class="title">4. Memory update</text>
+  <text x="140" y="252" text-anchor="middle" class="sub">Reweight recalled items</text>
+  <text x="140" y="270" text-anchor="middle" class="sub">Persist thoughts into context memory</text>
+
+  <text x="360" y="268" text-anchor="middle" class="cap">Consciousness loop</text>
+</svg>

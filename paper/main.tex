@@ -16,12 +16,24 @@
 \usepackage{microtype}      % microtypography
 \usepackage{graphicx}
 \usepackage{float}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
 \graphicspath{ {./images/} }
+\AtBeginDocument{
+  \newgeometry{
+    textheight=9in,
+    textwidth=5.1in,
+    top=1in,
+    headheight=14pt,
+    headsep=25pt,
+    footskip=30pt
+  }
+}
 \raggedbottom
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 
-\title{Neocortex\\\large Artificial consciousness with a surprise-weighted context system}
+\title{Neocortex - WIP/Draft\\\large Artificial consciousness with a high throughput context system}
 
 \author{
  Steven Enamakel \\
@@ -241,10 +253,49 @@ consolidation over time.
 After establishing the biological motivation and memory foundations, we
 now describe the key concept of this paper. Building an artificial consciousness.
 
-The consciousness loop in Neocortex is intentionally simple: \textbf{ingest
-first, then periodically reflect}. The system is designed to accumulate
-rich context about a user or entity over long horizons, then transform
-that context into compact, continuously updated internal thoughts.
+The consciousness loop in Neocortex runs in \textbf{four phases}:
+\textbf{(1)} ingest, \textbf{(2)} interval-based recall and thought
+synthesis, \textbf{(3)} action decision, and \textbf{(4)} memory updates.
+The system accumulates rich context about a user or entity over long
+horizons, then transforms that context into compact internal thoughts that
+persist and compete for recall in later cycles.
+
+% Vector sketch (optional): figures/consciousness-loop.svg
+\begin{figure}[H]
+\centering
+\resizebox{0.98\linewidth}{!}{%
+\begin{tikzpicture}[
+  font=\footnotesize,
+  box/.style={rectangle, draw=black!55, line width=0.7pt, rounded corners=4pt,
+    fill=black!4, align=center, inner sep=5pt, text width=2.6cm, minimum height=2.1cm},
+  arr/.style={-{Stealth[length=2.2mm]}, draw=black!40, line width=0.9pt}
+]
+  \node[box] (n1) at (0,3.1)
+    {\normalsize\bfseries 1.\ Ingest\\[3pt]
+     \scriptsize Contextual data to memory stores\\
+     \scriptsize (noise filtering)};
+  \node[box] (n2) at (3.5,0)
+    {\normalsize\bfseries 2.\ Recall \& thoughts\\[3pt]
+     \scriptsize Interval recall, lightweight LLM\\
+     \scriptsize Thought production};
+  \node[box] (n3) at (0,-3.1)
+    {\normalsize\bfseries 3.\ Action decision\\[3pt]
+     \scriptsize Act externally or stay passive};
+  \node[box] (n4) at (-3.5,0)
+    {\normalsize\bfseries 4.\ Memory update\\[3pt]
+     \scriptsize Reweight recalled items\\
+     \scriptsize Persist thoughts into context memory};
+  \node[font=\small\bfseries] at (0,0) {Consciousness loop};
+  \draw[arr] (n1.east) .. controls (2.2,2.2) and (2.2,1.2) .. (n2.north);
+  \draw[arr] (n2.south) .. controls (2.2,-1.2) and (1.2,-2.2) .. (n3.east);
+  \draw[arr] (n3.west) .. controls (-1.2,-2.2) and (-2.2,-1.2) .. (n4.south);
+  \draw[arr] (n4.north) .. controls (-2.2,1.2) and (-1.2,2.2) .. (n1.west);
+\end{tikzpicture}%
+}
+\caption{Control loop: ingest, periodic recall and thought synthesis, action
+decision, then memory reweighting and persistence of new thoughts.}
+\label{fig:consciousness-loop}
+\end{figure}
 
 \subsection{Phase 1: Large-Scale Contextual Ingestion}
 
@@ -274,17 +325,36 @@ system passes this compact recall packet to a lightweight LLM prompt.
 The objective of this prompt is not long-form generation but
 \textbf{thought production}: concise latent-state updates such as
 ``new preference inferred,'' ``contradiction detected,'' ``follow-up risk,''
-or ``candidate next action.'' These synthesized thoughts are then written
-back as first-class memory artifacts, closing the loop and enabling the
-next recall cycle to build on prior internal reasoning.
+or ``candidate next action.''
+
+\subsection{Phase 3: Action Decision}
+
+The third phase evaluates whether the system should \textbf{take external
+action} or remain passive. Given the recalled context and the synthesized
+thoughts, a policy decides if an outbound step is warranted---for example
+sending a follow-up, surfacing a reminder, updating an external system,
+or deferring until more evidence accumulates. When no action meets
+confidence or priority thresholds, the loop continues with internal
+updates only.
+
+\subsection{Phase 4: Memory Update and Thought Persistence}
+
+The fourth phase closes the cycle by \textbf{reweighting} every memory
+item that participated in this recall round: items that proved useful
+gain reinforcement (stronger future recall), while items that contributed
+little or misled decay faster. The new thoughts from Phase~2 are
+\textbf{inserted into persistent context memory} as durable artifacts, so
+they can be retrieved in future cycles alongside raw ingested data.
+Together, reweighting and thought insertion implement subconscious
+consolidation: the internal model shifts before the next interval begins.
 
 \subsection{Why This Loop Matters}
 
-This ingest--recall--think pattern separates expensive context
-accumulation from cheap continuous cognition. By using periodic recall
-and lightweight prompting, Neocortex can maintain an evolving internal
-model of a user or entity without requiring a large model invocation at
-every interaction.
+This four-phase pattern---ingest, recall and think, decide on action, then
+update memory---separates expensive context accumulation from cheap
+continuous cognition. Periodic recall, lightweight prompting, and explicit
+write-back of thoughts and weights let Neocortex maintain an evolving
+internal model without a large model invocation at every interaction.
 
 \section{Implementation}
 \section{Results}
@@ -292,17 +362,25 @@ every interaction.
 
 \section{Conclusion}
 
-We presented Neocortex, a high-level memory pipeline for long-term AI
-systems that integrates coherence memory, state-ledger memory,
-interaction reinforcement, and forgetting plus surprise dynamics. The
-architecture is motivated by both recent memory-augmented language-model
-research and cognitive theories of retention and prediction error. The
-central idea is that memory should be written in structured form,
-recalled through routed mechanisms, strengthened through use, and
-allowed to forget when it no longer matters. We argue that such systems
-are better aligned with both practical retrieval needs and efficient
-token use, because they prioritize what is recent, reinforced, and
-informative rather than treating all stored text as equally valuable.
+This paper argues that long-horizon AI memory should be treated as an
+adaptive cognitive process, not a static storage layer. Insights from
+Purkinje-style gating, Ebbinghaus-style decay, and conscious versus
+subconscious processing suggest three requirements for more human-like
+behavior: selective integration, principled forgetting, and continuous
+background consolidation.
+
+Related systems such as Titans/MIRAS, GraphRAG, and MemoryBank show
+important progress, but also surface practical gaps in production
+maturity, ingestion cost at scale, and retention-policy calibration.
+These constraints point to a broader design principle: memory quality
+depends as much on write-time filtering and maintenance loops as on
+query-time retrieval.
+
+The practical takeaway is straightforward: ingest rich contextual data,
+forget noise aggressively, and continuously reinforce information that
+proves useful through interaction over time. Systems built around this
+loop are better positioned to maintain coherent state, reduce context
+pollution, and support more reliable reasoning across long horizons.
 
 \bibliographystyle{unsrt}
 \nocite{
