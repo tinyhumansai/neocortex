@@ -73,7 +73,7 @@ token budgets. Memory is substrate for continuity, not the end goal.
 \begin{figure}[H]
   \centering
   \includegraphics[width=\linewidth,height=0.36\textheight,keepaspectratio]{figures/consciousness-architecture.png}
-  \caption{Three external inputs---\textbf{user data (noise)}, \textbf{user prompts}, and \textbf{conscious thoughts}---feed \textbf{memory}, \textbf{LLM/inference}, and \textbf{recall} respectively; the \textbf{consciousness loop} coordinates the stack each interval. Dashed path: write-back into memory; most code sits in inference.}
+  \caption{Three external inputs feed \textbf{memory}, \textbf{model weights / transformer}, and \textbf{recall} (with \textbf{user-specific weights} and a \textbf{reinforcement module}), all inside the dotted \textbf{inference} bundle. Dashed path: write-back into memory.}
   \label{fig:consciousness-architecture}
 \end{figure}
 \endgroup
@@ -133,8 +133,8 @@ consolidation over time.
 
 This paper introduces \textbf{Neocortex}, a product-level architecture for
 artificial consciousness that uses adaptive memory as its substrate.
-Figure~\ref{fig:consciousness-architecture} summarizes the repeating interval
-at a high level. It
+Figure~\ref{fig:consciousness-architecture} summarizes the inference stack and
+external inputs at a high level. It
 unifies these strands into a single operational
 pipeline. Neocortex continuously ingests new experience into structured
 memory and recalls context through a blend of semantic relevance,
