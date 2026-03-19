@@ -4,10 +4,7 @@ Neocortex offers SDKs and integrations across multiple languages and frameworks.
 
 ## SDKs
 
-| SDK                                     | Language   | Install                              | Description                                       |
-| --------------------------------------- | ---------- | ------------------------------------ | ------------------------------------------------- |
-| [**Python SDK**](high-level-sdk.md)     | Python     | `pip install tinyhumansai`           | Cloud API — managed memory layer, no infra needed |
-| [**TypeScript SDK**](typescript-sdk.md) | TypeScript | `npm install @alphahuman/memory-sdk` | Cloud API for Node.js and browser environments    |
+<table><thead><tr><th>SDK</th><th>Language</th><th width="192.359375">Install</th><th>Description</th></tr></thead><tbody><tr><td><a href="high-level-sdk.md"><strong>Python SDK</strong></a></td><td>Python</td><td><code>pip install tinyhumansai</code></td><td>Cloud API: managed memory layer, no infra needed</td></tr><tr><td><a href="typescript-sdk.md"><strong>TypeScript SDK</strong></a></td><td>TypeScript</td><td><code>npm install @alphahuman/memory-sdk</code></td><td>Cloud API for Node.js and browser environments</td></tr></tbody></table>
 
 ## Integrations
 

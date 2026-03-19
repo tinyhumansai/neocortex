@@ -1,16 +1,32 @@
+---
+description: The memory layer for AI agents. Scales to 1B+ tokens.
+---
+
 # Introducing Neocortex 🧠
 
-The human brain doesn't try to remember every passing detail — it aggressively prunes noise to maintain sharp, focused recall of what truly matters. Traditional AI memory systems do the opposite: they retrieve whatever is _similar_, but similar doesn't mean important. The result? Your AI drowns in stale, irrelevant context that degrades every response.
+Every AI memory system you've used does the same thing: store everything, retrieve by similarity, hope for the best.
 
-**Neocortex** is a brain-inspired AI memory system that **intelligently forgets noise**. Just like you don't remember every sentence you've ever read, Neocortex lets low-value memories naturally decay while reinforcing the knowledge that matters — the things you interact with, recall, and build upon.
+The outcome: Your agent drowns in stale context. Responses degrade. Costs inflate. You end up writing custom pruning logic at 2am.
 
-The result: an AI memory system that can process over **1 billion tokens**, stays lean and focused, and gets smarter with every interaction.
+Neocortex takes a fundamentally different approach. Inspired by how the human brain actually works, it **intelligently forgets noise** so your AI only reasons over what matters. Low-value memories decay naturally over time. Knowledge your users interact with gets reinforced and rises to the top. It doesn't require manual cleanup and there is no context window anxiety.
+
+The result: an AI memory system that processes over **1 billion tokens**, stays lean and focused, and gets smarter with every interaction.
+
+For a deployment serving 100,000 users with ongoing conversation history:
+
+| Approach                                       | Cost per user per year |
+| ---------------------------------------------- | ---------------------- |
+| Frontier model context (everything in-context) | \~$90,000              |
+| Standard RAG pipeline                          | \~$2.40                |
+| **Neocortex**                                  | **\~$0.72**            |
+
+The 1,000:1 compression ratio means storage and compute costs grow slowly relative to conversation volume. Neocortex indexes a conversation for $0.0004, compared to $0.0112 for Mem0 (28x lower).
 
 ## Core Features
 
 ### Intelligent Noise Filtering
 
-Memories that aren't accessed naturally decay over time. Frequently recalled knowledge becomes more durable. No manual cleanup needed — the system stays lean on its own.
+Memories that aren't accessed naturally decay over time. Frequently recalled knowledge becomes more durable. The system stays lean on its own without manual cleanup and intervention.
 
 <div align="center"><img src=".gitbook/assets/AppleEmailGraph.gif" alt="Memory Decay Simulation" width="700"></div>
 
@@ -18,11 +34,19 @@ Memories that aren't accessed naturally decay over time. Frequently recalled kno
 
 Not all memories are equal. Views, reactions, replies, and content creation all signal what matters. Knowledge people engage with rises to the top; ignored information fades away.
 
+
+
 <div align="center"><img src=".gitbook/assets/BobMemoryDecayVideo.gif" alt="Interaction Graph" width="700"></div>
 
 ### Low Latency, Low Cost, High Quality
 
-No compromise on speed and quality when processing data with Neocortex. Everything is processed at low cost and low latency while maintaining high benchmark scores.
+No compromise on speed and quality when processing data with Neocortex. Everything is processed at low cost and low latency while maintaining high benchmark scores
+
+| Metric          | Neocortex  | Nearest Competitor        |
+| --------------- | ---------- | ------------------------- |
+| Average latency | \~1.1s     | \~3.6s (Mem0)             |
+| Query cost      | \~$0.00095 | \~$0.00085 (Mem0)         |
+| Index cost      | \~$0.0005  | \~$0.014 (Mem0, 28x more) |
 
 ## Quick Start
 
@@ -50,6 +74,8 @@ response = client.recall_with_llm(
 )
 print(response.text)  # The user prefers dark mode
 ```
+
+That's it. Ingest memories, recall them with any LLM. Neocortex handles the hard parts: deduplication, decay, graph-based retrieval, and noise pruning.
 
 {% hint style="info" %}
 Neocortex is currently in **closed alpha**. To get access, [reach out to us](mailto:founders@tinyhumans.ai).

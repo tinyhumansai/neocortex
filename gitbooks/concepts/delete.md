@@ -24,8 +24,8 @@ client.delete_memory(namespace="preferences", delete_all=True)
 
 Most of the time, you can let [memory decay](memory-decay.md) handle cleanup naturally. Use explicit deletion when:
 
-- A user requests their data be removed
-- Information is known to be incorrect and should not influence future recall
-- You're resetting or rebuilding a namespace
+* A user requests their data be removed
+* Information is known to be incorrect and should not influence future recall
+* You're resetting or rebuilding a namespace
 
-Deletion is **permanent and immediate** — the memory is gone, not just decayed.
+Deletion is **permanent and immediate** the memory is gone, not just decayed.

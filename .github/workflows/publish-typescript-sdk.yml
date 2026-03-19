@@ -2,12 +2,23 @@ name: Publish Typescript SDK
 
 on:
   workflow_dispatch:
-  release:
-    types: [published]
+  push:
+    branches:
+      - main
+    paths:
+      - "packages/sdk-typescript/**"
+
+permissions:
+  id-token: write # Required for OIDC
+  contents: read
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+    environment: Production
+    defaults:
+      run:
+        working-directory: packages/sdk-typescript
     permissions:
       contents: read
       id-token: write
@@ -19,12 +30,12 @@ jobs:
           node-version: 20
           registry-url: https://registry.npmjs.org
 
-      - run: npm ci
+      - run: corepack enable
 
-      - run: npm run build
+      - run: yarn install --frozen-lockfile
 
-      - run: npm test
+      - run: yarn build
+
+      - run: yarn test
 
       - run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

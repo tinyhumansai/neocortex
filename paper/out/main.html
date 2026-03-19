@@ -172,46 +172,61 @@
 </head>
 <body>
 <h1
-id="neocortex-a-surprise-weighted-forgetting-aware-long-term-memory-pipeline-for-retrieval-augmented-language-systems">NeoCortex:
-A Surprise-Weighted, Forgetting-Aware Long-Term Memory Pipeline for
-Retrieval-Augmented Language Systems</h1>
-<p>Large language models remain fundamentally limited by bounded context
-windows and weak persistence across interactions. While
-retrieval-augmented generation improves factual access to external
-corpora, most systems still lack a unified account of how memory should
-be written, retained, reinforced, and forgotten over time. We present ,
-a high-level memory pipeline for long-term AI systems that combines four
-complementary memory mechanisms: (1) over chunks, entities, and
-relations, (2) an append-only for deterministic state reconstruction,
-(3) that reinforces content through user and workspace engagement, and
-(4) that decay stale memory while boosting informative novelty. The
-proposed architecture is inspired by cognitive theories of memory
-retention and prediction error, as well as recent work on long-term
-memory for language models. NeoCortex separates write-time structuring
-from recall-time routing, enabling both open-ended semantic retrieval
-and deterministic resolution of state-style queries such as location,
-ownership, and transitions. We argue that this design improves retrieval
-efficiency, personalization, interpretability, and token economy by
-prioritizing memory that is recent, reinforced, and behavior-changing
-rather than merely semantically similar.</p>
+id="neocortexlarge-artificial-consciousness-with-a-surprise-weighted-context-system">Neocortex\\large
+artificial consciousness with a surprise-weighted context system</h1>
+<p>{ {0.82}</p>
+<p>Current Large Language Models (LLMs) do not have consciousness or
+intrinsic intellect; they generate text based on training data by
+modeling language patterns rather than experiencing understanding.
+Furthermore, current LLMs are limited by bounded context windows;
+increasing them requires exponentially more compute and memory. While
+RAGs (Retrieval Augmented Generation) improve factual access to external
+corpora, they are not smart enough in simulating an artificial
+consciousness. \\</p>
+<p>The human brain is an incredibly power-efficient, parallel
+noise-cutting engine. Inspired by this, We design Neocortex, a
+contextual memory system that implements memory at inference time. It
+unifies coherence memory, a state event ledger, interaction memory and
+forgetting/surprise dynamics, to create a powerful, compute-efficient,
+artificial consciousness. }</p>
 <h2 id="introduction">Introduction</h2>
-<p>Contemporary language systems are highly capable within a bounded
-context window, yet they remain weak at persistent memory. Standard
-retrieval-augmented generation (RAG) addresses this limitation by
-retrieving passages from external stores, but naive retrieval often
-treats memory as a flat collection of text chunks. This makes it
-difficult to distinguish between broad semantic context, explicit state
-transitions, user-specific salience, and stale or redundant facts.</p>
-<p>Human memory offers a useful conceptual alternative. Memory is not
-merely stored and retrieved; it is reinforced through use, decays over
-time, and is selectively updated when new experiences are surprising or
-contradictory. Recent work in long-term memory for language models has
-begun to move in this direction, including forgetting-aware memory
-updates, episodic segmentation, graph-based retrieval, and persistent
-neural memory modules. However, these ideas are often studied
-separately.</p>
+<p>Modern LLMs can reason impressively within a single prompt, but
+building long-horizon systems remains hard. Despite steady progress in
+reasoning, LLMs are still constrained by finite context windows and weak
+persistence across interactions. Reasoning-oriented LLMs can allocate
+more computation to multi-step deliberation, yet they remain highly
+sensitive to what is placed into context, and naive RAG retrieval often
+treats memory as a flat collection of text chunks. Simply scaling
+context windows is expensive: attention and KV-cache costs grow rapidly
+with sequence length, and longer prompts can reduce accuracy by
+injecting irrelevant material, diluting key evidence, and increasing the
+chance that the model attends to the wrong details. Practical
+long-horizon systems therefore need memory mechanisms that select,
+structure, and refresh context rather than simply making the window
+bigger.</p>
+<p>In parallel, a growing ecosystem of memory tooling has emerged that
+is already highly efficient at storing and retrieving information for
+LLM applications. Systems such as MemGPT, mem0, and Supermemory maintain
+external memory stores and retrieval policies that can prioritize
+memories by time/recency, entities and user profiles, interaction
+history, or task-specific reasoning needs. These approaches demonstrate
+that the core bottleneck is often not storage, but selecting the right
+facts at the right time under tight latency and token budgets.</p>
+<p>The human brain faces an extreme noise problem: it continuously
+receives high-volume, ambiguous, and often redundant signals, yet it
+filters and compresses them into a small set of salient memories that
+influence future behavior. Many current LLM memory systems can store and
+retrieve efficiently, but they struggle to consistently infer and
+surface <em>importance</em>---what should be reinforced, what should be
+forgotten, and what should be promoted to durable state---especially
+when signals are subtle, long-range, or conflicting. Human memory offers
+a useful conceptual alternative: it is reinforced through use, decays
+over time, and is selectively updated when new experiences are
+surprising or contradictory, motivating forgetting-aware updates,
+episodic segmentation, graph-based retrieval, and persistent memory
+modules.</p>
 <p>This paper introduces , a product-level memory architecture that
-unifies these strands into a single operational pipeline. NeoCortex
+unifies these strands into a single operational pipeline. Neocortex
 continuously ingests new experience into structured memory and recalls
 context through a blend of semantic relevance, recency, interaction
 history, and surprise-weighted salience. At write time, the system
@@ -227,6 +242,10 @@ rather than a passive retrieval index. In particular, efficient token
 use requires not only better retrieval, but also mechanisms for
 forgetting noise, amplifying informative novelty, and separating
 semantic context from ordered state.</p>
+<h2 id="understanding-the-human-brain">Understanding the human
+brain</h2>
+<h3 id="purkinje-cells">Purkinje cells</h3>
+<h3 id="ebbinghaus-forgetting-curve">Ebbinghaus forgetting curve</h3>
 <h2 id="related-work">Related Work</h2>
 <h3 id="long-term-memory-for-language">Long-term memory for
 language</h3>
@@ -265,7 +284,7 @@ retrieval beyond flat vector similarity. GraphRAG builds entity-centric
 knowledge graphs and supports more global, query-focused reasoning over
 corpora. HippoRAG combines graph structure with personalized PageRank to
 mimic aspects of long-term associative recall.</p>
-<p>These systems support the NeoCortex design choice to maintain a
+<p>These systems support the Neocortex design choice to maintain a
 coherence graph over entities, relations, mentions, and chunks, rather
 than relying only on chunk embeddings.</p>
 <h3 id="forgetting-and">Forgetting and</h3>
@@ -299,9 +318,9 @@ challenge is to retrieve a compact, high-value context under a token
 budget while preserving correctness and supporting continual
 updates.</p></li>
 </ul>
-<h2 id="neocortex-architecture">NeoCortex Architecture</h2>
+<h2 id="neocortex-architecture">Neocortex Architecture</h2>
 <h3 id="end-to-end-design">End-to-end design</h3>
-<p>NeoCortex continuously performs two processes:</p>
+<p>Neocortex continuously performs two processes:</p>
 <p>{.}</p>
 <ul>
 <li><p>of new experience into structured memory.</p></li>
@@ -312,7 +331,7 @@ upstream: if memory is not encoded with entity links, state events, or
 salience metadata, it cannot later be selectively recalled.</p></li>
 </ul>
 <h3 id="memory-layers">Memory layers</h3>
-<p>NeoCortex contains four complementary memory layers.</p>
+<p>Neocortex contains four complementary memory layers.</p>
 <h4 id="coherence-memory">Coherence memory</h4>
 <p>Coherence memory stores semantic and relational context over
 documents, chunks, entities, and relations. It supports open-ended
@@ -342,7 +361,7 @@ provenance tracking. Each chunk preserves local order and source
 metadata.</p>
 <h3 id="entity-and-relation">Entity and relation</h3>
 <p>extraction</p>
-<p>From each chunk, NeoCortex extracts entities and relations. These are
+<p>From each chunk, Neocortex extracts entities and relations. These are
 linked into a coherence graph with mention-level metadata such as
 frequency, position, and source support. Embeddings are stored for
 chunks, entities, and possibly relations.</p>
@@ -372,7 +391,7 @@ value is stored as <code>reward\_weight</code> and later used to
 modulate salience during retrieval.</p>
 <h2 id="recall-and-routing">Recall and Routing</h2>
 <h3 id="query-routing">Query routing</h3>
-<p>Given a query (q), NeoCortex first decides whether the question is
+<p>Given a query (q), Neocortex first decides whether the question is
 best handled by:</p>
 <ul>
 <li><p>a , or</p></li>
@@ -399,7 +418,7 @@ a deterministic answer exists, reducing hallucination risk and token
 usage.</p>
 <h2 id="forgetting-and-1">Forgetting and</h2>
 <p>Reinforcement</p>
-<p>NeoCortex models retention using an Ebbinghaus-style decay process.
+<p>Neocortex models retention using an Ebbinghaus-style decay process.
 Let (a_m) denote the age in days of memory item (m), and let (n_m)
 denote its reinforcement count. Stability is defined as</p>
 <p>[ S_m = S_0 ( 1 + (1 + n_m) ), ]</p>
@@ -419,7 +438,7 @@ increment <code>access\_count</code>, creating a closed loop:</p></li>
 <h2 id="surprise-weighted">Surprise-Weighted</h2>
 <p>Memory</p>
 <p>Pure recency and frequency are insufficient because they overvalue
-repeated background facts. NeoCortex therefore incorporates a
+repeated background facts. Neocortex therefore incorporates a
 surprise-weighted factor derived from prediction error.</p>
 <p>Let (m) be a newly ingested chunk and ((m)) its nearest prior memory
 neighborhood. A prediction-error proxy can be defined as the mismatch
@@ -444,7 +463,7 @@ Consider queries such as:</p>
 <li><p>Where was object (y) before it moved to room (z)?</p></li>
 <li><p>Which entity interacted most recently with node (u)? These are
 not just retrieval tasks. They require ordered state reconstruction over
-transitions. By maintaining an append-only ledger, NeoCortex supports
+transitions. By maintaining an append-only ledger, Neocortex supports
 deterministic resolution, provenance inspection, and conflict
 handling.</p></li>
 </ul>
@@ -457,11 +476,11 @@ free-form synthesis.</p></li>
 </ul>
 <h2 id="token-efficiency-and-product">Token Efficiency and Product</h2>
 <p>Implications</p>
-<p>The core product claim of NeoCortex is that better memory is also
+<p>The core product claim of Neocortex is that better memory is also
 better token economy. Systems consume too many tokens not only because
 context windows are small, but because they lack mechanisms to suppress
 noise and preserve only what remains behaviorally useful.</p>
-<p>NeoCortex improves token efficiency in three ways:</p>
+<p>Neocortex improves token efficiency in three ways:</p>
 <p>{.}</p>
 <ul>
 <li><p>through chunking, entity extraction, and event
@@ -473,7 +492,7 @@ reasoning. This reframes memory from a storage problem into a .</p></li>
 </ul>
 <h2 id="limitations-and-open">Limitations and Open</h2>
 <p>Questions</p>
-<p>NeoCortex is a systems architecture rather than a single end-to-end
+<p>Neocortex is a systems architecture rather than a single end-to-end
 trained model, and several issues remain open.</p>
 <p>First, surprise estimation is only as good as the baseline against
 which novelty is measured. Poor nearest-neighbor memory can misestimate
@@ -489,7 +508,7 @@ valuable.</p>
 contradiction management, uncertainty estimation, and offline memory
 consolidation.</p>
 <h2 id="conclusion">Conclusion</h2>
-<p>We presented NeoCortex, a high-level memory pipeline for long-term AI
+<p>We presented Neocortex, a high-level memory pipeline for long-term AI
 systems that integrates coherence memory, state-ledger memory,
 interaction reinforcement, and forgetting plus surprise dynamics. The
 architecture is motivated by both recent memory-augmented language-model
@@ -501,37 +520,5 @@ are better aligned with both practical retrieval needs and efficient
 token use, because they prioritize what is recent, reinforced, and
 informative rather than treating all stored text as equally
 valuable.</p>
-<h2 id="references">References</h2>
-<p>{[}1{]} Wanjun Zhong, Lianghong Guo, Qiqi Gao, He Ye, and Yanlin
-Wang. <em>MemoryBank: Enhancing Large Language Models with Long-Term
-Memory</em>. arXiv:2305.10250, 2023.</p>
-<p>{[}2{]} Ali Behrouz, Peilin Zhong, and Vahab Mirrokni. <em>Titans:
-Learning to Memorize at Test Time</em>. arXiv:2501.00663, 2025.</p>
-<p>{[}3{]} Ali Behrouz, Meisam Razaviyayn, Peilin Zhong, and Vahab
-Mirrokni. <em>It's All Connected: A Journey Through Test-Time
-Memorization, Attentional Bias, Retention, and Online Optimization</em>.
-arXiv:2504.13173, 2025.</p>
-<p>{[}4{]} Zafeirios Fountas, Martin A. Benfeghoul, Adnan Oomerjee,
-Fenia Christopoulou, Gerasimos Lampouras, Haitham Bou-Ammar, and Jun
-Wang. <em>Human-like Episodic Memory for Infinite Context LLMs</em>.
-arXiv:2407.09450, 2024.</p>
-<p>{[}5{]} Bernal Jiménez Gutiérrez, Yiheng Shu, Yu Gu, Michihiro
-Yasunaga, and Yu Su. <em>HippoRAG: Neurobiologically Inspired Long-Term
-Memory for Large Language Models</em>. arXiv:2405.14831, 2024.</p>
-<p>{[}6{]} Darren Edge, Ha Trinh, Newman Cheng, Joshua Bradley, Alex
-Chao, Apurva Mody, Steven Truitt, and Jonathan Larson. <em>From Local to
-Global: A Graph RAG Approach to Query-Focused Summarization</em>.
-arXiv:2404.16130, 2024.</p>
-<p>{[}7{]} Yaxiong Wu, Xinyue Wang, Yue Zhang, and others. <em>From
-Human Memory to AI Memory: A Survey on Memory Mechanisms in the Era of
-LLMs</em>. arXiv:2504.15965, 2025.</p>
-<p>{[}8{]} Stephan Lewandowsky, Sergio E. Hartwig, and colleagues.
-<em>Replication and Analysis of Ebbinghaus' Forgetting Curve</em>. PLOS
-ONE, 2015.</p>
-<p>{[}9{]} Anne Clewett and colleagues. <em>Predictions Transform
-Memories: How Expected Versus Unexpected Events Shape Memory</em>.
-Neuroscience and Biobehavioral Reviews, 2024.</p>
-<p>{[}10{]} Kim and colleagues. <em>Prediction Error Determines How
-Memories Are Organized in the Brain</em>. eLife, 2024.</p>
 </body>
 </html>

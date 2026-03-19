@@ -23,7 +23,7 @@ client.ingest_memories(items=[
 
 ## Upsert Behavior
 
-Ingest is an **upsert** operation — if a memory with the same `(namespace, key)` already exists, its content and metadata are updated. Otherwise a new memory is created.
+Ingest is an **upsert** operation if a memory with the same `(namespace, key)` already exists, its content and metadata are updated. Otherwise a new memory is created.
 
 This means you can safely call ingest repeatedly without worrying about duplicates. The `key` is your deduplication handle.
 

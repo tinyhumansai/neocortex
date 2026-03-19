@@ -4,7 +4,7 @@ TypeScript / JavaScript SDK for the TinyHumans Memory API.
 
 ## Requirements
 
-- Node.js 18+ (uses native `fetch`)
+* Node.js 18+ (uses native `fetch`)
 
 ## Install
 
@@ -56,11 +56,11 @@ const client = new AlphahumanMemoryClient({
 
 ### `client.ingestMemory(request)`
 
-Upserts memory items. Items are deduplicated by `(namespace, key)` — if a matching item exists, its `content` and `metadata` are updated.
+Upserts memory items. Items are deduplicated by `(namespace, key)`  if a matching item exists, its `content` and `metadata` are updated.
 
-| Field | Type | Required | Description |
-| --- | --- | --- | --- |
-| `items` | `MemoryItem[]` | yes | One or more items to ingest |
+| Field   | Type           | Required | Description                 |
+| ------- | -------------- | -------- | --------------------------- |
+| `items` | `MemoryItem[]` | yes      | One or more items to ingest |
 
 Returns `{ ingested, updated, errors }` counts.
 
@@ -68,11 +68,11 @@ Returns `{ ingested, updated, errors }` counts.
 
 Read memory items. All filter fields are optional; omitting all returns every item for the authenticated user.
 
-| Field | Type | Description |
-| --- | --- | --- |
-| `key` | `string` | Exact key match |
-| `keys` | `string[]` | Match any of the given keys |
-| `namespace` | `string` | Scope to a namespace |
+| Field       | Type       | Description                 |
+| ----------- | ---------- | --------------------------- |
+| `key`       | `string`   | Exact key match             |
+| `keys`      | `string[]` | Match any of the given keys |
+| `namespace` | `string`   | Scope to a namespace        |
 
 Returns `{ items, count }`.
 
@@ -80,12 +80,12 @@ Returns `{ items, count }`.
 
 Delete memory. At least one of `key`, `keys`, or `deleteAll` must be set.
 
-| Field | Type | Description |
-| --- | --- | --- |
-| `key` | `string` | Delete a single key |
-| `keys` | `string[]` | Delete multiple keys |
-| `namespace` | `string` | Scope deletion to a namespace |
-| `deleteAll` | `boolean` | Delete all user memory |
+| Field       | Type       | Description                   |
+| ----------- | ---------- | ----------------------------- |
+| `key`       | `string`   | Delete a single key           |
+| `keys`      | `string[]` | Delete multiple keys          |
+| `namespace` | `string`   | Scope deletion to a namespace |
+| `deleteAll` | `boolean`  | Delete all user memory        |
 
 Returns `{ deleted }` count.
 

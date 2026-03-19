@@ -33,7 +33,7 @@
 
 ## Benchmarks
 
-* [Overview](benchmarks/README.md)
+* [Overview](benchmarks/benchmarks.md)
 * [RAGAS](benchmarks/ragas.md)
 * [TemporalBench](benchmarks/temporalbench.md)
 * [BABILong](benchmarks/babilong.md)

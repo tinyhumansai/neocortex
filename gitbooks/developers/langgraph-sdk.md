@@ -4,9 +4,9 @@ Drop-in memory tools for [LangGraph](https://langchain-ai.github.io/langgraph/) 
 
 ## Requirements
 
-- Python 3.9+
-- `langgraph >= 0.2`
-- `langchain-core >= 0.3`
+* Python 3.9+
+* `langgraph >= 0.2`
+* `langchain-core >= 0.3`
 
 ## Install
 
@@ -14,7 +14,7 @@ Drop-in memory tools for [LangGraph](https://langchain-ai.github.io/langgraph/) 
 pip install alphahuman-langgraph
 ```
 
-## Quick Start — Factory Pattern (Recommended)
+## Quick Start: Factory Pattern (Recommended)
 
 Use `make_memory_tools` to create tools with credentials baked in. Credentials are **never** exposed to the LLM as tool parameters, preventing prompt-injection attacks.
 
@@ -62,11 +62,11 @@ tools = get_tools()
 
 ## Available Tools
 
-| Tool | Description |
-| --- | --- |
-| `alphahuman_ingest_memory` | Upsert one or more memory items |
-| `alphahuman_read_memory` | Read items filtered by key / keys / namespace |
-| `alphahuman_delete_memory` | Delete items by key / keys / delete\_all |
+| Tool                       | Description                                   |
+| -------------------------- | --------------------------------------------- |
+| `alphahuman_ingest_memory` | Upsert one or more memory items               |
+| `alphahuman_read_memory`   | Read items filtered by key / keys / namespace |
+| `alphahuman_delete_memory` | Delete items by key / keys / delete\_all      |
 
 ## Error Handling
 

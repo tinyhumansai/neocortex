@@ -17,7 +17,7 @@ print(ctx.count)    # Number of items returned
 
 ## How It Works
 
-Recall is **prompt-driven** — the system uses your query to find the most relevant memories, not just the most recent. Neocortex considers semantic relevance, time-decay, and interaction signals to rank results.
+Recall is **prompt-driven:** the system uses your query to find the most relevant memories, not just the most recent. Neocortex considers semantic relevance, time-decay, and interaction signals to rank results.
 
 ## Filter by Key
 

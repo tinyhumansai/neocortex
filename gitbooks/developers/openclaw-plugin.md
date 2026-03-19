@@ -8,8 +8,8 @@ The OpenClaw plugin adds Neocortex memory to agents built with the [OpenClaw](ht
 
 ## What to Expect
 
-- **Drop-in plugin** — register once and your OpenClaw agents gain memory tools automatically
-- **Same API** — uses the same ingest/read/delete memory operations as the other SDKs
-- **Credential isolation** — API keys are configured at the plugin level, never exposed to the LLM
+* **Drop-in plugin** register once and your OpenClaw agents gain memory tools automatically
+* **Same API** uses the same ingest/read/delete memory operations as the other SDKs
+* **Credential isolation** API keys are configured at the plugin level, never exposed to the LLM
 
-Stay tuned — [reach out](mailto:founders@tinyhumans.ai) if you'd like early access.
+Stay tuned or [reach out](mailto:founders@tinyhumans.ai) if you'd like early access.

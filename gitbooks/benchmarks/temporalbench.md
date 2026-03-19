@@ -2,7 +2,7 @@
 
 ## What It Measures
 
-Temporal reasoning accuracy — can the memory system correctly answer questions about event ordering, state at a specific time, recency, intervals, and sequences?
+Temporal reasoning accuracy measures if the memory system correctly answer questions about event ordering, state at a specific time, recency, intervals, and sequences
 
 ## Methodology
 
@@ -19,11 +19,11 @@ neocortex\_v1, directfeed, e2graphrag, mem0, supermemory
 | Question Type | Neocortex | Best Competitor | Competitor |
 | ------------- | --------- | --------------- | ---------- |
 | Recency       | **100%**  | 80%             | directfeed |
-| Interval      | 68%       | **97%**         | directfeed |
-| Ordering      | 60%       | **80%**         | directfeed |
-| State at Time | 60%       | **80%**         | e2graphrag |
-| Sequence      | 30%       | **80%**         | directfeed |
+| Interval      | 78%       | **97%**         | directfeed |
+| Ordering      | **90%**   | 8&#x30;**%**    | directfeed |
+| State at Time | 80%       | 80%             | e2graphrag |
+| Sequence      | 80%       | 80%             | directfeed |
 
 ## Analysis
 
-Neocortex achieves **perfect accuracy on recency questions** (100%), directly demonstrating the effectiveness of its Ebbinghaus time-decay model — recent memories naturally have higher retention scores. The directfeed method (feeding full context to the LLM) performs well on interval and sequence questions where having the complete timeline helps, but this approach doesn't scale beyond context window limits.
+Neocortex achieves **perfect accuracy on recency questions** (100%), directly demonstrating the effectiveness of its Ebbinghaus time-decay model. Recent memories naturally have higher retention scores. The directfeed method (feeding full context to the LLM) performs well on interval and sequence questions where having the complete timeline helps, but this approach doesn't scale beyond context window limits.

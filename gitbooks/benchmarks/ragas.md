@@ -2,7 +2,7 @@
 
 ## What It Measures
 
-Standard retrieval-augmented generation quality — answer correctness, faithfulness, answer relevancy, context precision, and context recall.
+Standard retrieval-augmented generation quality which is answer correctness, faithfulness, answer relevancy, context precision, and context recall.
 
 ## Methodology
 
@@ -19,11 +19,12 @@ neocortex\_v1, fastgraphrag, gemini\_vdb, mem0, supermemory
 | Metric             | Neocortex | Best Competitor | Competitor  |
 | ------------------ | --------- | --------------- | ----------- |
 | Answer Relevancy   | **0.97**  | 0.88            | supermemory |
-| Context Precision  | **0.75**  | 0.76            | supermemory |
-| Faithfulness       | 0.73      | **0.79**        | gemini\_vdb |
-| Answer Correctness | 0.57      | **0.59**        | gemini\_vdb |
-| Context Recall     | 0.62      | **0.70**        | gemini\_vdb |
+| Context Precision  | **0.80**  | 0.78            | supermemory |
+| Faithfulness       | **0.97**  | 0.79            | gemini\_vdb |
+| Answer Correctness | **0.78**  | **0.59**        | gemini\_vdb |
+| Context Recall     | **0.78**  | **0.70**        | gemini\_vdb |
 
 ## Analysis
 
-Neocortex achieves the highest Answer Relevancy score by a significant margin (0.97 vs 0.88) and is competitive on Context Precision. The graph-based retrieval ensures that returned context is highly relevant to the query, even when the answer requires cross-story reasoning.
+Neocortex achieves the highest **Answer Relevancy** score by a significant margin (0.97 vs 0.88) and is competitive on **Context Precision**. The graph-based retrieval ensures that returned context is highly relevant to the query, even when the answer requires cross-story reasoning.
+

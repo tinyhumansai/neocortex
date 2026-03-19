@@ -1,6 +1,6 @@
-# TinyHumans SDK (Cloud)
+# Python SDK
 
-The TinyHumans SDK provides a managed, cloud-hosted memory layer for AI applications. No infrastructure required — just install and start storing memories.
+The TinyHumans SDK provides a managed, cloud-hosted memory layer for AI applications. No infrastructure require just install and start storing memories.
 
 ## Installation
 
@@ -33,14 +33,14 @@ with api.TinyHumanMemoryClient(token="...", model_id="...") as client:
 
 **Memory items** are the basic unit of storage. Each item has:
 
-| Field | Required | Description |
-| --- | --- | --- |
-| `key` | yes | Unique identifier within a namespace (used for upsert/dedup) |
-| `content` | yes | The memory text |
-| `namespace` | yes | Scope for organizing items |
-| `metadata` | no | Arbitrary dict for tagging/filtering |
-| `created_at` | no | Unix timestamp in seconds |
-| `updated_at` | no | Unix timestamp in seconds |
+| Field        | Required | Description                                                  |
+| ------------ | -------- | ------------------------------------------------------------ |
+| `key`        | yes      | Unique identifier within a namespace (used for upsert/dedup) |
+| `content`    | yes      | The memory text                                              |
+| `namespace`  | yes      | Scope for organizing items                                   |
+| `metadata`   | no       | Arbitrary dict for tagging/filtering                         |
+| `created_at` | no       | Unix timestamp in seconds                                    |
+| `updated_at` | no       | Unix timestamp in seconds                                    |
 
 **Namespaces** let you organize memories by category (e.g. `"preferences"`, `"conversation-history"`, `"user-facts"`).
 
@@ -50,7 +50,7 @@ with api.TinyHumanMemoryClient(token="...", model_id="...") as client:
 
 ### `ingest_memory`
 
-Upsert a single memory item. Deduped by `(namespace, key)` — if a match exists, it is updated; otherwise a new item is created.
+Upsert a single memory item. Deduped by `(namespace, key)`  if a match exists, it is updated; otherwise a new item is created.
 
 ```python
 result = client.ingest_memory(

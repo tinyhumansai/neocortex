@@ -1,7 +1,7 @@
 {
-  "name": "@tinyhumansai/memory-sdk",
-  "version": "0.1.0",
-  "description": "TypeScript SDK for Alphahuman Memory API - insert, query, delete, recall",
+  "name": "@tinyhumansai/neocortex",
+  "version": "0.1.2",
+  "description": "TypeScript SDK for TinyHumans Neocortex API - insert, query, delete, recall",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
