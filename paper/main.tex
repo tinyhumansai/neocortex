@@ -101,6 +101,65 @@ index. In particular, efficient token use requires not only better
 retrieval, but also mechanisms for forgetting noise, amplifying
 informative novelty, and separating semantic context from ordered state.
 
+\section{Related Work}
+
+\subsection{Long-term memory for language
+models}
+
+Several recent systems address persistent memory in LLMs. MemoryBank
+augments conversational agents with a long-term memory store and a
+forgetting-aware update mechanism inspired by the Ebbinghaus forgetting
+curve. Its core contribution is the explicit treatment of memory
+retention as a dynamic process rather than static storage.
+
+Titans introduces a neural long-term memory module that complements
+short-term attention, framing attention as short-term memory and
+persistent neural memory as a longer-lived store. The later MIRAS
+framework generalizes this view by casting sequence models as
+associative memory systems with explicit retention and attentional bias
+mechanisms.
+
+These approaches motivate the idea that memory should not be identified
+with the context window alone. Instead, memory should be structured,
+persistent, and updated through principled retention mechanisms.
+
+\subsection{Episodic segmentation and
+surprise}
+
+EM-LLM shows that long-context performance benefits from segmenting
+experience into events using Bayesian surprise and graph-theoretic
+boundary refinement. This is highly relevant to systems that must
+distinguish routine background information from important shifts in
+world state.
+
+In cognitive science and neuroscience, prediction error has long been
+linked to memory updating, event segmentation, and adaptive learning.
+Unexpected events can either strengthen encoding or trigger the
+formation of a new memory boundary. This motivates the use of surprise
+as a write-time salience signal in memory systems.
+
+\subsection{Graph-based memory and
+retrieval}
+
+GraphRAG and HippoRAG demonstrate that graph structure can improve
+retrieval beyond flat vector similarity. GraphRAG builds entity-centric
+knowledge graphs and supports more global, query-focused reasoning over
+corpora. HippoRAG combines graph structure with personalized PageRank to
+mimic aspects of long-term associative recall.
+
+These systems support the Neocortex design choice to maintain a
+coherence graph over entities, relations, mentions, and chunks, rather
+than relying only on chunk embeddings.
+
+\subsection{Forgetting and
+retention}
+
+The Ebbinghaus forgetting curve remains a foundational model for memory
+decay, though later work suggests that the precise functional form of
+forgetting can vary. For AI systems, the key principle is operational:
+memory strength should decrease with age unless reinforced, while
+repeated retrieval or interaction should slow future decay.
+
 \section{Understanding the human brain}
 
 Before proposing implementation details, we briefly ground the design in
@@ -228,65 +287,9 @@ and lightweight prompting, Neocortex can maintain an evolving internal
 model of a user or entity without requiring a large model invocation at
 every interaction.
 
+\section{Implementation}
 \section{Results}
-\section{Related Work}
 
-\subsection{Long-term memory for language
-models}
-
-Several recent systems address persistent memory in LLMs. MemoryBank
-augments conversational agents with a long-term memory store and a
-forgetting-aware update mechanism inspired by the Ebbinghaus forgetting
-curve. Its core contribution is the explicit treatment of memory
-retention as a dynamic process rather than static storage.
-
-Titans introduces a neural long-term memory module that complements
-short-term attention, framing attention as short-term memory and
-persistent neural memory as a longer-lived store. The later MIRAS
-framework generalizes this view by casting sequence models as
-associative memory systems with explicit retention and attentional bias
-mechanisms.
-
-These approaches motivate the idea that memory should not be identified
-with the context window alone. Instead, memory should be structured,
-persistent, and updated through principled retention mechanisms.
-
-\subsection{Episodic segmentation and
-surprise}
-
-EM-LLM shows that long-context performance benefits from segmenting
-experience into events using Bayesian surprise and graph-theoretic
-boundary refinement. This is highly relevant to systems that must
-distinguish routine background information from important shifts in
-world state.
-
-In cognitive science and neuroscience, prediction error has long been
-linked to memory updating, event segmentation, and adaptive learning.
-Unexpected events can either strengthen encoding or trigger the
-formation of a new memory boundary. This motivates the use of surprise
-as a write-time salience signal in memory systems.
-
-\subsection{Graph-based memory and
-retrieval}
-
-GraphRAG and HippoRAG demonstrate that graph structure can improve
-retrieval beyond flat vector similarity. GraphRAG builds entity-centric
-knowledge graphs and supports more global, query-focused reasoning over
-corpora. HippoRAG combines graph structure with personalized PageRank to
-mimic aspects of long-term associative recall.
-
-These systems support the Neocortex design choice to maintain a
-coherence graph over entities, relations, mentions, and chunks, rather
-than relying only on chunk embeddings.
-
-\subsection{Forgetting and
-retention}
-
-The Ebbinghaus forgetting curve remains a foundational model for memory
-decay, though later work suggests that the precise functional form of
-forgetting can vary. For AI systems, the key principle is operational:
-memory strength should decrease with age unless reinforced, while
-repeated retrieval or interaction should slow future decay.
 
 \section{Problem Formulation}
 
@@ -393,8 +396,7 @@ chunks. Chunking is necessary for embedding, retrieval, citation, and
 provenance tracking. Each chunk preserves local order and source
 metadata.
 
-\subsection{Entity and relation
-extraction}
+\subsection{Entity and relation extraction}
 
 From each chunk, Neocortex extracts entities and relations. These are
 linked into a coherence graph with mention-level metadata such as
