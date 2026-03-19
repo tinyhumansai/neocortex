@@ -184,13 +184,11 @@ Current evidence is primarily qualitative. Formal benchmarking, including ablati
 
 # Conclusion
 
-This paper argues that long-horizon adaptive memory is a prerequisite for consciousness-like behavior in LLM systems.
-
 Prior work including Titans/MIRAS, GraphRAG, and MemoryBank demonstrates the importance of structured memory and retention-aware mechanisms. Neocortex extends this direction with an operational conscious-intelligence loop that integrates ingestion, interval recall, action policy, and write-back reweighting in one production workflow.
 
 Biological inspiration from the human brain (Purkinje-style endogenous activity, Ebbinghaus-style decay, and conscious/subconscious separation) maps to three engineering requirements: selective integration, principled forgetting, and continuous consolidation.
 
-Combined with a strong multi-store memory substrate and an explicit consciousness loop (ingest, recall, act, reinforce), these ingredients yield better intelligence in practice: more stable reasoning over time, lower context noise, and behavior that is less purely reactive.
+Combined with a strong memory system and an explicit consciousness loop (ingest, recall, act, reinforce), these ingredients yield better intelligence in practice.
 
 <div id="refs" class="references csl-bib-body hanging-indent">
 
