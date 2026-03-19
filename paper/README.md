@@ -1,4 +1,16 @@
-# Neocortex artificial consciousness with a surprise-weighted context system
+# Neocortex
+
+Artificial consciousness with a surprise-weighted context system
+
+### Authors
+
+- <a href="mailto:enamakel@tinyhumans.ai">Steven Enamakel (Tiny Humans)</a>
+
+# Abstract
+
+Current Large Language Models (LLMs) do not have consciousness or intrinsic intellect; they generate text based on training data by modeling language patterns rather than experiencing understanding. Furthermore, current LLMs are limited by bounded context windows; increasing them requires exponentially more compute and memory. While RAGs (Retrieval Augmented Generation) improve factual access to external corpora, they are not smart enough in simulating an artificial consciousness.
+
+The human brain is an incredibly power-efficient, parallel noise-cutting engine. Inspired by this, We design Neocortex, a contextual memory system that implements memory at inference time. It unifies coherence memory, a state event ledger, interaction memory and forgetting/surprise dynamics, to create a powerful, compute-efficient, artificial consciousness.
 
 # Introduction
 
