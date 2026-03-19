@@ -30,7 +30,7 @@ jobs:
           node-version: 20
           registry-url: https://registry.npmjs.org
 
-      - run: npm install -g yarn
+      - run: corepack enable
 
       - run: yarn install --frozen-lockfile
 
@@ -38,4 +38,4 @@ jobs:
 
       - run: yarn test
 
-      - run: yarn publish
+      - run: npm publish --provenance --access public
