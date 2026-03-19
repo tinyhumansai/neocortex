@@ -32,12 +32,13 @@ Before proposing implementation details, we briefly ground the design in biologi
 
 *The “we problem”* in artificial consciousness can be framed as a coordination problem: how separate signals become a coherent self-model that acts as a unified agent. In biological systems, this coherence is not produced by a single neuron, but by layered circuits that compress, filter, and synchronize information across time.
 
-Purkinje cells provide a useful computational analogy for this coordination role. As the principal output neurons of the cerebellar cortex, they integrate massive parallel input, then emit sparse, inhibitory control signals that shape downstream behavior. Their architecture highlights three design principles relevant to AI memory: **(i)** high-dimensional input integration, **(ii)** selective gating of action, and **(iii)** temporal tuning through repeated feedback (see Figure <a href="#fig:purkinje-cell-diagram" data-reference-type="ref" data-reference="fig:purkinje-cell-diagram">1</a>).
+Purkinje cells provide a useful computational analogy for this coordination role. As the principal output neurons of the cerebellar cortex, they integrate massive parallel input, then emit sparse, inhibitory control signals that shape downstream behavior. Their architecture highlights three design principles relevant to AI memory: **(i)** high-dimensional input integration, **(ii)** selective gating of action, and **(iii)** temporal tuning through repeated feedback (see Figure <a href="#fig:purkinje-cell-diagram" data-reference-type="ref" data-reference="fig:purkinje-cell-diagram">[fig:purkinje-cell-diagram]</a>).
 
-<figure id="fig:purkinje-cell-diagram" data-latex-placement="t">
-<img src="figures/purkinje-cell.png" style="width:80.0%" />
-<figcaption>Purkinje cell diagram used as a biological reference for integration and gating.</figcaption>
-</figure>
+<div class="wrapfigure">
+
+r0.45 <img src="figures/purkinje-cell.png" style="width:43.0%" alt="image" />
+
+</div>
 
 For Neocortex, this motivates a memory controller that does more than retrieve nearest neighbors. The system should aggregate semantic, episodic, and state-transition evidence, then gate what enters the active context. In other words, conscious-like behavior is approached not by storing everything, but by learning which memories should influence the current decision boundary.
 

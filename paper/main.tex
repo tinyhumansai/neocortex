@@ -15,7 +15,9 @@
 \usepackage{nicefrac}       % compact symbols for 1/2, etc.
 \usepackage{microtype}      % microtypography
 \usepackage{graphicx}
+\usepackage{float}
 \graphicspath{ {./images/} }
+\raggedbottom
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 
@@ -122,9 +124,9 @@ architecture highlights three design principles relevant to AI memory:
 gating of action, and \textbf{(iii)} temporal tuning through repeated
 feedback (see Figure~\ref{fig:purkinje-cell-diagram}).
 
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
-\includegraphics[width=0.8\linewidth]{figures/purkinje-cell.png}
+\includegraphics[width=0.75\linewidth]{figures/purkinje-cell.png}
 \caption{Purkinje cell diagram used as a biological reference for
 integration and gating.}
 \label{fig:purkinje-cell-diagram}
@@ -136,13 +138,23 @@ episodic, and state-transition evidence, then gate what enters the
 active context. In other words, conscious-like behavior is approached
 not by storing everything, but by learning which memories should
 influence the current decision boundary.
+
 \subsection{Ebbinghaus forgetting curve}
 
-The Ebbinghaus forgetting curve complements this view by formalizing a
-second constraint: \emph{retention must decay unless reinforced}. Human
-memory is adaptive precisely because it forgets low-value details while
-preserving repeatedly useful structure. A practical AI memory system
-should follow the same rule.
+As a conceptual foundation, the Ebbinghaus forgetting curve describes how
+memory retention declines over time when information is not reinforced.
+This idea is well documented and widely referenced in cognitive science
+and later replication studies \cite{lewandowsky2015ebbinghaus}. For memory
+systems, the implication is practical: high-value information should be
+rehearsed or reused, while low-value details should naturally decay.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.75\linewidth]{figures/forgetting-curve.png}
+\caption{Ebbinghaus-inspired forgetting dynamics: retention drops rapidly
+without reinforcement, motivating selective memory maintenance.}
+\label{fig:forgetting-curve}
+\end{figure}
 
 This leads to an implementation strategy before tackling stronger claims
 about artificial consciousness: encode all candidate memories at write
@@ -151,13 +163,72 @@ and utility. Neocortex operationalizes this with retention-aware scoring
 and periodic pruning, so stale or weakly supported memories lose
 influence while salient patterns remain available for recall.
 
+\subsection{Conclusion}
+
 Taken together, Purkinje-style gating and Ebbinghaus-style decay provide
 a biologically grounded bridge from the ``we problem'' to engineering
 practice. Before proposing full conscious architectures, we can already
 implement tractable mechanisms for integration, selection, and adaptive
-forgetting.
+forgetting. In operational terms, this means ingesting large volumes of
+memory-relevant data, aggressively forgetting noise, and retaining the
+most important information based on repeated interactions and observed
+utility.
 
 
+\section{Consciousness Loop}
+
+After establishing the biological motivation and memory foundations, we
+now describe the runtime control loop that makes these ideas executable.
+This section moves from conceptual framing to system behavior: what the
+platform does continuously, why it does so, and how each cycle updates
+the internal model of a user or entity.
+
+The operational loop in Neocortex is intentionally simple: \textbf{ingest
+first, then periodically reflect}. The system is designed to accumulate
+rich context about a user or entity over long horizons, then transform
+that context into compact, continuously updated internal thoughts.
+
+\subsection{Phase 1: large-scale contextual ingestion}
+
+The first phase continuously ingests heterogeneous signals that describe
+the entity's world state and behavior. In practice, this includes email
+threads, direct messages, documents, notes, tickets, logs, and other
+structured or semi-structured artifacts that can provide identity,
+intent, preference, and temporal context.
+
+At write time, raw inputs are normalized, segmented into chunks, and
+mapped into memory stores (semantic vectors, entity/relation graphs, and
+state-transition events). This allows later recall to query the same
+underlying history from multiple perspectives: ``what is relevant,'' ``who
+and what are connected,'' and ``what changed over time.''
+Critically, this phase is not a pure accumulation step: Neocortex also
+applies early noise-forgetting heuristics so low-signal, repetitive, or
+non-actionable fragments do not dominate long-term memory.
+
+\subsection{Phase 2: interval-based recall and thought synthesis}
+
+The second phase runs at regular intervals, independent of user prompts.
+During each cycle, Neocortex recalls a small, high-salience memory set
+using recency, relevance, interaction frequency, and surprise-weighted
+signals. Rather than sending the full memory graph to a heavy model, the
+system passes this compact recall packet to a lightweight LLM prompt.
+
+The objective of this prompt is not long-form generation but
+\textbf{thought production}: concise latent-state updates such as
+``new preference inferred,'' ``contradiction detected,'' ``follow-up risk,''
+or ``candidate next action.'' These synthesized thoughts are then written
+back as first-class memory artifacts, closing the loop and enabling the
+next recall cycle to build on prior internal reasoning.
+
+\subsection{Why this loop matters}
+
+This ingest--recall--think pattern separates expensive context
+accumulation from cheap continuous cognition. By using periodic recall
+and lightweight prompting, Neocortex can maintain an evolving internal
+model of a user or entity without requiring a large model invocation at
+every interaction.
+
+\section{Results}
 \section{Related Work}
 
 \subsection{Long-term memory for language

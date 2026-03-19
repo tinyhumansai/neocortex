@@ -1,6 +1,6 @@
-.PHONY: all setup build clean arxiv html markdown
+.PHONY: all setup build clean arxiv markdown
 
-all: build html markdown
+all: build markdown
 
 setup:
 	./scripts/setup.sh
@@ -8,10 +8,6 @@ setup:
 build:
 	./scripts/build.sh
 	echo "Build complete: $$ROOT_DIR/out/main.pdf"
-
-html:
-	./scripts/render_html.sh
-	echo "HTML render complete: $$ROOT_DIR/out/main.html"
 
 markdown:
 	./scripts/render_markdown.sh
