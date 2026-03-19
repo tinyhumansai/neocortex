@@ -101,6 +101,11 @@ informative novelty, and separating semantic context from ordered state.
 
 \section{Understanding the human brain}
 
+Before proposing implementation details, we briefly ground the design in
+biological memory principles. The goal is not to claim a complete neural
+equivalence, but to extract practical mechanisms for integration,
+selection, and retention that can improve long-horizon AI behavior.
+
 \subsection{Purkinje cells}
 \textit{The ``we problem''} in artificial consciousness can be framed as a
 coordination problem: how separate signals become a coherent self-model
@@ -115,7 +120,15 @@ inhibitory control signals that shape downstream behavior. Their
 architecture highlights three design principles relevant to AI memory:
 \textbf{(i)} high-dimensional input integration, \textbf{(ii)} selective
 gating of action, and \textbf{(iii)} temporal tuning through repeated
-feedback.
+feedback (see Figure~\ref{fig:purkinje-cell-diagram}).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.8\linewidth]{figures/purkinje-cell.png}
+\caption{Purkinje cell diagram used as a biological reference for
+integration and gating.}
+\label{fig:purkinje-cell-diagram}
+\end{figure}
 
 For Neocortex, this motivates a memory controller that does more than
 retrieve nearest neighbors. The system should aggregate semantic,

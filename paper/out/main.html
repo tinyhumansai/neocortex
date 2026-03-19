@@ -244,8 +244,49 @@ forgetting noise, amplifying informative novelty, and separating
 semantic context from ordered state.</p>
 <h2 id="understanding-the-human-brain">Understanding the human
 brain</h2>
+<p>Before proposing implementation details, we briefly ground the design
+in biological memory principles. The goal is not to claim a complete
+neural equivalence, but to extract practical mechanisms for integration,
+selection, and retention that can improve long-horizon AI behavior.</p>
 <h3 id="purkinje-cells">Purkinje cells</h3>
+<p>in artificial consciousness can be framed as a coordination problem:
+how separate signals become a coherent self-model that acts as a unified
+agent. In biological systems, this coherence is not produced by a single
+neuron, but by layered circuits that compress, filter, and synchronize
+information across time.</p>
+<p>Purkinje cells provide a useful computational analogy for this
+coordination role. As the principal output neurons of the cerebellar
+cortex, they integrate massive parallel input, then emit sparse,
+inhibitory control signals that shape downstream behavior. Their
+architecture highlights three design principles relevant to AI memory:
+high-dimensional input integration, selective gating of action, and
+temporal tuning through repeated feedback (see
+Figure~fig:purkinje-cell-diagram).</p>
+<p>[t]</p>
+<p>For Neocortex, this motivates a memory controller that does more than
+retrieve nearest neighbors. The system should aggregate semantic,
+episodic, and state-transition evidence, then gate what enters the
+active context. In other words, conscious-like behavior is approached
+not by storing everything, but by learning which memories should
+influence the current decision boundary.</p>
 <h3 id="ebbinghaus-forgetting-curve">Ebbinghaus forgetting curve</h3>
+<p>The Ebbinghaus forgetting curve complements this view by formalizing
+a second constraint: <em>retention must decay unless reinforced</em>.
+Human memory is adaptive precisely because it forgets low-value details
+while preserving repeatedly useful structure. A practical AI memory
+system should follow the same rule.</p>
+<p>This leads to an implementation strategy before tackling stronger
+claims about artificial consciousness: encode all candidate memories at
+write time, then modulate retention as a function of access frequency,
+recency, and utility. Neocortex operationalizes this with
+retention-aware scoring and periodic pruning, so stale or weakly
+supported memories lose influence while salient patterns remain
+available for recall.</p>
+<p>Taken together, Purkinje-style gating and Ebbinghaus-style decay
+provide a biologically grounded bridge from the ``we problem'' to
+engineering practice. Before proposing full conscious architectures, we
+can already implement tractable mechanisms for integration, selection,
+and adaptive forgetting.</p>
 <h2 id="related-work">Related Work</h2>
 <h3 id="long-term-memory-for-language">Long-term memory for
 language</h3>

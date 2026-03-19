@@ -15,8 +15,6 @@ html:
 
 markdown:
 	./scripts/render_markdown.sh
-	cp ./out/main.md ./README.md
-	echo "Markdown render complete: $$ROOT_DIR/out/main.md"
 	echo "README updated: ./README.md"
 
 clean:
