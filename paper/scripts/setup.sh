@@ -22,4 +22,10 @@ else
   echo "pandoc found: $(command -v pandoc)"
 fi
 
+if ! command -v rsvg-convert >/dev/null 2>&1; then
+  echo "rsvg-convert is not installed (needed for SVG→PNG figures). Install with: brew install librsvg"
+else
+  echo "rsvg-convert found: $(command -v rsvg-convert)"
+fi
+
 echo "Paper workspace initialized at: $ROOT_DIR"

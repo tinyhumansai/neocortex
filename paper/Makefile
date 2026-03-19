@@ -1,10 +1,14 @@
-.PHONY: all setup build clean arxiv markdown
+.PHONY: all setup build clean arxiv markdown figures-png
 
 all: build markdown
 
 setup:
 	./scripts/setup.sh
 
+figures-png:
+	./scripts/export-svgs-to-png.sh
+
+# PDF build (export-svgs-to-png runs inside scripts/build.sh).
 build:
 	./scripts/build.sh
 	echo "Build complete: $$ROOT_DIR/out/main.pdf"
