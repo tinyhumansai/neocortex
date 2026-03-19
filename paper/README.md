@@ -90,7 +90,7 @@ Any path toward more human-like memory therefore requires all three: integration
 
 After establishing the biological motivation and memory foundations, we now describe the key concept of this paper. Building an artificial consciousness.
 
-The consciousness loop in Neocortex runs in **four phases**: **(1)** ingest, **(2)** interval-based recall and thought synthesis, **(3)** action decision, and **(4)** memory updates. The system accumulates rich context about a user or entity over long horizons, then transforms that context into compact internal thoughts that persist and compete for recall in later cycles.
+The consciousness loop runs in **four phases**: **(1)** ingest, **(2)** interval-based recall and thought synthesis, **(3)** action decision, and **(4)** memory updates. The system accumulates rich context about a user or entity over long horizons, then transforms that context into compact internal thoughts that persist and compete for recall in later cycles.
 
 <figure id="fig:consciousness-loop" data-latex-placement="H">
 <img src="figures/consciousness-loop.png" style="width:98.0%" />
@@ -101,11 +101,11 @@ The consciousness loop in Neocortex runs in **four phases**: **(1)** ingest, **(
 
 The first phase continuously ingests heterogeneous signals that describe the entity’s world state and behavior. In practice, this includes email threads, direct messages, documents, notes, tickets, logs, and other structured or semi-structured artifacts that can provide identity, intent, preference, and temporal context.
 
-At write time, raw inputs are normalized, segmented into chunks, and mapped into memory stores (semantic vectors, entity/relation graphs, and state-transition events). This allows later recall to query the same underlying history from multiple perspectives: “what is relevant,” “who and what are connected,” and “what changed over time.” Critically, this phase is not a pure accumulation step: Neocortex also applies early noise-forgetting heuristics so low-signal, repetitive, or non-actionable fragments do not dominate long-term memory.
+At write time, raw inputs are normalized, segmented into chunks, and mapped into memory stores (semantic vectors, entity/relation graphs, and state-transition events). This allows later recall to query the same underlying history from multiple perspectives: “what is relevant,” “who and what are connected,” and “what changed over time.” Critically, this phase is not a pure accumulation step: the system also applies early noise-forgetting heuristics so low-signal, repetitive, or non-actionable fragments do not dominate long-term memory.
 
 ## Phase 2: Interval-Based Recall and Thought Synthesis
 
-The second phase runs at regular intervals, independent of user prompts. During each cycle, Neocortex recalls a small, high-salience memory set using recency, relevance, interaction frequency, and surprise-weighted signals. Rather than sending the full memory graph to a heavy model, the system passes this compact recall packet to a lightweight LLM prompt.
+The second phase runs at regular intervals, independent of user prompts. During each cycle, the system recalls a small, high-salience memory set using recency, relevance, interaction frequency, and surprise-weighted signals. Rather than sending the full memory graph to a heavy model, the system passes this compact recall packet to a lightweight LLM prompt.
 
 The objective of this prompt is not long-form generation but **thought production**: concise latent-state updates such as “new preference inferred,” “contradiction detected,” “follow-up risk,” or “candidate next action.”
 
@@ -119,7 +119,7 @@ The fourth phase closes the cycle by **reweighting** every memory item that part
 
 ## Why This Loop Matters
 
-This four-phase pattern—ingest, recall and think, decide on action, then update memory—separates expensive context accumulation from cheap continuous cognition. Periodic recall, lightweight prompting, and explicit write-back of thoughts and weights let Neocortex maintain an evolving internal model without a large model invocation at every interaction.
+This four-phase pattern—ingest, recall and think, decide on action, then update memory—separates expensive context accumulation from cheap continuous cognition. Periodic recall, lightweight prompting, and explicit write-back of thoughts and weights maintain an evolving internal model without a large model invocation at every interaction.
 
 # Implementation
 
