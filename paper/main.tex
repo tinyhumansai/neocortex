@@ -102,7 +102,47 @@ informative novelty, and separating semantic context from ordered state.
 \section{Understanding the human brain}
 
 \subsection{Purkinje cells}
+\textit{The ``we problem''} in artificial consciousness can be framed as a
+coordination problem: how separate signals become a coherent self-model
+that acts as a unified agent. In biological systems, this coherence is
+not produced by a single neuron, but by layered circuits that compress,
+filter, and synchronize information across time.
+
+Purkinje cells provide a useful computational analogy for this
+coordination role. As the principal output neurons of the cerebellar
+cortex, they integrate massive parallel input, then emit sparse,
+inhibitory control signals that shape downstream behavior. Their
+architecture highlights three design principles relevant to AI memory:
+\textbf{(i)} high-dimensional input integration, \textbf{(ii)} selective
+gating of action, and \textbf{(iii)} temporal tuning through repeated
+feedback.
+
+For Neocortex, this motivates a memory controller that does more than
+retrieve nearest neighbors. The system should aggregate semantic,
+episodic, and state-transition evidence, then gate what enters the
+active context. In other words, conscious-like behavior is approached
+not by storing everything, but by learning which memories should
+influence the current decision boundary.
 \subsection{Ebbinghaus forgetting curve}
+
+The Ebbinghaus forgetting curve complements this view by formalizing a
+second constraint: \emph{retention must decay unless reinforced}. Human
+memory is adaptive precisely because it forgets low-value details while
+preserving repeatedly useful structure. A practical AI memory system
+should follow the same rule.
+
+This leads to an implementation strategy before tackling stronger claims
+about artificial consciousness: encode all candidate memories at write
+time, then modulate retention as a function of access frequency, recency,
+and utility. Neocortex operationalizes this with retention-aware scoring
+and periodic pruning, so stale or weakly supported memories lose
+influence while salient patterns remain available for recall.
+
+Taken together, Purkinje-style gating and Ebbinghaus-style decay provide
+a biologically grounded bridge from the ``we problem'' to engineering
+practice. Before proposing full conscious architectures, we can already
+implement tractable mechanisms for integration, selection, and adaptive
+forgetting.
 
 
 \section{Related Work}
