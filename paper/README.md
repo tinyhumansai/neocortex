@@ -32,89 +32,91 @@ Building Artificial Consciousness with a High-Throughput Context System
 
 # Abstract
 
-Large Language Models already perform well; Retrieval-Augmented Generation (RAG) improves them further via external grounding. Neither is conscious or instinct-like: behavior stays *reactive* and *task-framed*, while retrieved context is easily **polluted** and systems stay **narrow** relative to open-ended, long-horizon coherence. They excel at explicit logical reasoning yet still fail at **sustained, open-world judgment** when evidence is partial and goals are implicit or shifting.
+Large language models are good at short tasks, but they still struggle with long-term coherence and adaptation. Most systems retrieve information, answer, and move on.
 
-present **Neocortex**, a multi-store memory architecture for inference-time adaptation: semantic and graph retrieval, an ordered state-event ledger, retention-aware forgetting, and interval-based thought synthesis. It implements an artificial consciousness loop—what to reinforce, forget, and promote to durable state—under strict latency and token budgets. Memory is substrate for continuity, not the end goal.
+present **Neocortex**, a simple ongoing intelligence loop built on top of memory. The loop continuously processes experience, learns from feedback, forgets low-value noise, and updates a persistent internal state over time. has two components: **(1)** a memory layer and **(2)** a consciousness loop. Together they provide persistent context and continuous adaptation.
 
-**Key observations.** In practice the loop supports *real-time* thought generation and streaming speech while recall and memory updates run concurrently; in representative sessions, a coherent user-specific model of context, preferences, and narrative can emerge within minutes—not after a long cold start—as a concrete step toward mapping a user’s consciousness at interaction scale.
+**Current result.** In internal usage, this approach improves continuity across sessions and helps the system adapt faster to a user’s evolving context. Our claim is practical: stronger feedback, learning, and forgetting dynamics can move AI systems closer to consciousness-like behavior and, over time, to AGI-level adaptability.
 
 # Introduction
 
-Modern LLMs can reason impressively within a single prompt, but building long-horizon systems remains hard. Despite steady progress in reasoning, LLMs are still constrained by finite context windows and weak persistence across interactions. Reasoning-oriented LLMs can allocate more computation to multi-step deliberation, yet they remain highly sensitive to what is placed into context, and naive RAG retrieval often treats memory as a flat collection of text chunks. Simply scaling context windows is expensive: attention and KV-cache costs grow rapidly with sequence length, and longer prompts can reduce accuracy by injecting irrelevant material, diluting key evidence, and increasing the chance that the model attends to the wrong details. Practical long-horizon systems therefore need memory mechanisms that select, structure, and refresh context rather than simply making the window bigger.
+Modern LLMs are strong at local reasoning but weak at long-horizon coherence. Three constraints repeatedly appear in production systems: **(i)** finite context windows, **(ii)** retrieval pollution in RAG-style pipelines (irrelevant or stale evidence), and **(iii)** lack of instinct-like consciousness, which keeps behavior narrow and reactive. Increasing context length helps only partially, because cost scales with sequence length and quality often drops when the active prompt carries too much low-signal text.
 
-In parallel, a growing ecosystem of memory tooling has emerged that is already highly efficient at storing and retrieving information for LLM applications. Systems such as MemGPT, mem0, and Supermemory maintain external memory stores and retrieval policies that can prioritize memories by time/recency, entities and user profiles, interaction history, or task-specific reasoning needs. These approaches demonstrate that the core bottleneck is often not storage, but selecting the right facts at the right time under tight latency and token budgets.
+This shifts the design focus from “more context” to “better memory control.” Practical systems must decide which evidence to admit, which evidence to decay, and which state transitions to preserve as durable history.
 
-The human brain faces an extreme noise problem: it continuously receives high-volume, ambiguous, and often redundant signals, yet it filters and compresses them into a small set of salient memories that influence future behavior. Many current LLM memory systems can store and retrieve efficiently, but they struggle to consistently infer and surface *importance*—what should be reinforced, what should be forgotten, and what should be promoted to durable state—especially when signals are subtle, long-range, or conflicting. Human memory offers a useful conceptual alternative: it is reinforced through use, decays over time, and is selectively updated when new experiences are surprising or contradictory, motivating forgetting-aware updates, episodic segmentation, graph-based retrieval, and persistent memory modules.
+Neocortex is explicitly two things: a memory layer and a consciousness loop. The memory layer provides durable context; the consciousness loop provides continuous adaptation through feedback, learning, and forgetting. Together, they transform stored context into evolving intelligence.
 
-Viewed against this biological backdrop, current LLM systems often remain non-human-like in memory behavior for three interrelated reasons. First, they frequently lack strong **selective gating**, so too much irrelevant context enters the active reasoning path. Second, they lack robust **adaptive forgetting**, so memory either accumulates noise or loses important details without principled reinforcement. Third, they typically lack an **always-on subconscious loop** that continuously consolidates, reweights, and organizes experience between explicit tasks. Any path toward more human-like memory therefore requires all three: integration with gating, retention with controlled decay, and background consolidation over time.
+Human memory provides a useful engineering analogy. Biological systems handle continuous noisy input through selective gating, reinforcement by use, and time-based forgetting. Most current LLM memory stacks implement storage and retrieval well, but still under-specify these three control functions: **what to keep**, **what to strengthen**, and **what to update over time**.
 
-This paper introduces **Neocortex**, a product-level architecture for artificial consciousness that uses adaptive memory as its substrate. Figure <a href="#fig:consciousness-architecture" data-reference-type="ref" data-reference="fig:consciousness-architecture">5</a> summarizes the inference stack and external inputs at a high level. It unifies these strands into a single operational pipeline. Neocortex continuously ingests new experience into structured memory and recalls context through a blend of semantic relevance, recency, interaction history, and surprise-weighted salience. At write time, the system parses documents into chunks, extracts entities and relations, persists them in graph/vector memory, and appends explicit state transitions to an event ledger. At recall time, the system routes queries either to broad semantic retrieval or to a deterministic state resolver when the question targets ordered state transitions. Memory is further modulated by reinforcement through access patterns and by Ebbinghaus-style forgetting dynamics.
+We introduce **Neocortex**, an architecture for conscious intelligence designed around those control functions. It combines:
 
-Our main claim is that artificial consciousness requires a **multi-store adaptive memory substrate** rather than a passive retrieval index. In particular, efficient token use requires not only better retrieval, but also mechanisms for forgetting noise, amplifying informative novelty, and separating semantic context from ordered state so that stable internal state can emerge across time.
+- Semantic and graph retrieval for topical and relational recall;
 
-The rest of this paper follows a simple progression: related work, biological design motivation, the Neocortex control loop, and results.
+- An ordered state-event ledger for deterministic temporal/state queries;
+
+- Retention-aware reweighting and decay to suppress memory pollution;
+
+- Interval-based thought synthesis to maintain latent internal state between explicit prompts.
+
+Figure <a href="#fig:consciousness-architecture" data-reference-type="ref" data-reference="fig:consciousness-architecture">5</a> summarizes the architecture. Our central claim is operational: consciousness-like continuity requires both an adaptive memory substrate and a recurrent intelligence loop. The memory layer and the consciousness loop work together to produce adaptation over time.
 
 # Related Work
 
 ## Titans and MIRAS: Long-Term Memory for Language Models
 
-Google’s Titans line of work reframes the role of memory in sequence models by separating fast in-context processing from a slower persistent memory path (Behrouz, Zhong, et al. 2025). Instead of relying only on larger context windows, Titans introduces a learned long-term memory mechanism that can carry information across longer horizons and complement attention.
+Google’s Titans line reframes sequence modeling by separating fast in-context processing from a slower persistent memory path (Behrouz, Zhong, et al. 2025). Instead of relying only on larger context windows, Titans introduces a learned long-term mechanism that complements attention on long horizons.
 
-The follow-on MIRAS perspective extends this idea by viewing sequence models as associative memory systems with explicit retention and biasing dynamics (Behrouz, Razaviyayn, et al. 2025). In this framing, retrieval and retention are not side effects of attention alone; they are first-class mechanisms that can be shaped during inference.
+The MIRAS perspective extends this idea by treating sequence models as associative memory systems with explicit retention and biasing dynamics (Behrouz, Razaviyayn, et al. 2025). Retrieval and retention are first-class inference-time mechanisms rather than side effects of attention alone.
 
-As of this writing, these architectures are still largely in the research stage and have not yet been seen in production.
+These directions are promising but remain mostly research-stage.
 
 ## GraphRAG and Graph-Based Memory and Retrieval
 
-GraphRAG demonstrates that graph structure can improve retrieval beyond flat vector similarity. GraphRAG builds entity-centric knowledge graphs and supports more global, query-focused reasoning over corpora (Edge et al. 2024; Microsoft Research 2025).
-
-A common limitation in graph-centric systems is ingestion cost and latency at very large scale. Building and maintaining high-quality graphs often requires substantial LLM use during extraction and linking, which can make indexing pipelines slow and expensive on massive datasets.
+GraphRAG demonstrates that graph structure can improve retrieval beyond flat vector similarity by enabling entity-centric and global reasoning over corpora (Edge et al. 2024; Microsoft Research 2025). A recurring tradeoff is ingestion overhead: high-quality graph extraction and linking can be expensive and slow at large scale.
 
 ## MemoryBank: Retention-Aware Memory for Language Models
 
-MemoryBank (Zhong et al. 2023) is one of the most direct precursors to retention-aware memory in LLM systems. It introduces a long-term memory module that explicitly models memory strength over time and updates retention based on interaction, rather than treating memory as static retrieved text.
+MemoryBank (Zhong et al. 2023) is a direct precursor to retention-aware LLM memory. It models memory strength over time and updates retention from interaction signals, rather than treating memory as static retrieved text.
 
 # Understanding the Human Brain
 
-Before proposing implementation details, we briefly ground the design in biological memory principles. The goal is not to claim a complete neural equivalence, but to extract practical mechanisms for integration, selection, and retention that can improve long-horizon AI behavior.
+Before implementation details, we ground the design in biological principles. The goal is not neural equivalence, but transferable mechanisms for memory selection, retention, and consolidation.
 
 ## Purkinje Cells
 
-*The “we problem”* in artificial consciousness can be framed as a coordination problem: how separate signals become a coherent self-model that acts as a unified agent. In biological systems, this coherence is not produced by a single neuron, but by layered circuits that compress, filter, and synchronize information across time.
+*The “we problem”* in artificial consciousness can be framed as coordination: how distributed signals become a coherent self-model that acts as a unified agent. In biology, this coherence emerges from layered circuits, not a single unit.
 
-Purkinje cells provide a useful computational analogy for how *background activity* can coexist with *coordinated control*. As the principal output neurons of the cerebellar cortex, they integrate massive parallel input; critically, they also exhibit **ongoing, partly stochastic simple-spike firing**—high-rate baseline activity and intermittent modulation that does not reduce to “one external stimulus, one discrete output.” That endogenous drive is part of why the cerebellum supports fine timing and internally generated adjustments, not purely reactive, step-by-step responses.
+Purkinje cells offer a useful analogy for combining *background activity* with *coordinated control*. They integrate high-dimensional parallel input while maintaining ongoing, partly stochastic firing. This endogenous activity supports fine timing and internal adjustment, not only stimulus-response reactivity.
 
-For systems that treat ambient *noise* and *conscious thoughts* as first-class inputs (Figure <a href="#fig:consciousness-architecture" data-reference-type="ref" data-reference="fig:consciousness-architecture">5</a>), the lesson is not only integration and gating, but **permission for spontaneous initiation**: ongoing, intermittently triggered internal activity can surface as endogenous thoughts or micro-actions, which are then amplified or suppressed by learned feedback. Three design principles carry over: **(i)** high-dimensional input integration, **(ii)** time-varying, partly stochastic output that can qualify or initiate behavior without a single explicit user prompt, and **(iii)** selective inhibitory gating and calibration through interaction (see Figure <a href="#fig:purkinje-cell-diagram" data-reference-type="ref" data-reference="fig:purkinje-cell-diagram">1</a>).
+For memory systems that treat ambient *noise* and *conscious thoughts* as first-class signals (Figure <a href="#fig:consciousness-architecture" data-reference-type="ref" data-reference="fig:consciousness-architecture">5</a>), the key lesson is permission for controlled spontaneous initiation. Internally generated candidates can surface and then be amplified or suppressed through feedback. Three principles carry over: **(i)** high-dimensional integration, **(ii)** time-varying endogenous candidate generation, and **(iii)** selective inhibitory gating calibrated by interaction.
 
 <figure id="fig:purkinje-cell-diagram" data-latex-placement="H">
 <img src="figures/purkinje-cell.png" style="width:75.0%" />
 <figcaption>Purkinje cells as biological reference: parallel integration, ongoing spontaneous firing, and inhibitory gating of downstream pathways.</figcaption>
 </figure>
 
-This motivates a memory controller that does more than retrieve nearest neighbors. A robust system should aggregate semantic, episodic, and temporal evidence, then gate what enters active context—including candidates surfaced by *internally generated* activity, not only by user-issued prompts. In other words, conscious-like behavior is approached not by storing everything, but by learning which memories (and which spontaneous internal candidates) should influence the current decision boundary.
+This motivates a controller that does more than nearest-neighbor retrieval. It must combine semantic, episodic, and temporal evidence, then gate what enters active context, including internally generated candidates. The target is not maximal storage, but reliable influence control at decision time.
 
 ## Ebbinghaus Forgetting Curve
 
-As a conceptual foundation, the Ebbinghaus forgetting curve describes how memory retention declines over time when information is not reinforced. This idea is well documented and widely referenced in cognitive science and later replication studies (<span class="nocase">Lewandowsky et al.</span> 2015). For memory systems, the implication is practical: high-value information should be rehearsed or reused, while low-value details should naturally decay.
+The Ebbinghaus forgetting curve captures a practical principle: memory retention drops without reinforcement (<span class="nocase">Lewandowsky et al.</span> 2015). For LLM memory systems, this implies that useful information should gain weight through reuse, while low-value details should decay automatically.
 
 <figure id="fig:forgetting-curve" data-latex-placement="H">
 <img src="figures/forgetting-curve.png" style="width:75.0%" />
 <figcaption>Ebbinghaus-inspired forgetting dynamics: retention drops rapidly without reinforcement, motivating selective memory maintenance.</figcaption>
 </figure>
 
-This leads to an implementation strategy before tackling stronger claims about artificial consciousness: encode candidate memories at write time, then modulate retention as a function of access frequency, recency, and utility. With retention-aware scoring and periodic pruning, stale or weakly supported memories lose influence while salient patterns remain available for recall.
+This yields a concrete strategy: encode candidate memories at write time, then update retention from access frequency, recency, and utility. Periodic pruning and reweighting reduce stale noise while preserving salient patterns.
 
 ## Conscious and Subconscious Processing
 
-Another useful cognitive distinction is between conscious and subconscious processing. The conscious layer is task-facing and deliberative: it responds to explicit goals, prompts, and immediate decisions. The subconscious layer is background and continuous: it keeps running even when no explicit query is present, consolidating experience, updating associations, and reweighting salience.
-
-In human cognition, much of memory organization happens in this always-on background mode rather than only during active reasoning. For memory systems, this suggests that high-quality recall depends not only on query-time retrieval, but also on continuous offline maintenance: reinforcement of recurring signals, decay of stale noise, and periodic synthesis of latent patterns that may become relevant later.
+Another useful distinction is conscious versus subconscious processing. The conscious layer is task-facing and prompt-responsive. The subconscious layer is continuous and background: it consolidates experience, updates associations, and reweights salience between explicit tasks. This supports a key design choice in Neocortex: recall quality depends on both query-time retrieval and ongoing maintenance cycles.
 
 # Consciousness Loop
 
-After the biological motivation, we now describe the core operational mechanism: a recurring control loop that continuously updates memory and policy state.
+We now describe the core operational mechanism: a recurring four-phase loop that updates memory and policy state continuously.
 
-In production, sources arrive first as **noise**: high-volume, redundant, and weakly structured streams that are not yet safe to recall verbatim. **Ingest** (phase 1) digests that firehose—filtering, deduplicating, and normalizing—so only curated context lands in memory stores for later phases. The loop then runs in **four phases**: **(1)** ingest, **(2)** interval-based recall and thought synthesis, **(3)** action decision, and **(4)** memory updates. The system accumulates rich context about a user or entity over long horizons, then transforms that context into compact internal thoughts that persist and compete for recall in later cycles.
+In production, most incoming data is initially **noise**: high-volume, redundant, and weakly structured. Phase 1 filters and normalizes this stream before storage. The loop then executes: **(1)** ingestion, **(2)** interval recall and thought synthesis, **(3)** action decision, and **(4)** memory reweighting plus thought persistence. Over time, this converts raw interaction history into a compact evolving internal model.
 
 <figure id="fig:consciousness-loop" data-latex-placement="H">
 <img src="figures/consciousness-loop.png" style="width:98.0%" />
@@ -123,68 +125,72 @@ In production, sources arrive first as **noise**: high-volume, redundant, and we
 
 ## Phase 1: Large-Scale Contextual Ingestion
 
-The first phase sits immediately downstream of noisy raw input: it continuously ingests heterogeneous signals that describe the entity’s world state and behavior. In practice, this includes email threads, direct messages, documents, notes, tickets, logs, and other structured or semi-structured artifacts that can provide identity, intent, preference, and temporal context.
+Phase 1 ingests heterogeneous signals that describe entity state and behavior: emails, direct messages, documents, notes, tickets, logs, and related artifacts. Inputs are normalized, chunked, and mapped into multiple stores: semantic vectors, entity-relation graphs, and ordered state-transition events.
 
-At write time, raw inputs are normalized, segmented into chunks, and mapped into memory stores (semantic vectors, entity/relation graphs, and state-transition events). This allows later recall to query the same underlying history from multiple perspectives: “what is relevant,” “who and what are connected,” and “what changed over time.” Critically, this phase is not a pure accumulation step: the system also applies early noise-forgetting heuristics so low-signal, repetitive, or non-actionable fragments do not dominate long-term memory.
+This enables later recall from complementary views: “what is relevant,” “what is connected,” and “what changed over time.” Importantly, ingestion is not passive accumulation; early filtering suppresses repetitive, low-signal, and non-actionable fragments.
 
 ## Phase 2: Interval-Based Recall and Thought Synthesis
 
-The second phase runs at regular intervals, independent of user prompts. During each cycle, the system recalls a small, high-salience memory set using recency, relevance, interaction frequency, and surprise-weighted signals. Rather than sending the full memory graph to a heavy model, the system passes this compact recall packet to a lightweight LLM prompt.
+Phase 2 runs on a fixed interval, independent of user prompts. Each cycle recalls a compact high-salience set using recency, relevance, interaction frequency, and surprise-weighted signals. Instead of passing large raw context to a heavy model, the system sends this compact packet to a lightweight LLM.
 
-The objective of this prompt is not long-form generation but **thought production**: concise latent-state updates such as “new preference inferred,” “contradiction detected,” “follow-up risk,” or “candidate next action.”
+The objective is **thought production**, not long-form text generation: short latent-state updates such as “new preference inferred,” “contradiction detected,” “follow-up risk,” or “candidate next action.”
 
 ## Phase 3: Action Decision
 
-The third phase evaluates whether the system should **take external action** or remain passive. Given the recalled context and the synthesized thoughts, a policy decides if an outbound step is warranted—for example sending a follow-up, surfacing a reminder, updating an external system, or deferring until more evidence accumulates. When no action meets confidence or priority thresholds, the loop continues with internal updates only.
+Phase 3 decides whether to take **external action** or remain passive. Given recalled context and synthesized thoughts, a policy checks confidence and priority thresholds for outbound effects (for example reminders, follow-ups, or external system updates). If thresholds are not met, the loop continues with internal updates only.
 
 ## Phase 4: Memory Update and Thought Persistence
 
-The fourth phase closes the cycle by **reweighting** every memory item that participated in this recall round: items that proved useful gain reinforcement (stronger future recall), while items that contributed little or misled decay faster. Figure <a href="#fig:reinforcement-weights" data-reference-type="ref" data-reference="fig:reinforcement-weights">4</a> shows a concrete picture: a memory graph contains many low-weight links and alternate routes; recall highlights one *path* through that graph; after Phase 4 updates, weights along the activated trace jump so that trace is much less likely to be forgotten, while competing branches remain comparatively weak.
+Phase 4 closes the cycle by **reweighting** recalled memories. Items that improved the decision are reinforced; items that were unused or misleading are decayed. Figure <a href="#fig:reinforcement-weights" data-reference-type="ref" data-reference="fig:reinforcement-weights">4</a> illustrates this with a toy graph where one activated path is strengthened while alternatives remain weak.
 
 <figure id="fig:reinforcement-weights" data-latex-placement="H">
 <img src="figures/reinforcement-weights.png" />
 <figcaption>Reinforcement of weights in Phase 4 (toy subgraph): before recall, scattered weak branches; middle, recall selects one path; after reweighting, only that trace is strongly reinforced.</figcaption>
 </figure>
 
-The new thoughts from Phase 2 are **inserted into persistent context memory** as durable artifacts, so they can be retrieved in future cycles alongside raw ingested data. Together, reweighting and thought insertion implement subconscious consolidation: the internal model shifts before the next interval begins.
+Thoughts produced in Phase 2 are also **written back** as durable memory artifacts, so future cycles can retrieve both source evidence and prior latent-state summaries. Reweighting plus thought write-back implements subconscious consolidation between intervals.
 
 ## Why This Loop Matters
 
-This four-phase pattern—ingest, recall and think, decide on action, then update memory—separates expensive context accumulation from cheap continuous cognition. Periodic recall, lightweight prompting, and explicit write-back of thoughts and weights maintain an evolving internal model without a large model invocation at every interaction.
+This loop separates expensive context accumulation from cheap continuous cognition. Periodic recall, lightweight prompting, and explicit write-back maintain evolving internal state without requiring a heavy model call at every interaction.
+
+More importantly, this loop creates system-level traits associated with conscious intelligence: **feedback** (actions and outcomes alter future weights), **learning** (useful patterns are reinforced into latent state), and **forgetting** (noise decays unless revalidated). In this view, Neocortex is not merely a memory layer; it is a practical control mechanism for adaptive intelligence growth.
 
 # Implementation & Results
 
-We implement Neocortex as a custom memory architecture coupled with a lightweight LLM under the periodic consciousness loop described above. We then modify the inference layer of an open source LLM to allow it to use the Neocortex memory architecture.
+We implement Neocortex as a custom memory stack coupled to a lightweight LLM within the loop above. We then modify the inference layer of an open-source LLM runtime to consume Neocortex recall packets and write back thought/memory updates each cycle.
 
 <figure id="fig:consciousness-architecture" data-latex-placement="H">
 <p><img src="figures/consciousness-architecture.png" style="height:36.0%" alt="image" /> <span id="fig:consciousness-architecture" data-label="fig:consciousness-architecture"></span></p>
 </figure>
 
-We do not use any LLMs for the ingestion and recall phases. We only use a lightweight LLM for the thought synthesis (consciousness loop) and action decision phases thereby allowing us to test with large amounts of context/data.
+No LLM is required in ingestion or deterministic recall routing. LLM usage is concentrated in thought synthesis and action decision, which keeps the system practical under large context volumes.
 
-We then proceed to evaluate the performance of Neocortex on a bunch of benchmarks that test it’s ability to reason and make decisions whilst at the same time testing against a bunch of memory/retrieval benchmarks.
+Evaluation is ongoing across reasoning and memory benchmarks to measure both decision quality and retrieval/state accuracy.
 
 ## Current Evaluation Status
 
-This draft focuses on architecture and consciousness-loop behavior. At this stage, we do not claim full artificial consciousness or a final benchmark win over all baselines. Instead, we report the current validation framing and qualitative outcomes from internal usage.
+This draft reports architecture and loop behavior. We do not claim full artificial consciousness or benchmark leadership at this stage. The current evidence is implementation-oriented and qualitative, but it already indicates improvements in feedback-driven adaptation and learning/forgetting balance.
 
 ## Observed Behavior
 
-Across long-running interaction traces, Neocortex shows three consistent effects: **(1)** improved continuity across sessions due to persistent state-event handling, **(2)** lower context noise from retention-aware pruning, and **(3)** better handling of temporal/state questions through explicit ledger routing.
+Across long-running internal traces, we observe three recurring effects: **(1)** stronger cross-session continuity from explicit state-event tracking, **(2)** lower active-context noise from retention-aware decay, and **(3)** better performance on temporal/state queries through ledger-based routing.
 
-These behaviors are most visible on tasks that mix semantic recall with ordered state updates, where flat chunk retrieval frequently confuses what is relevant with what is current.
+These gains are most visible in mixed tasks where systems must distinguish “relevant” from “currently true.”
 
 ## Limitations and Next Measurement Steps
 
-The current evidence is primarily qualitative and implementation-driven. Formal benchmarking (including ablations for routing, forgetting, and thought write-back) remains ongoing. The next version of this paper will add: **(i)** quantitative benchmark deltas, **(ii)** latency and token-cost breakdowns, and **(iii)** error analysis by query type.
+Current evidence is primarily qualitative. Formal benchmarking, including ablations for routing, forgetting, and thought write-back, remains in progress. The next version will add: **(i)** quantitative deltas against baselines, **(ii)** latency and token-cost decomposition, and **(iii)** error analysis by query type.
 
 # Conclusion
 
-This paper argues that artificial consciousness is the target, and that long-horizon adaptive memory is a prerequisite layer rather than the final objective. Insights from Purkinje-style spontaneous activity and inhibitory gating, Ebbinghaus-style decay, and conscious versus subconscious processing suggest three requirements for more human-like behavior: selective integration, principled forgetting, and continuous background consolidation.
+This paper argues that long-horizon adaptive memory is a prerequisite for consciousness-like behavior in LLM systems.
 
-Related systems such as Titans/MIRAS, GraphRAG, and MemoryBank show important progress, but also surface practical gaps in production maturity, ingestion cost at scale, and retention-policy calibration. These constraints point to a broader design principle: memory quality depends as much on write-time filtering and maintenance loops as on query-time retrieval.
+Prior work including Titans/MIRAS, GraphRAG, and MemoryBank demonstrates the importance of structured memory and retention-aware mechanisms. Neocortex extends this direction with an operational conscious-intelligence loop that integrates ingestion, interval recall, action policy, and write-back reweighting in one production workflow.
 
-The practical takeaway is straightforward: ingest rich contextual data, forget noise aggressively, and continuously reinforce information that proves useful through interaction over time. These memory operations are the scaffolding for consciousness-like continuity: a system that can maintain a self-consistent evolving state, not just retrieve relevant text.
+Biological inspiration from the human brain (Purkinje-style endogenous activity, Ebbinghaus-style decay, and conscious/subconscious separation) maps to three engineering requirements: selective integration, principled forgetting, and continuous consolidation.
+
+Combined with a strong multi-store memory substrate and an explicit consciousness loop (ingest, recall, act, reinforce), these ingredients yield better intelligence in practice: more stable reasoning over time, lower context noise, and behavior that is less purely reactive.
 
 <div id="refs" class="references csl-bib-body hanging-indent">
 
