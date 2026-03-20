@@ -489,6 +489,52 @@ export class AlphahumanMemoryClient {
     );
   }
 
+  /** Poll an ingestion job until it reaches a terminal state. */
+  async waitForIngestionJob(
+    jobId: string,
+    options: { timeoutMs?: number; pollIntervalMs?: number } = {},
+  ): Promise<GetIngestionJobResponse> {
+    if (!jobId) throw new Error("jobId is required");
+    const timeoutMs = options.timeoutMs ?? 30_000;
+    const pollIntervalMs = options.pollIntervalMs ?? 1_000;
+    if (timeoutMs <= 0) throw new Error("timeoutMs must be > 0");
+    if (pollIntervalMs <= 0) throw new Error("pollIntervalMs must be > 0");
+
+    const pendingStates = new Set([
+      "pending",
+      "queued",
+      "processing",
+      "in_progress",
+      "in-progress",
+      "started",
+      "start",
+    ]);
+    const completedStates = new Set(["completed", "done", "succeeded", "success"]);
+    const failedStates = new Set(["failed", "error", "cancelled", "canceled"]);
+
+    const deadline = Date.now() + timeoutMs;
+    let last: GetIngestionJobResponse | null = null;
+
+    while (Date.now() < deadline) {
+      const job = await this.getIngestionJob(jobId);
+      last = job;
+      const stateRaw = job.data?.state;
+      const state = (stateRaw ?? "").trim().toLowerCase();
+      if (completedStates.has(state)) return job;
+      if (failedStates.has(state)) {
+        throw new Error(`Ingestion job ${jobId} failed (state=${stateRaw})`);
+      }
+      if (state && !pendingStates.has(state)) return job;
+      await this.sleep(pollIntervalMs);
+    }
+
+    throw new Error(
+      `Ingestion job ${jobId} timed out after ${timeoutMs}ms${
+        last ? ` (last_state=${last.data?.state ?? "unknown"})` : ""
+      }`,
+    );
+  }
+
   // --- Document & Mirrored Endpoints ---
 
   /** Ingest a single memory document. POST /memory/documents */
@@ -677,6 +723,10 @@ export class AlphahumanMemoryClient {
       throw new AlphahumanError(message, res.status, json);
     }
     return json as T;
+  }
+
+  private async sleep(ms: number): Promise<void> {
+    await new Promise<void>((resolve) => setTimeout(resolve, ms));
   }
 }
 

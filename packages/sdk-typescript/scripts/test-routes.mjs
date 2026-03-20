@@ -48,6 +48,39 @@ const docBatch2 = `ts-doc-batch-2-${ts}`;
 const results = [];
 let maybeJobId;
 
+function collectJobIds(payload) {
+  const ids = [];
+  if (!payload || typeof payload !== "object") return ids;
+  const direct = payload?.data?.jobId ?? payload?.jobId;
+  if (typeof direct === "string" && direct) ids.push(direct);
+  const accepted = payload?.data?.accepted ?? payload?.accepted;
+  if (Array.isArray(accepted)) {
+    for (const row of accepted) {
+      const jid = row?.jobId ?? row?.job_id;
+      if (typeof jid === "string" && jid) ids.push(jid);
+    }
+  }
+  return [...new Set(ids)];
+}
+
+function collectDocumentIds(payload) {
+  const found = [];
+  const walk = (node) => {
+    if (Array.isArray(node)) {
+      for (const item of node) walk(item);
+      return;
+    }
+    if (!node || typeof node !== "object") return;
+    for (const key of ["documentId", "document_id", "id"]) {
+      const value = node[key];
+      if (typeof value === "string" && value) found.push(value);
+    }
+    for (const value of Object.values(node)) walk(value);
+  };
+  walk(payload);
+  return [...new Set(found)];
+}
+
 async function run(name, fn, optional = false) {
   try {
     const data = await fn();
@@ -86,7 +119,7 @@ try {
     }),
   );
 
-  await run("insertDocument", () =>
+  const singleInsertRes = await run("insertDocument", () =>
     client.insertDocument({
       title: "TS Route Test Single",
       content: "Single document for route test",
@@ -96,6 +129,15 @@ try {
       documentId: docSingle,
     }),
   );
+  const singleJobIds = collectJobIds(singleInsertRes);
+  if (singleJobIds.length > 0) {
+    if (!maybeJobId) maybeJobId = singleJobIds[0];
+    for (const jid of singleJobIds) {
+      await run(`insertDocumentJobPoll(${jid})`, () => client.waitForIngestionJob(jid));
+    }
+  } else {
+    results.push({ name: "insertDocumentJobPoll", ok: false, msg: "insertDocument did not return jobId" });
+  }
 
   const batchRes = await run("insertDocumentsBatch", () =>
     client.insertDocumentsBatch({
@@ -115,20 +157,24 @@ try {
       ],
     }),
   );
-
-  if (batchRes?.data?.jobId) {
-    maybeJobId = batchRes.data.jobId;
-  } else if (Array.isArray(batchRes?.data?.accepted)) {
-    for (const row of batchRes.data.accepted) {
-      if (row?.jobId) {
-        maybeJobId = row.jobId;
-        break;
-      }
+  const batchJobIds = collectJobIds(batchRes);
+  if (batchJobIds.length > 0) {
+    if (!maybeJobId) maybeJobId = batchJobIds[0];
+    for (const jid of batchJobIds) {
+      await run(`insertDocumentsBatchJobPoll(${jid})`, () => client.waitForIngestionJob(jid));
     }
+  } else {
+    results.push({
+      name: "insertDocumentsBatchJobPoll",
+      ok: false,
+      msg: "insertDocumentsBatch did not return jobId",
+    });
   }
 
-  await run("listDocuments", () => client.listDocuments({ namespace, limit: 20, offset: 0 }));
-  await run("getDocument", () => client.getDocument({ documentId: docSingle, namespace }));
+  const listDocumentsRes = await run("listDocuments", () => client.listDocuments({ namespace, limit: 20, offset: 0 }));
+  const listedIds = collectDocumentIds(listDocumentsRes);
+  const getDocId = listedIds.includes(docSingle) ? docSingle : listedIds[0] ?? docSingle;
+  await run("getDocument", () => client.getDocument({ documentId: getDocId, namespace }));
 
   await run("queryMemoryContext", () =>
     client.queryMemoryContext({
@@ -196,9 +242,14 @@ try {
   }
 
 } finally {
-  await run("deleteDocument(single)", () => client.deleteDocument({ documentId: docSingle, namespace }), true);
-  await run("deleteDocument(batch1)", () => client.deleteDocument({ documentId: docBatch1, namespace }), true);
-  await run("deleteDocument(batch2)", () => client.deleteDocument({ documentId: docBatch2, namespace }), true);
+  const cleanupIds = [docSingle, docBatch1, docBatch2];
+  const listForCleanup = await run("listDocuments(cleanup)", () => client.listDocuments({ namespace, limit: 200, offset: 0 }), true);
+  for (const discovered of collectDocumentIds(listForCleanup)) {
+    if (!cleanupIds.includes(discovered)) cleanupIds.push(discovered);
+  }
+  for (const docId of cleanupIds) {
+    await run(`deleteDocument(${docId})`, () => client.deleteDocument({ documentId: docId, namespace }), true);
+  }
   await run("deleteMemory", () => client.deleteMemory({ namespace }), true);
 }
 

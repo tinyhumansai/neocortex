@@ -832,6 +832,60 @@ class TinyHumanMemoryClient:
         path = f"{INGESTION_JOB_PATH_PREFIX}/{quote(job_id, safe='')}"
         return self._send_get(path, None)
 
+    def wait_for_ingestion_job(
+        self,
+        *,
+        job_id: str,
+        timeout_seconds: float = 30.0,
+        poll_interval_seconds: float = 1.0,
+    ) -> dict[str, Any]:
+        """Poll an ingestion job until it reaches a terminal state."""
+        if not job_id or not isinstance(job_id, str):
+            raise ValueError("job_id is required and must be a string")
+        if timeout_seconds <= 0:
+            raise ValueError("timeout_seconds must be > 0")
+        if poll_interval_seconds <= 0:
+            raise ValueError("poll_interval_seconds must be > 0")
+
+        pending_states = {
+            "pending",
+            "queued",
+            "processing",
+            "in_progress",
+            "in-progress",
+            "started",
+            "start",
+        }
+        completed_states = {"completed", "done", "succeeded", "success"}
+        failed_states = {"failed", "error", "cancelled", "canceled"}
+
+        deadline = time.time() + timeout_seconds
+        last_job: dict[str, Any] | None = None
+
+        while time.time() < deadline:
+            job = self.get_ingestion_job(job_id=job_id)
+            last_job = job
+            state_raw = job.get("state") or job.get("status") or job.get("jobState")
+            if isinstance(state_raw, str):
+                state = state_raw.strip().lower()
+                if state in completed_states:
+                    return job
+                if state in failed_states:
+                    raise TinyHumanError(
+                        f"Ingestion job {job_id} failed (state={state_raw})",
+                        500,
+                        job,
+                    )
+                if state not in pending_states:
+                    return job
+            time.sleep(poll_interval_seconds)
+
+        raise TinyHumanError(
+            f"Ingestion job {job_id} timed out after {timeout_seconds}s",
+            408,
+            last_job,
+        )
+
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------

@@ -38,6 +38,55 @@ def env(name: str, *fallbacks: str) -> str | None:
     return None
 
 
+def collect_job_ids(payload: Any) -> list[str]:
+    ids: list[str] = []
+    if not isinstance(payload, dict):
+        return ids
+    direct = payload.get("jobId") or payload.get("job_id")
+    if isinstance(direct, str) and direct:
+        ids.append(direct)
+    accepted = payload.get("accepted")
+    if isinstance(accepted, list):
+        for row in accepted:
+            if isinstance(row, dict):
+                jid = row.get("jobId") or row.get("job_id")
+                if isinstance(jid, str) and jid:
+                    ids.append(jid)
+    # stable dedupe
+    seen: set[str] = set()
+    out: list[str] = []
+    for jid in ids:
+        if jid not in seen:
+            seen.add(jid)
+            out.append(jid)
+    return out
+
+
+def collect_document_ids(payload: Any) -> list[str]:
+    found: list[str] = []
+
+    def walk(node: Any) -> None:
+        if isinstance(node, dict):
+            for key in ("documentId", "document_id", "id"):
+                value = node.get(key)
+                if isinstance(value, str) and value:
+                    found.append(value)
+            for value in node.values():
+                walk(value)
+        elif isinstance(node, list):
+            for item in node:
+                walk(item)
+
+    walk(payload)
+    seen: set[str] = set()
+    out: list[str] = []
+    for doc_id in found:
+        if doc_id not in seen:
+            seen.add(doc_id)
+            out.append(doc_id)
+    return out
+
+
 def main() -> int:
     pkg_root = Path(__file__).resolve().parents[1]
     env_file = Path(env("ENV_FILE") or pkg_root / ".env")
@@ -96,7 +145,7 @@ def main() -> int:
             ),
         )
 
-        run(
+        single_insert_res = run(
             "insert_document",
             lambda: client.insert_document(
                 title="Python Route Test Single",
@@ -107,6 +156,23 @@ def main() -> int:
                 document_id=doc_single,
             ),
         )
+        single_job_ids = collect_job_ids(single_insert_res)
+        if single_job_ids:
+            if not maybe_job_id:
+                maybe_job_id = single_job_ids[0]
+            for jid in single_job_ids:
+                run(
+                    f"insert_document_job_poll({jid})",
+                    lambda jid=jid: client.wait_for_ingestion_job(job_id=jid),
+                )
+        else:
+            results.append(
+                (
+                    "insert_document_job_poll",
+                    False,
+                    "insert_document did not return jobId",
+                )
+            )
 
         batch_res = run(
             "insert_documents_batch",
@@ -127,15 +193,23 @@ def main() -> int:
                 ]
             ),
         )
-
-        if isinstance(batch_res, dict):
-            maybe_job_id = batch_res.get("jobId")
-            accepted = batch_res.get("accepted")
-            if not maybe_job_id and isinstance(accepted, list):
-                for item in accepted:
-                    if isinstance(item, dict) and item.get("jobId"):
-                        maybe_job_id = item["jobId"]
-                        break
+        batch_job_ids = collect_job_ids(batch_res)
+        if batch_job_ids:
+            if not maybe_job_id:
+                maybe_job_id = batch_job_ids[0]
+            for jid in batch_job_ids:
+                run(
+                    f"insert_documents_batch_job_poll({jid})",
+                    lambda jid=jid: client.wait_for_ingestion_job(job_id=jid),
+                )
+        else:
+            results.append(
+                (
+                    "insert_documents_batch_job_poll",
+                    False,
+                    "insert_documents_batch did not return jobId",
+                )
+            )
 
         run("list_documents", lambda: client.list_documents(namespace=namespace, limit=20, offset=0))
         run("get_document", lambda: client.get_document(document_id=doc_single, namespace=namespace))
@@ -209,9 +283,24 @@ def main() -> int:
             results.append(("get_ingestion_job", True, "optional-skip: no jobId returned by inserts"))
 
     finally:
-        run("delete_document(single)", lambda: client.delete_document(document_id=doc_single, namespace=namespace), optional=True)
-        run("delete_document(batch1)", lambda: client.delete_document(document_id=doc_batch_1, namespace=namespace), optional=True)
-        run("delete_document(batch2)", lambda: client.delete_document(document_id=doc_batch_2, namespace=namespace), optional=True)
+        cleanup_ids: list[str] = [doc_single, doc_batch_1, doc_batch_2]
+        docs_payload = run(
+            "list_documents(cleanup)",
+            lambda: client.list_documents(namespace=namespace, limit=200, offset=0),
+            optional=True,
+        )
+        for discovered in collect_document_ids(docs_payload):
+            if discovered not in cleanup_ids:
+                cleanup_ids.append(discovered)
+        for doc_id in cleanup_ids:
+            run(
+                f"delete_document({doc_id})",
+                lambda doc_id=doc_id: client.delete_document(
+                    document_id=doc_id,
+                    namespace=namespace,
+                ),
+                optional=True,
+            )
         run("delete_memory(namespace)", lambda: client.delete_memory(namespace=namespace, delete_all=True), optional=True)
         client.close()
 
