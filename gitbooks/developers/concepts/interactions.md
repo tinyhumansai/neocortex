@@ -23,4 +23,4 @@ The interaction model means Neocortex **gets smarter over time**. The more your 
 
 A piece of knowledge that gets recalled frequently becomes more durable. A fact that was ingested once and never accessed again naturally fades exactly like how human memory works.
 
-<div align="center"><img src="../.gitbook/assets/BobMemoryDecayVideo.gif" alt="Interaction-weighted memory" width="700"></div>
+<div align="center"><img src="../../.gitbook/assets/BobMemoryDecayVideo.gif" alt="Interaction-weighted memory" width="700"></div>

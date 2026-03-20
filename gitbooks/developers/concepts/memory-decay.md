@@ -9,7 +9,7 @@ Neocortex implements a **time-decay model** inspired by the Ebbinghaus Forgettin
 * **Recalled or interacted-with memories** are reinforced their retention resets and strengthens.
 * **Decayed memories** are effectively pruned, keeping the memory system lean.
 
-<div align="center"><img src="../.gitbook/assets/AppleEmailGraph.gif" alt="Memory decay simulation" width="700"></div>
+<div align="center"><img src="../../.gitbook/assets/AppleEmailGraph.gif" alt="Memory decay simulation" width="700"></div>
 
 ## Why Decay?
 

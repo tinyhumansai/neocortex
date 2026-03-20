@@ -13,23 +13,22 @@
 
 ## Developers
 
-* [Choosing an SDK](developers/getting-started.md)
-* [Python SDK](developers/high-level-sdk.md)
-* [TypeScript SDK](developers/typescript-sdk.md)
-* [LangGraph Integration](developers/langgraph-sdk.md)
-* [OpenClaw Plugin](developers/openclaw-plugin.md)
-
-## Concepts
-
-* [Memory Items](concepts/memory-items.md)
-* [Namespaces](concepts/namespaces.md)
-* [Timestamps](concepts/timestamps.md)
-* [Ingest](concepts/ingest.md)
-* [Recall](concepts/recall.md)
-* [Context](concepts/context.md)
-* [Interactions](concepts/interactions.md)
-* [Memory Decay](concepts/memory-decay.md)
-* [Delete](concepts/delete.md)
+* [Overview](developers/overview.md)
+* [Concepts](developers/concepts/README.md)
+  * [Recall](developers/concepts/recall.md)
+  * [Memory Decay](developers/concepts/memory-decay.md)
+  * [Namespaces](developers/concepts/namespaces.md)
+  * [Context](developers/concepts/context.md)
+  * [Memory Items](developers/concepts/memory-items.md)
+  * [Interactions](developers/concepts/interactions.md)
+  * [Delete](developers/concepts/delete.md)
+  * [Ingest](developers/concepts/ingest.md)
+  * [Timestamps](developers/concepts/timestamps.md)
+* [SDK Functions](developers/sdk-functions/README.md)
+  * [Inserting Memories](developers/sdk-functions/inserting-memories.md)
+* [Third-party Plugins/Integrations](developers/third-party-plugins-integrations/README.md)
+  * [LangGraph Plugin](developers/third-party-plugins-integrations/langgraph-sdk.md)
+  * [OpenClaw Plugin](developers/third-party-plugins-integrations/openclaw-plugin.md)
 
 ## Benchmarks
 
