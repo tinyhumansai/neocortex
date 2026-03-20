@@ -22,7 +22,7 @@ Some deployments and SDKs use a `/v1` prefix (`/v1/memory/admin/delete`). If you
 {% tab title="cURL" %}
 ```bash
 curl -X POST "https://api.tinyhumans.ai/memory/admin/delete" \
-  -H "Authorization: Bearer $ALPHAHUMAN_TOKEN" \
+  -H "Authorization: Bearer $TINYHUMANS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"namespace": "preferences"}'
 ```

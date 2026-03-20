@@ -11,7 +11,7 @@ Drop-in memory tools for [LangGraph](https://langchain-ai.github.io/langgraph/) 
 ## Install
 
 ```bash
-pip install alphahuman-langgraph
+pip install tinyhuman-langgraph
 ```
 
 ## Quick Start: Factory Pattern (Recommended)
@@ -20,7 +20,7 @@ Use `make_memory_tools` to create tools with credentials baked in. Credentials a
 
 ```python
 from langchain_openai import ChatOpenAI
-from alphahuman_langgraph import make_memory_tools
+from tinyhuman_langgraph import make_memory_tools
 
 tools = make_memory_tools(token="your-api-key")
 
@@ -32,7 +32,7 @@ model = ChatOpenAI(model="gpt-4o").bind_tools(tools)
 
 ```python
 from langgraph.graph import StateGraph, MessagesState
-from alphahuman_langgraph import make_memory_tools
+from tinyhuman_langgraph import make_memory_tools
 
 ingest_tool, read_tool, delete_tool = make_memory_tools(token="your-api-key")
 
@@ -51,11 +51,11 @@ graph.add_node("memory", memory_node)
 You can configure via environment instead of passing credentials directly:
 
 ```bash
-export ALPHAHUMAN_API_KEY="your-api-key"
+export TINYHUMANS_API_KEY="your-api-key"
 ```
 
 ```python
-from alphahuman_langgraph import get_tools
+from tinyhuman_langgraph import get_tools
 
 tools = get_tools()
 ```
@@ -64,10 +64,10 @@ tools = get_tools()
 
 | Tool                       | Description                                   |
 | -------------------------- | --------------------------------------------- |
-| `alphahuman_ingest_memory` | Upsert one or more memory items               |
-| `alphahuman_read_memory`   | Read items filtered by key / keys / namespace |
-| `alphahuman_delete_memory` | Delete items by key / keys / delete\_all      |
+| `tinyhuman_ingest_memory` | Upsert one or more memory items               |
+| `tinyhuman_read_memory`   | Read items filtered by key / keys / namespace |
+| `tinyhuman_delete_memory` | Delete items by key / keys / delete\_all      |
 
 ## Error Handling
 
-Tools raise `AlphahumanError` on API failures and `ValueError` on invalid input. Both propagate normally through LangGraph.
+Tools raise `TinyHumanError` on API failures and `ValueError` on invalid input. Both propagate normally through LangGraph.

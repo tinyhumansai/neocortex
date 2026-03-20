@@ -26,7 +26,7 @@ Some deployments and SDKs use a `/v1` prefix (`/v1/memory/insert`). If your depl
 {% tab title="cURL" %}
 ```bash
 curl -X POST "https://api.tinyhumans.ai/memory/insert" \
-  -H "Authorization: Bearer $ALPHAHUMAN_TOKEN" \
+  -H "Authorization: Bearer $TINYHUMANS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "title": "user-preference-theme",
@@ -40,9 +40,9 @@ curl -X POST "https://api.tinyhumans.ai/memory/insert" \
 
 {% tab title="TypeScript" %}
 ```ts
-import { AlphahumanMemoryClient } from "@alphahuman/memory-sdk";
+import { TinyHumanMemoryClient } from "@tinyhuman/memory-sdk";
 
-const client = new AlphahumanMemoryClient({ token: process.env.ALPHAHUMAN_TOKEN! });
+const client = new TinyHumanMemoryClient({ token: process.env.TINYHUMANS_TOKEN! });
 
 const result = await client.insertMemory({
   title: "user-preference-theme",
@@ -77,7 +77,7 @@ print(result.ingested, result.updated, result.errors)
 
 {% tab title="Go" %}
 ```go
-client, err := tinyhumans.NewClient(os.Getenv("ALPHAHUMAN_TOKEN"))
+client, err := tinyhumans.NewClient(os.Getenv("TINYHUMANS_TOKEN"))
 if err != nil {
     log.Fatal(err)
 }
@@ -118,9 +118,9 @@ println!("{}", response.data.status.unwrap_or_default());
 
 {% tab title="Java" %}
 ```java
-import xyz.alphahuman.sdk.*;
+import xyz.tinyhuman.sdk.*;
 
-try (AlphahumanMemoryClient client = new AlphahumanMemoryClient(System.getenv("ALPHAHUMAN_TOKEN"))) {
+try (TinyHumanMemoryClient client = new TinyHumanMemoryClient(System.getenv("TINYHUMANS_TOKEN"))) {
     InsertMemoryResponse response = client.insertMemory(
         new InsertMemoryParams("user-preference-theme", "User prefers dark mode", "preferences")
     );
@@ -132,10 +132,10 @@ try (AlphahumanMemoryClient client = new AlphahumanMemoryClient(System.getenv("A
 
 {% tab title="C++" %}
 ```cpp
-#include "alphahuman/alphahuman.hpp"
-using namespace alphahuman;
+#include "tinyhuman/tinyhuman.hpp"
+using namespace tinyhuman;
 
-AlphahumanMemoryClient client(std::getenv("ALPHAHUMAN_TOKEN"));
+TinyHumanMemoryClient client(std::getenv("TINYHUMANS_TOKEN"));
 
 InsertMemoryParams params;
 params

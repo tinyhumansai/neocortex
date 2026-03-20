@@ -23,7 +23,7 @@ Some deployments and SDKs use a `/v1` prefix (`/v1/memory/recall`). If your depl
 {% tab title="cURL" %}
 ```bash
 curl -X POST "https://api.tinyhumans.ai/memory/recall" \
-  -H "Authorization: Bearer $ALPHAHUMAN_TOKEN" \
+  -H "Authorization: Bearer $TINYHUMANS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "namespace": "preferences",
@@ -34,9 +34,9 @@ curl -X POST "https://api.tinyhumans.ai/memory/recall" \
 
 {% tab title="TypeScript" %}
 ```ts
-import { AlphahumanMemoryClient } from "@alphahuman/memory-sdk";
+import { TinyHumanMemoryClient } from "@tinyhuman/memory-sdk";
 
-const client = new AlphahumanMemoryClient({ token: process.env.ALPHAHUMAN_TOKEN! });
+const client = new TinyHumanMemoryClient({ token: process.env.TINYHUMANS_TOKEN! });
 
 const result = await client.recallMemory({
   namespace: "preferences",
@@ -97,9 +97,9 @@ println!("{:?}", response.data.llm_context_message);
 
 {% tab title="Java" %}
 ```java
-import xyz.alphahuman.sdk.*;
+import xyz.tinyhuman.sdk.*;
 
-try (AlphahumanMemoryClient client = new AlphahumanMemoryClient(System.getenv("ALPHAHUMAN_TOKEN"))) {
+try (TinyHumanMemoryClient client = new TinyHumanMemoryClient(System.getenv("TINYHUMANS_TOKEN"))) {
     RecallMemoryResponse response = client.recallMemory(
         new RecallMemoryParams()
             .setNamespace("preferences")
