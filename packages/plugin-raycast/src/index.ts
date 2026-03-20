@@ -89,6 +89,120 @@ export class RaycastNeocortexMemory {
     };
   }
 
+  private extractContext(data: any): string {
+    const llmMsg = data?.llmContextMessage || data?.response;
+    if (typeof llmMsg === "string" && llmMsg.trim()) return llmMsg.trim();
+
+    const chunks = data?.context?.chunks ?? [];
+    if (!Array.isArray(chunks) || chunks.length === 0) {
+      return "No relevant memories found.";
+    }
+
+    const texts: string[] = [];
+    for (const chunk of chunks) {
+      if (!chunk || typeof chunk !== "object") continue;
+      const text =
+        (chunk as any).content ?? (chunk as any).text ?? (chunk as any).body ?? "";
+      if (typeof text === "string" && text.trim()) texts.push(text.trim());
+    }
+
+    return texts.length ? texts.join("\n\n") : "No relevant memories found.";
+  }
+
+  async syncMemory(input: any) {
+    const raw = await this.client.syncMemory(input);
+    return { ok: true as const, raw };
+  }
+
+  async insertDocument(input: any) {
+    const raw = await this.client.insertDocument(input);
+    return { ok: true as const, raw };
+  }
+
+  async insertDocumentsBatch(input: any) {
+    const raw = await this.client.insertDocumentsBatch(input);
+    return { ok: true as const, raw };
+  }
+
+  async listDocuments(input: any) {
+    const raw = await this.client.listDocuments(input);
+    return { ok: true as const, raw };
+  }
+
+  async getDocument(input: any) {
+    const raw = await this.client.getDocument(input);
+    return { ok: true as const, raw };
+  }
+
+  async deleteDocument(input: any) {
+    const raw = await this.client.deleteDocument(input);
+    return { ok: true as const, raw };
+  }
+
+  async queryMemoryContext(input: any) {
+    const namespace = this.resolveNamespace(input.namespace);
+    const rawRes = await this.client.queryMemoryContext({ ...input, namespace });
+    const data = rawRes?.data ?? rawRes;
+    return {
+      ok: true as const,
+      namespace,
+      context: this.extractContext(data),
+      raw: data,
+    };
+  }
+
+  async chatMemoryContext(input: any) {
+    const rawRes = await this.client.chatMemoryContext(input);
+    const data = rawRes?.data ?? rawRes;
+    const content = typeof data?.content === "string" ? data.content : "";
+    return { ok: true as const, content, raw: data };
+  }
+
+  async recordInteractions(input: any) {
+    const raw = await this.client.recordInteractions(input);
+    return { ok: true as const, raw };
+  }
+
+  async recallThoughts(input: any) {
+    const rawRes = await this.client.recallThoughts(input);
+    const data = rawRes?.data ?? rawRes;
+    return { ok: true as const, thought: data?.thought, raw: data };
+  }
+
+  async chatMemory(input: any) {
+    const rawRes = await this.client.chatMemory(input);
+    const data = rawRes?.data ?? rawRes;
+    const content = typeof data?.content === "string" ? data.content : "";
+    return { ok: true as const, content, raw: data };
+  }
+
+  async interactMemory(input: any) {
+    const raw = await this.client.interactMemory(input);
+    return { ok: true as const, raw };
+  }
+
+  async recallMemoryMaster(input: any) {
+    const namespace = this.resolveNamespace(input.namespace);
+    const rawRes = await this.client.recallMemoryMaster({ ...input, namespace });
+    const data = rawRes?.data ?? rawRes;
+    return {
+      ok: true as const,
+      namespace,
+      context: this.extractContext(data),
+      raw: data,
+    };
+  }
+
+  async recallMemories(input: any) {
+    const raw = await this.client.recallMemories(input);
+    return { ok: true as const, raw };
+  }
+
+  async getIngestionJob(input: any) {
+    const raw = await this.client.getIngestionJob(input);
+    return { ok: true as const, raw };
+  }
+
   /**
    * MCP tool definitions that can be registered on a Model Context Protocol server
    * for consumption by Raycast via the Raycast MCP extension.
@@ -116,6 +230,114 @@ export class RaycastNeocortexMemory {
 
     const deleteMemorySchema = z.object({
       namespace: z.string().optional().describe("Namespace to delete."),
+    });
+
+    const syncMemorySchema = z.object({
+      workspace_id: z.string().describe("Workspace identifier."),
+      agent_id: z.string().describe("Agent identifier."),
+      source: z.enum(["startup", "agent_end"]).optional(),
+      files: z.array(
+        z.object({
+          file_path: z.string().optional(),
+          content: z.string(),
+          timestamp: z.union([z.string(), z.number()]).optional(),
+          hash: z.string(),
+        })
+      ),
+    });
+
+    const insertDocumentSchema = z.object({
+      title: z.string(),
+      content: z.string(),
+      namespace: z.string(),
+      source_type: z.string().optional(),
+      metadata: z.record(z.unknown()).optional(),
+      priority: z.string().optional(),
+      created_at: z.number().optional(),
+      updated_at: z.number().optional(),
+      document_id: z.string().optional(),
+    });
+
+    const insertDocumentsBatchSchema = z.object({
+      items: z.array(insertDocumentSchema),
+    });
+
+    const listDocumentsSchema = z.object({
+      namespace: z.string().optional(),
+      limit: z.number().int().optional(),
+      offset: z.number().int().optional(),
+    });
+
+    const getDocumentSchema = z.object({
+      document_id: z.string(),
+      namespace: z.string().optional(),
+    });
+
+    const deleteDocumentSchema = z.object({
+      document_id: z.string(),
+      namespace: z.string(),
+    });
+
+    const queryMemoryContextSchema = z.object({
+      query: z.string(),
+      namespace: z.string().optional(),
+      include_references: z.boolean().optional(),
+      max_chunks: z.number().int().optional(),
+      document_ids: z.array(z.string()).optional(),
+      recall_only: z.boolean().optional(),
+      llm_query: z.string().optional(),
+    });
+
+    const chatMemoryContextSchema = z.object({
+      messages: z.array(z.object({ role: z.string(), content: z.string() })),
+      temperature: z.number().optional(),
+      max_tokens: z.number().int().optional(),
+    });
+
+    const recordInteractionsSchema = z.object({
+      namespace: z.string(),
+      entity_names: z.array(z.string()),
+      description: z.string().optional(),
+      interaction_level: z.string().optional(),
+      interaction_levels: z.array(z.string()).optional(),
+      timestamp: z.number().optional(),
+    });
+
+    const recallThoughtsSchema = z.object({
+      namespace: z.string().optional(),
+      max_chunks: z.number().int().optional(),
+      temperature: z.number().optional(),
+      randomness_seed: z.number().int().optional(),
+      persist: z.boolean().optional(),
+      enable_prediction_check: z.boolean().optional(),
+      thought_prompt: z.string().optional(),
+    });
+
+    const chatMemorySchema = chatMemoryContextSchema;
+
+    const interactMemorySchema = z.object({
+      namespace: z.string(),
+      entity_names: z.array(z.string()),
+      description: z.string().optional(),
+      interaction_level: z.string().optional(),
+      interaction_levels: z.array(z.string()).optional(),
+      timestamp: z.number().optional(),
+    });
+
+    const recallMemoryMasterSchema = z.object({
+      namespace: z.string().optional(),
+      max_chunks: z.number().int().optional(),
+    });
+
+    const recallMemoriesSchema = z.object({
+      namespace: z.string().optional(),
+      top_k: z.number().optional(),
+      min_retention: z.number().optional(),
+      as_of: z.number().optional(),
+    });
+
+    const getIngestionJobSchema = z.object({
+      job_id: z.string(),
     });
 
     return [
@@ -147,6 +369,156 @@ export class RaycastNeocortexMemory {
           const input = deleteMemorySchema.parse(args);
           const memory = (server as any).__memory as RaycastNeocortexMemory;
           return await memory.deleteMemory(input);
+        },
+      },
+      {
+        name: "neocortex_sync_memory",
+        description: "Sync OpenClaw memory files (POST /v1/memory/sync).",
+        inputSchema: syncMemorySchema,
+        async handler(args: unknown, { server }: { server: McpServer }) {
+          const input = syncMemorySchema.parse(args);
+          const memory = (server as any).__memory as RaycastNeocortexMemory;
+          return await memory.syncMemory(input);
+        },
+      },
+      {
+        name: "neocortex_insert_document",
+        description: "Insert a single memory document (POST /v1/memory/documents).",
+        inputSchema: insertDocumentSchema,
+        async handler(args: unknown, { server }: { server: McpServer }) {
+          const input = insertDocumentSchema.parse(args);
+          const memory = (server as any).__memory as RaycastNeocortexMemory;
+          return await memory.insertDocument(input);
+        },
+      },
+      {
+        name: "neocortex_insert_documents_batch",
+        description: "Insert multiple memory documents (POST /v1/memory/documents/batch).",
+        inputSchema: insertDocumentsBatchSchema,
+        async handler(args: unknown, { server }: { server: McpServer }) {
+          const input = insertDocumentsBatchSchema.parse(args);
+          const memory = (server as any).__memory as RaycastNeocortexMemory;
+          return await memory.insertDocumentsBatch(input);
+        },
+      },
+      {
+        name: "neocortex_list_documents",
+        description: "List ingested documents (GET /v1/memory/documents).",
+        inputSchema: listDocumentsSchema,
+        async handler(args: unknown, { server }: { server: McpServer }) {
+          const input = listDocumentsSchema.parse(args);
+          const memory = (server as any).__memory as RaycastNeocortexMemory;
+          return await memory.listDocuments(input);
+        },
+      },
+      {
+        name: "neocortex_get_document",
+        description: "Get a memory document (GET /v1/memory/documents/:documentId).",
+        inputSchema: getDocumentSchema,
+        async handler(args: unknown, { server }: { server: McpServer }) {
+          const input = getDocumentSchema.parse(args);
+          const memory = (server as any).__memory as RaycastNeocortexMemory;
+          return await memory.getDocument(input);
+        },
+      },
+      {
+        name: "neocortex_delete_document",
+        description: "Delete a memory document (DELETE /v1/memory/documents/:documentId?namespace=...).",
+        inputSchema: deleteDocumentSchema,
+        async handler(args: unknown, { server }: { server: McpServer }) {
+          const input = deleteDocumentSchema.parse(args);
+          const memory = (server as any).__memory as RaycastNeocortexMemory;
+          return await memory.deleteDocument(input);
+        },
+      },
+      {
+        name: "neocortex_query_memory_context",
+        description: "Query memory context (POST /v1/memory/queries).",
+        inputSchema: queryMemoryContextSchema,
+        async handler(args: unknown, { server }: { server: McpServer }) {
+          const input = queryMemoryContextSchema.parse(args);
+          const memory = (server as any).__memory as RaycastNeocortexMemory;
+          return await memory.queryMemoryContext(input);
+        },
+      },
+      {
+        name: "neocortex_chat_memory_context",
+        description: "Chat with memory context (POST /v1/memory/conversations).",
+        inputSchema: chatMemoryContextSchema,
+        async handler(args: unknown, { server }: { server: McpServer }) {
+          const input = chatMemoryContextSchema.parse(args);
+          const memory = (server as any).__memory as RaycastNeocortexMemory;
+          return await memory.chatMemoryContext(input);
+        },
+      },
+      {
+        name: "neocortex_record_interactions",
+        description: "Record interactions (POST /v1/memory/interactions).",
+        inputSchema: recordInteractionsSchema,
+        async handler(args: unknown, { server }: { server: McpServer }) {
+          const input = recordInteractionsSchema.parse(args);
+          const memory = (server as any).__memory as RaycastNeocortexMemory;
+          return await memory.recordInteractions(input);
+        },
+      },
+      {
+        name: "neocortex_recall_thoughts",
+        description: "Generate reflective thoughts (POST /v1/memory/memories/thoughts).",
+        inputSchema: recallThoughtsSchema,
+        async handler(args: unknown, { server }: { server: McpServer }) {
+          const input = recallThoughtsSchema.parse(args);
+          const memory = (server as any).__memory as RaycastNeocortexMemory;
+          return await memory.recallThoughts(input);
+        },
+      },
+      {
+        name: "neocortex_chat_memory",
+        description: "Chat with memory cache (POST /v1/memory/chat).",
+        inputSchema: chatMemorySchema,
+        async handler(args: unknown, { server }: { server: McpServer }) {
+          const input = chatMemorySchema.parse(args);
+          const memory = (server as any).__memory as RaycastNeocortexMemory;
+          return await memory.chatMemory(input);
+        },
+      },
+      {
+        name: "neocortex_interact_memory",
+        description: "Record entity interactions (POST /v1/memory/interact).",
+        inputSchema: interactMemorySchema,
+        async handler(args: unknown, { server }: { server: McpServer }) {
+          const input = interactMemorySchema.parse(args);
+          const memory = (server as any).__memory as RaycastNeocortexMemory;
+          return await memory.interactMemory(input);
+        },
+      },
+      {
+        name: "neocortex_recall_memory_master",
+        description: "Recall context from the master node (POST /v1/memory/recall).",
+        inputSchema: recallMemoryMasterSchema,
+        async handler(args: unknown, { server }: { server: McpServer }) {
+          const input = recallMemoryMasterSchema.parse(args);
+          const memory = (server as any).__memory as RaycastNeocortexMemory;
+          return await memory.recallMemoryMaster(input);
+        },
+      },
+      {
+        name: "neocortex_recall_memories",
+        description: "Recall memories from the Ebbinghaus bank (POST /v1/memory/memories/recall).",
+        inputSchema: recallMemoriesSchema,
+        async handler(args: unknown, { server }: { server: McpServer }) {
+          const input = recallMemoriesSchema.parse(args);
+          const memory = (server as any).__memory as RaycastNeocortexMemory;
+          return await memory.recallMemories(input);
+        },
+      },
+      {
+        name: "neocortex_get_ingestion_job",
+        description: "Get ingestion job status (GET /v1/memory/ingestion/jobs/:jobId).",
+        inputSchema: getIngestionJobSchema,
+        async handler(args: unknown, { server }: { server: McpServer }) {
+          const input = getIngestionJobSchema.parse(args);
+          const memory = (server as any).__memory as RaycastNeocortexMemory;
+          return await memory.getIngestionJob(input);
         },
       },
     ];

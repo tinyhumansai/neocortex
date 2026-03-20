@@ -6,10 +6,25 @@ This package provides a small MCP server and TypeScript helpers so the [Raycast 
 
 ## Features
 
-- **MCP server for Raycast** — exposes three tools:
+- **MCP server for Raycast** — exposes the full Mastra-compatible Neocortex tool surface:
   - `neocortex_save_memory`
   - `neocortex_recall_memory`
   - `neocortex_delete_memory`
+  - `neocortex_sync_memory`
+  - `neocortex_insert_document`
+  - `neocortex_insert_documents_batch`
+  - `neocortex_list_documents`
+  - `neocortex_get_document`
+  - `neocortex_delete_document`
+  - `neocortex_query_memory_context`
+  - `neocortex_chat_memory_context`
+  - `neocortex_record_interactions`
+  - `neocortex_recall_thoughts`
+  - `neocortex_chat_memory`
+  - `neocortex_interact_memory`
+  - `neocortex_recall_memory_master`
+  - `neocortex_recall_memories`
+  - `neocortex_get_ingestion_job`
 - **Shared client** — reuses the same `NeocortexMemoryClient` and types as the other Neocortex plugins.
 - **Simple bootstrap** — one helper (`runNeocortexMcpServerFromEnv`) you can point to from the Raycast MCP Extension configuration.
 
@@ -51,6 +66,21 @@ After saving, Raycast will:
   - `neocortex_save_memory`
   - `neocortex_recall_memory`
   - `neocortex_delete_memory`
+  - `neocortex_sync_memory`
+  - `neocortex_insert_document`
+  - `neocortex_insert_documents_batch`
+  - `neocortex_list_documents`
+  - `neocortex_get_document`
+  - `neocortex_delete_document`
+  - `neocortex_query_memory_context`
+  - `neocortex_chat_memory_context`
+  - `neocortex_record_interactions`
+  - `neocortex_recall_thoughts`
+  - `neocortex_chat_memory`
+  - `neocortex_interact_memory`
+  - `neocortex_recall_memory_master`
+  - `neocortex_recall_memories`
+  - `neocortex_get_ingestion_job`
 - Allow you to `@-mention` the Neocortex server and invoke its tools in AI Chat, Commands, and Presets.
 
 ## Programmatic Usage
