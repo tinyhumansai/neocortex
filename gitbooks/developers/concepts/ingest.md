@@ -1,39 +1,24 @@
 # Ingest
 
-**Ingesting** is how you store memories. You can ingest a single item or a batch.
+Ingesting is how you write memory into Neocortex. Ingest is an upsert operation.
 
-## Single Item
+## What Upsert Means
 
-```python
-client.ingest_memory(item={
-    "key": "fact-1",
-    "content": "User is vegetarian",
-    "namespace": "preferences",
-})
-```
+- If `(namespace, key)` does not exist, Neocortex creates a new memory item.
+- If `(namespace, key)` already exists, Neocortex updates the existing item.
 
-## Batch
+This prevents duplicates and lets you safely re-send corrected or richer versions of the same memory.
 
-```python
-client.ingest_memories(items=[
-    {"key": "fact-1", "content": "User is vegetarian", "namespace": "preferences"},
-    {"key": "fact-2", "content": "Allergic to peanuts", "namespace": "preferences"},
-])
-```
+## Typical Fields
 
-## Upsert Behavior
+- `key`: stable identifier in a namespace
+- `content`: memory text
+- `namespace`: scope bucket
+- `metadata` (optional): tags/attributes
+- `created_at` / `updated_at` (optional): Unix timestamps
 
-Ingest is an **upsert** operation if a memory with the same `(namespace, key)` already exists, its content and metadata are updated. Otherwise a new memory is created.
+## Practical Pattern
 
-This means you can safely call ingest repeatedly without worrying about duplicates. The `key` is your deduplication handle.
+Use deterministic keys where possible, like `user:{id}:preference:theme`, so updates naturally target the same memory item over time.
 
-## Response
-
-The response tells you what happened:
-
-```python
-result = client.ingest_memory(item={...})
-print(result.ingested)  # Number of new items created
-print(result.updated)   # Number of existing items updated
-print(result.errors)    # Number of items that failed
-```
+For implementation examples in all supported languages, see [Inserting Memories](../sdk-functions/inserting-memories.md).

@@ -26,6 +26,8 @@
   * [Timestamps](developers/concepts/timestamps.md)
 * [SDK Functions](developers/sdk-functions/README.md)
   * [Inserting Memories](developers/sdk-functions/inserting-memories.md)
+  * [Recalling Memories](developers/sdk-functions/recalling-memories.md)
+  * [Deleting Memories](developers/sdk-functions/deleting-memories.md)
 * [Third-party Plugins/Integrations](developers/third-party-plugins-integrations/README.md)
   * [LangGraph Plugin](developers/third-party-plugins-integrations/langgraph-sdk.md)
   * [OpenClaw Plugin](developers/third-party-plugins-integrations/openclaw-plugin.md)

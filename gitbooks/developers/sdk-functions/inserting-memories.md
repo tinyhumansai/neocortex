@@ -1,44 +1,150 @@
 # Inserting Memories
 
-## Multi-syntax code
+Use this operation to upsert memory into a namespace.
 
-You can add code to your GitBook pages using code blocks.
+## API Endpoint
 
-When you add a code block, you can choose to [set the syntax](https://gitbook.com/docs/creating-content/blocks/code-block#set-syntax), [show line numbers](https://gitbook.com/docs/creating-content/blocks/code-block#with-line-numbers), [show a caption](https://gitbook.com/docs/creating-content/blocks/code-block#with-caption), and [wrap the lines](https://gitbook.com/docs/creating-content/blocks/code-block#wrap-code). It’s also easy to [copy the contents of a code block to the clipboard](https://gitbook.com/docs/creating-content/blocks/code-block#copying-the-code), so you can use it elsewhere.
+`POST /memory/insert`
 
-### Example of code block
+Some deployments and SDKs use a `/v1` prefix (`/v1/memory/insert`). If your deployment requires it, prepend `/v1`.
+
+## Request Body
+
+```json
+{
+  "title": "user-preference-theme",
+  "content": "User prefers dark mode",
+  "namespace": "preferences",
+  "sourceType": "doc",
+  "metadata": {"source": "onboarding"}
+}
+```
+
+## Examples by Language
 
 {% tabs %}
-{% tab title="JavaScript" %}
-```javascript
-const message = "hello world";
-console.log(message);
+{% tab title="cURL" %}
+```bash
+curl -X POST "https://api.tinyhumans.ai/memory/insert" \
+  -H "Authorization: Bearer $ALPHAHUMAN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "user-preference-theme",
+    "content": "User prefers dark mode",
+    "namespace": "preferences",
+    "sourceType": "doc",
+    "metadata": {"source": "onboarding"}
+  }'
+```
+{% endtab %}
+
+{% tab title="TypeScript" %}
+```ts
+import { AlphahumanMemoryClient } from "@alphahuman/memory-sdk";
+
+const client = new AlphahumanMemoryClient({ token: process.env.ALPHAHUMAN_TOKEN! });
+
+const result = await client.insertMemory({
+  title: "user-preference-theme",
+  content: "User prefers dark mode",
+  namespace: "preferences",
+  sourceType: "doc",
+  metadata: { source: "onboarding" },
+});
+
+console.log(result.data.status);
 ```
 {% endtab %}
 
 {% tab title="Python" %}
 ```python
-message = "hello world"
-print(message)
+import tinyhumansai as api
+
+client = api.TinyHumanMemoryClient(token="YOUR_API_KEY")
+
+result = client.ingest_memory(
+    item={
+        "key": "user-preference-theme",
+        "content": "User prefers dark mode",
+        "namespace": "preferences",
+        "metadata": {"source": "onboarding"},
+    }
+)
+
+print(result.ingested, result.updated, result.errors)
 ```
 {% endtab %}
 
-{% tab title="Ruby" %}
-```ruby
-message = "hello world"
-puts message
+{% tab title="Go" %}
+```go
+client, err := tinyhumans.NewClient(os.Getenv("ALPHAHUMAN_TOKEN"))
+if err != nil {
+    log.Fatal(err)
+}
+defer client.Close()
+
+resp, err := client.IngestMemory(tinyhumans.MemoryItem{
+    Key:       "user-preference-theme",
+    Content:   "User prefers dark mode",
+    Namespace: "preferences",
+    Metadata:  map[string]interface{}{"source": "onboarding"},
+})
+if err != nil {
+    log.Fatal(err)
+}
+
+fmt.Println(resp.Ingested, resp.Updated, resp.Errors)
+```
+{% endtab %}
+
+{% tab title="Rust" %}
+```rust
+use tinyhumansai::{InsertMemoryParams, TinyHumanConfig, TinyHumanMemoryClient};
+
+let client = TinyHumanMemoryClient::new(TinyHumanConfig::new("YOUR_API_KEY"))?;
+
+let response = client
+    .insert_memory(InsertMemoryParams {
+        title: "user-preference-theme".into(),
+        content: "User prefers dark mode".into(),
+        namespace: "preferences".into(),
+        ..Default::default()
+    })
+    .await?;
+
+println!("{}", response.data.status.unwrap_or_default());
+```
+{% endtab %}
+
+{% tab title="Java" %}
+```java
+import xyz.alphahuman.sdk.*;
+
+try (AlphahumanMemoryClient client = new AlphahumanMemoryClient(System.getenv("ALPHAHUMAN_TOKEN"))) {
+    InsertMemoryResponse response = client.insertMemory(
+        new InsertMemoryParams("user-preference-theme", "User prefers dark mode", "preferences")
+    );
+
+    System.out.println(response.getStatus());
+}
+```
+{% endtab %}
+
+{% tab title="C++" %}
+```cpp
+#include "alphahuman/alphahuman.hpp"
+using namespace alphahuman;
+
+AlphahumanMemoryClient client(std::getenv("ALPHAHUMAN_TOKEN"));
+
+InsertMemoryParams params;
+params
+    .set_title("user-preference-theme")
+    .set_content("User prefers dark mode")
+    .set_namespace("preferences");
+
+auto response = client.insert_memory(params);
+std::cout << response.status << std::endl;
 ```
 {% endtab %}
 {% endtabs %}
-
-{% hint style="info" %}
-You can make code blocks [span the full width of your window](https://gitbook.com/docs/creating-content/blocks#full-width-blocks) by clicking on the **Options menu** <i class="fa-grip-dots-vertical">:grip-dots-vertical:</i> icon in GitBook next to the block and choosing **Full width.**
-{% endhint %}
-
-## HTTP Schema
-
-You can also directly test
-
-{% openapi-operation spec="tinyhumans-api" path="/actionable-items/ingest" method="post" %}
-[OpenAPI tinyhumans-api](https://4401d86825a13bf607936cc3a9f3897a.r2.cloudflarestorage.com/gitbook-x-prod-openapi/raw/b063a0161bcaed2556372fc23f676821d08c87ea3e7e17732d3e3d37ca3b7e87.json?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=dce48141f43c0191a2ad043a6888781c%2F20260320%2Fauto%2Fs3%2Faws4_request&X-Amz-Date=20260320T231947Z&X-Amz-Expires=172800&X-Amz-Signature=10f116f5610bf82445010a8d2f50371e2645dccfd408e739b138083ab23c072f&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject)
-{% endopenapi-operation %}

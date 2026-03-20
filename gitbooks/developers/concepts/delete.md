@@ -1,31 +1,18 @@
 # Delete
 
-**Deleting** removes memories explicitly when you need immediate cleanup rather than waiting for natural decay.
+Delete removes stored memory explicitly.
 
-## Delete a Specific Memory
+## When to Delete
 
-```python
-client.delete_memory(namespace="preferences", key="fact-1")
-```
+- user-requested data removal
+- invalid or unsafe memory content
+- namespace reset during migrations or test setup
 
-## Delete Multiple Memories
+## Delete vs. Decay
 
-```python
-client.delete_memory(namespace="preferences", keys=["fact-1", "fact-2"])
-```
+- Use decay for natural long-term pruning.
+- Use delete when you need immediate removal.
 
-## Delete Everything in a Namespace
+Deletion is permanent.
 
-```python
-client.delete_memory(namespace="preferences", delete_all=True)
-```
-
-## When to Delete vs. Let Decay
-
-Most of the time, you can let [memory decay](memory-decay.md) handle cleanup naturally. Use explicit deletion when:
-
-* A user requests their data be removed
-* Information is known to be incorrect and should not influence future recall
-* You're resetting or rebuilding a namespace
-
-Deletion is **permanent and immediate** the memory is gone, not just decayed.
+For implementation examples in all supported languages, see [Deleting Memories](../sdk-functions/deleting-memories.md).

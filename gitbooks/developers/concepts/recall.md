@@ -1,45 +1,28 @@
 # Recall
 
-**Recalling** is how you retrieve memories. You provide a natural-language prompt and Neocortex returns the most relevant memories as an LLM-ready context string.
+Recall is how you fetch relevant memory context for a given task.
 
-## Basic Usage
+## How Recall Works
 
-```python
-ctx = client.recall_memory(
-    namespace="preferences",
-    prompt="What dietary restrictions does the user have?",
-    num_chunks=10,
-)
-print(ctx.context)  # Formatted string ready for an LLM prompt
-print(ctx.items)    # Individual memory items
-print(ctx.count)    # Number of items returned
-```
+Neocortex ranks candidate memories using:
 
-## How It Works
+- semantic relevance to the query
+- recency/decay behavior
+- interaction reinforcement signals
 
-Recall is **prompt-driven:** the system uses your query to find the most relevant memories, not just the most recent. Neocortex considers semantic relevance, time-decay, and interaction signals to rank results.
+The output can include both structured chunks and an LLM-ready context string.
 
-## Filter by Key
+## Prompt-Driven Retrieval
 
-If you know exactly which memories you need, you can filter by key instead of using prompt-based retrieval:
+Most applications recall with a query such as:
 
-```python
-ctx = client.recall_memory(namespace="preferences", prompt="", key="fav-color", num_chunks=10)
-```
+- "What dietary restrictions does the user have?"
+- "Summarize prior project decisions"
 
-## Recall with LLM
+This keeps retrieval dynamic and task-specific.
 
-For convenience, you can recall and query an LLM in one step. Neocortex fetches the relevant context and injects it into the LLM prompt automatically:
+## Scope With Namespaces
 
-```python
-response = client.recall_with_llm(
-    prompt="What dietary restrictions does the user have?",
-    namespace="preferences",
-    provider="openai",
-    model="gpt-4o-mini",
-    api_key="your-openai-key",
-)
-print(response.text)
-```
+Always scope recall to the namespace most relevant to the current task. This reduces noise and improves answer quality.
 
-Supports OpenAI, Anthropic, Google Gemini, and any OpenAI-compatible endpoint.
+For implementation examples in all supported languages, see [Recalling Memories](../sdk-functions/recalling-memories.md).
