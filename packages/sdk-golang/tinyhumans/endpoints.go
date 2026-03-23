@@ -55,3 +55,45 @@ func (c *Client) ChatMemoryContext(messages []ChatMessage, opts *ChatMemoryOptio
 
 	return c.send("POST", "/memory/conversations", body)
 }
+
+// InteractMemory records entity interaction signals.
+// POST /memory/interact
+func (c *Client) InteractMemory(namespace string, entityNames []string, opts *InteractMemoryOptions) (map[string]interface{}, error) {
+	return c.sendInteraction("/memory/interact", namespace, entityNames, opts)
+}
+
+// RecordInteractions records entity interaction signals via the mirrored endpoint.
+// POST /memory/interactions
+func (c *Client) RecordInteractions(namespace string, entityNames []string, opts *InteractMemoryOptions) (map[string]interface{}, error) {
+	return c.sendInteraction("/memory/interactions", namespace, entityNames, opts)
+}
+
+func (c *Client) sendInteraction(path, namespace string, entityNames []string, opts *InteractMemoryOptions) (map[string]interface{}, error) {
+	if namespace == "" {
+		return nil, errors.New("namespace is required")
+	}
+	if len(entityNames) == 0 {
+		return nil, errors.New("entity_names must be a non-empty list")
+	}
+
+	body := map[string]interface{}{
+		"namespace":   namespace,
+		"entityNames": entityNames,
+	}
+	if opts != nil {
+		if opts.Description != "" {
+			body["description"] = opts.Description
+		}
+		if opts.InteractionLevel != "" {
+			body["interactionLevel"] = opts.InteractionLevel
+		}
+		if opts.InteractionLevels != nil {
+			body["interactionLevels"] = opts.InteractionLevels
+		}
+		if opts.Timestamp != nil {
+			body["timestamp"] = *opts.Timestamp
+		}
+	}
+
+	return c.send("POST", path, body)
+}

@@ -117,3 +117,95 @@ func TestChatMemoryContext_EmptyMessages(t *testing.T) {
 		t.Fatal("expected error for empty messages")
 	}
 }
+
+// --- InteractMemory ---
+
+func TestInteractMemory_Success(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/memory/interact" {
+			t.Errorf("path = %s, want /memory/interact", r.URL.Path)
+		}
+
+		var body map[string]interface{}
+		json.NewDecoder(r.Body).Decode(&body)
+
+		if body["namespace"] != "ns1" {
+			t.Errorf("namespace = %v", body["namespace"])
+		}
+		entities := body["entityNames"].([]interface{})
+		if len(entities) != 2 || entities[0] != "alice" {
+			t.Errorf("entityNames = %v", body["entityNames"])
+		}
+
+		w.Write([]byte(`{"data":{"recorded":true}}`))
+	}))
+	defer server.Close()
+
+	c := testClient(t, server)
+	data, err := c.InteractMemory("ns1", []string{"alice", "bob"}, nil)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if data["recorded"] != true {
+		t.Errorf("recorded = %v", data["recorded"])
+	}
+}
+
+func TestInteractMemory_EmptyNamespace(t *testing.T) {
+	c, _ := NewClient("tok")
+	_, err := c.InteractMemory("", []string{"alice"}, nil)
+	if err == nil {
+		t.Fatal("expected error for empty namespace")
+	}
+}
+
+func TestInteractMemory_EmptyEntityNames(t *testing.T) {
+	c, _ := NewClient("tok")
+	_, err := c.InteractMemory("ns1", []string{}, nil)
+	if err == nil {
+		t.Fatal("expected error for empty entity_names")
+	}
+}
+
+func TestInteractMemory_WithOptions(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var body map[string]interface{}
+		json.NewDecoder(r.Body).Decode(&body)
+
+		if body["description"] != "met at conf" {
+			t.Errorf("description = %v", body["description"])
+		}
+		if body["interactionLevel"] != "high" {
+			t.Errorf("interactionLevel = %v", body["interactionLevel"])
+		}
+
+		w.Write([]byte(`{"data":{}}`))
+	}))
+	defer server.Close()
+
+	c := testClient(t, server)
+	ts := 1700000000.0
+	c.InteractMemory("ns", []string{"alice"}, &InteractMemoryOptions{
+		Description:      "met at conf",
+		InteractionLevel: "high",
+		Timestamp:        &ts,
+	})
+}
+
+// --- RecordInteractions ---
+
+func TestRecordInteractions_UsesCorrectPath(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/memory/interactions" {
+			t.Errorf("path = %s, want /memory/interactions", r.URL.Path)
+		}
+		w.Write([]byte(`{"data":{}}`))
+	}))
+	defer server.Close()
+
+	c := testClient(t, server)
+	_, err := c.RecordInteractions("ns", []string{"alice"}, nil)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
