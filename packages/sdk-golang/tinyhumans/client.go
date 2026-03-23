@@ -250,6 +250,60 @@ func (c *Client) RecallWithLLM(prompt, apiKey string, opts RecallWithLLMOptions)
 	return queryLLM(prompt, provider, model, apiKey, context, opts.MaxTokens, opts.Temperature, opts.URL)
 }
 
+// sendGet performs an HTTP GET request with query parameters and returns the parsed data.
+func (c *Client) sendGet(path string, params map[string]string) (map[string]interface{}, error) {
+	req, err := http.NewRequest("GET", c.baseURL+path, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+
+	if len(params) > 0 {
+		q := req.URL.Query()
+		for k, v := range params {
+			q.Set(k, v)
+		}
+		req.URL.RawQuery = q.Encode()
+	}
+
+	req.Header.Set("Authorization", "Bearer "+c.token)
+	req.Header.Set("X-Model-Id", c.modelID)
+
+	resp, err := c.http.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	return c.parseResponse(resp)
+}
+
+// sendDelete performs an HTTP DELETE request with query parameters and returns the parsed data.
+func (c *Client) sendDelete(path string, params map[string]string) (map[string]interface{}, error) {
+	req, err := http.NewRequest("DELETE", c.baseURL+path, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+
+	if len(params) > 0 {
+		q := req.URL.Query()
+		for k, v := range params {
+			q.Set(k, v)
+		}
+		req.URL.RawQuery = q.Encode()
+	}
+
+	req.Header.Set("Authorization", "Bearer "+c.token)
+	req.Header.Set("X-Model-Id", c.modelID)
+
+	resp, err := c.http.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	return c.parseResponse(resp)
+}
+
 // send performs an HTTP request with JSON body and returns the parsed data.
 func (c *Client) send(method, path string, body map[string]interface{}) (map[string]interface{}, error) {
 	jsonBody, err := json.Marshal(body)
