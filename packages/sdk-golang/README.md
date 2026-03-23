@@ -64,25 +64,77 @@ func main() {
 
 ## Full route example
 
-`example/main.go` exercises all exported client methods:
-- `IngestMemory`
-- `IngestMemories`
-- `RecallMemory`
-- `DeleteMemory`
-- `RecallWithLLM`
-- `Close`
-
-Run it with:
+`example/main.go` exercises all exported client methods. Run it with:
 
 ```bash
 cd packages/sdk-golang
 go run ./example/main.go
 ```
 
-## API surface
+## API Reference
 
-`NewClient(token string, baseURL ...string)`
-- Base URL resolution: argument -> `TINYHUMANS_BASE_URL` env -> `https://api.tinyhumans.ai`.
+### Client constructors
+
+| Function | Description |
+|----------|-------------|
+| `NewClient(token, baseURL...)` | Create client with default model ID |
+| `NewClientWithModelID(token, modelID, baseURL...)` | Create client with custom model ID |
+| `Close()` | Release idle HTTP connections |
+
+Base URL resolution: argument → `TINYHUMANS_BASE_URL` env → `https://api.tinyhumans.ai`.
+
+### Core Memory
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `IngestMemory(item)` | POST `/v1/memory/insert` | Ingest a single memory item |
+| `IngestMemories(items)` | POST `/v1/memory/insert` | Batch ingest memory items |
+| `RecallMemory(namespace, prompt, opts)` | POST `/v1/memory/recall` | Recall LLM-friendly context |
+| `DeleteMemory(namespace, opts)` | POST `/v1/memory/admin/delete` | Delete memory by namespace |
+| `RecallWithLLM(prompt, apiKey, opts)` | — | Query LLM with memory context |
+
+### Chat
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `ChatMemory(messages, opts)` | POST `/memory/chat` | Chat with DeltaNet memory cache |
+| `ChatMemoryContext(messages, opts)` | POST `/memory/conversations` | Chat with memory context |
+
+### Interactions
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `InteractMemory(namespace, entityNames, opts)` | POST `/memory/interact` | Record entity interaction signals |
+| `RecordInteractions(namespace, entityNames, opts)` | POST `/memory/interactions` | Record interactions (mirrored) |
+
+### Advanced Recall
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `RecallMemories(opts)` | POST `/memory/memories/recall` | Recall from Ebbinghaus memory bank |
+| `RecallThoughts(opts)` | POST `/memory/memories/thoughts` | Generate reflective thoughts |
+| `QueryMemoryContext(query, opts)` | POST `/memory/queries` | Query memory context |
+
+### Documents
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `InsertDocument(title, content, namespace, opts)` | POST `/memory/documents` | Insert a single document |
+| `InsertDocumentsBatch(items)` | POST `/memory/documents/batch` | Batch insert documents |
+| `ListDocuments(opts)` | GET `/memory/documents` | List ingested documents |
+| `GetDocument(documentID, opts)` | GET `/memory/documents/{id}` | Get document details |
+| `DeleteDocument(documentID, namespace)` | DELETE `/memory/documents/{id}` | Delete a document |
+
+### Admin & Utility
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GetGraphSnapshot(opts)` | GET `/memory/admin/graph-snapshot` | Get admin graph snapshot |
+| `SyncMemory(opts)` | POST `/memory/sync` | Sync memory files |
+| `GetIngestionJob(jobID)` | GET `/memory/ingestion/jobs/{id}` | Get ingestion job status |
+| `WaitForIngestionJob(jobID, opts)` | — | Poll job until terminal state |
+
+### LLM providers
 
 `RecallWithLLM` supports:
 - OpenAI (`provider: "openai"`)
@@ -90,6 +142,11 @@ go run ./example/main.go
 - Google (`"google"`)
 - Custom OpenAI-compatible URL (`URL` option)
 
-## Current SDK scope
+## Testing
 
-This Go SDK currently implements the core memory routes plus LLM helper only. It does not yet expose the newer document/mirrored routes that exist in the TypeScript/Python/Rust SDKs.
+```bash
+cd packages/sdk-golang
+make test        # run all unit tests
+make test-cover  # with coverage report
+make check       # build + vet + test
+```
