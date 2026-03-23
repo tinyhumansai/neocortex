@@ -118,6 +118,165 @@ func TestChatMemoryContext_EmptyMessages(t *testing.T) {
 	}
 }
 
+// --- RecallMemories ---
+
+func TestRecallMemories_Success(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/memory/memories/recall" {
+			t.Errorf("path = %s, want /memory/memories/recall", r.URL.Path)
+		}
+		var body map[string]interface{}
+		json.NewDecoder(r.Body).Decode(&body)
+		if body["namespace"] != "ns1" {
+			t.Errorf("namespace = %v", body["namespace"])
+		}
+		w.Write([]byte(`{"data":{"memories":[]}}`))
+	}))
+	defer server.Close()
+
+	c := testClient(t, server)
+	data, err := c.RecallMemories(&RecallMemoriesOptions{Namespace: "ns1"})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if data["memories"] == nil {
+		t.Error("expected memories in response")
+	}
+}
+
+func TestRecallMemories_NilOpts(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var body map[string]interface{}
+		json.NewDecoder(r.Body).Decode(&body)
+		if len(body) != 0 {
+			t.Errorf("expected empty body, got %v", body)
+		}
+		w.Write([]byte(`{"data":{}}`))
+	}))
+	defer server.Close()
+
+	c := testClient(t, server)
+	_, err := c.RecallMemories(nil)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+// --- RecallThoughts ---
+
+func TestRecallThoughts_Success(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/memory/memories/thoughts" {
+			t.Errorf("path = %s, want /memory/memories/thoughts", r.URL.Path)
+		}
+		var body map[string]interface{}
+		json.NewDecoder(r.Body).Decode(&body)
+		if body["namespace"] != "ns1" {
+			t.Errorf("namespace = %v", body["namespace"])
+		}
+		if body["thoughtPrompt"] != "reflect on today" {
+			t.Errorf("thoughtPrompt = %v", body["thoughtPrompt"])
+		}
+		w.Write([]byte(`{"data":{"thoughts":["thought1"]}}`))
+	}))
+	defer server.Close()
+
+	c := testClient(t, server)
+	maxC := 5
+	data, err := c.RecallThoughts(&RecallThoughtsOptions{
+		Namespace:     "ns1",
+		MaxChunks:     &maxC,
+		ThoughtPrompt: "reflect on today",
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if data["thoughts"] == nil {
+		t.Error("expected thoughts in response")
+	}
+}
+
+func TestRecallThoughts_NilOpts(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte(`{"data":{}}`))
+	}))
+	defer server.Close()
+
+	c := testClient(t, server)
+	_, err := c.RecallThoughts(nil)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+}
+
+// --- QueryMemoryContext ---
+
+func TestQueryMemoryContext_Success(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/memory/queries" {
+			t.Errorf("path = %s, want /memory/queries", r.URL.Path)
+		}
+		var body map[string]interface{}
+		json.NewDecoder(r.Body).Decode(&body)
+		if body["query"] != "what happened?" {
+			t.Errorf("query = %v", body["query"])
+		}
+		if body["namespace"] != "ns1" {
+			t.Errorf("namespace = %v", body["namespace"])
+		}
+		w.Write([]byte(`{"data":{"context":"relevant info"}}`))
+	}))
+	defer server.Close()
+
+	c := testClient(t, server)
+	data, err := c.QueryMemoryContext("what happened?", &QueryMemoryContextOptions{Namespace: "ns1"})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if data["context"] != "relevant info" {
+		t.Errorf("context = %v", data["context"])
+	}
+}
+
+func TestQueryMemoryContext_EmptyQuery(t *testing.T) {
+	c, _ := NewClient("tok")
+	_, err := c.QueryMemoryContext("", nil)
+	if err == nil {
+		t.Fatal("expected error for empty query")
+	}
+}
+
+func TestQueryMemoryContext_WithAllOptions(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var body map[string]interface{}
+		json.NewDecoder(r.Body).Decode(&body)
+
+		if body["includeReferences"] != true {
+			t.Errorf("includeReferences = %v", body["includeReferences"])
+		}
+		if body["maxChunks"] != float64(5) {
+			t.Errorf("maxChunks = %v", body["maxChunks"])
+		}
+		docIDs := body["documentIds"].([]interface{})
+		if len(docIDs) != 1 || docIDs[0] != "doc1" {
+			t.Errorf("documentIds = %v", body["documentIds"])
+		}
+
+		w.Write([]byte(`{"data":{}}`))
+	}))
+	defer server.Close()
+
+	c := testClient(t, server)
+	incRef := true
+	maxC := 5
+	c.QueryMemoryContext("q", &QueryMemoryContextOptions{
+		Namespace:         "ns",
+		IncludeReferences: &incRef,
+		MaxChunks:         &maxC,
+		DocumentIDs:       []string{"doc1"},
+	})
+}
+
 // --- InteractMemory ---
 
 func TestInteractMemory_Success(t *testing.T) {

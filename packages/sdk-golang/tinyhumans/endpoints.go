@@ -68,6 +68,93 @@ func (c *Client) RecordInteractions(namespace string, entityNames []string, opts
 	return c.sendInteraction("/memory/interactions", namespace, entityNames, opts)
 }
 
+// RecallMemories recalls memories from the Ebbinghaus memory bank.
+// POST /memory/memories/recall
+func (c *Client) RecallMemories(opts *RecallMemoriesOptions) (map[string]interface{}, error) {
+	body := map[string]interface{}{}
+	if opts != nil {
+		if opts.Namespace != "" {
+			body["namespace"] = opts.Namespace
+		}
+		if opts.TopK != nil {
+			body["topK"] = *opts.TopK
+		}
+		if opts.MinRetention != nil {
+			body["minRetention"] = *opts.MinRetention
+		}
+		if opts.AsOf != nil {
+			body["asOf"] = *opts.AsOf
+		}
+	}
+
+	return c.send("POST", "/memory/memories/recall", body)
+}
+
+// RecallThoughts generates reflective thoughts from memory.
+// POST /memory/memories/thoughts
+func (c *Client) RecallThoughts(opts *RecallThoughtsOptions) (map[string]interface{}, error) {
+	body := map[string]interface{}{}
+	if opts != nil {
+		if opts.Namespace != "" {
+			body["namespace"] = opts.Namespace
+		}
+		if opts.MaxChunks != nil {
+			body["maxChunks"] = *opts.MaxChunks
+		}
+		if opts.Temperature != nil {
+			body["temperature"] = *opts.Temperature
+		}
+		if opts.RandomnessSeed != nil {
+			body["randomnessSeed"] = *opts.RandomnessSeed
+		}
+		if opts.Persist != nil {
+			body["persist"] = *opts.Persist
+		}
+		if opts.EnablePredictionCheck != nil {
+			body["enablePredictionCheck"] = *opts.EnablePredictionCheck
+		}
+		if opts.ThoughtPrompt != "" {
+			body["thoughtPrompt"] = opts.ThoughtPrompt
+		}
+	}
+
+	return c.send("POST", "/memory/memories/thoughts", body)
+}
+
+// QueryMemoryContext queries memory context via the queries endpoint.
+// POST /memory/queries
+func (c *Client) QueryMemoryContext(query string, opts *QueryMemoryContextOptions) (map[string]interface{}, error) {
+	if query == "" {
+		return nil, errors.New("query is required")
+	}
+
+	body := map[string]interface{}{
+		"query": query,
+	}
+	if opts != nil {
+		if opts.Namespace != "" {
+			body["namespace"] = opts.Namespace
+		}
+		if opts.IncludeReferences != nil {
+			body["includeReferences"] = *opts.IncludeReferences
+		}
+		if opts.MaxChunks != nil {
+			body["maxChunks"] = *opts.MaxChunks
+		}
+		if opts.DocumentIDs != nil {
+			body["documentIds"] = opts.DocumentIDs
+		}
+		if opts.RecallOnly != nil {
+			body["recallOnly"] = *opts.RecallOnly
+		}
+		if opts.LLMQuery != "" {
+			body["llmQuery"] = opts.LLMQuery
+		}
+	}
+
+	return c.send("POST", "/memory/queries", body)
+}
+
 func (c *Client) sendInteraction(path, namespace string, entityNames []string, opts *InteractMemoryOptions) (map[string]interface{}, error) {
 	if namespace == "" {
 		return nil, errors.New("namespace is required")
