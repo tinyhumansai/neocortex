@@ -368,3 +368,215 @@ func TestRecordInteractions_UsesCorrectPath(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	}
 }
+
+// --- InsertDocument ---
+
+func TestInsertDocument_Success(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/memory/documents" {
+			t.Errorf("path = %s, want /memory/documents", r.URL.Path)
+		}
+		if r.Method != "POST" {
+			t.Errorf("method = %s, want POST", r.Method)
+		}
+
+		var body map[string]interface{}
+		json.NewDecoder(r.Body).Decode(&body)
+		if body["title"] != "doc1" {
+			t.Errorf("title = %v", body["title"])
+		}
+		if body["content"] != "content1" {
+			t.Errorf("content = %v", body["content"])
+		}
+		if body["namespace"] != "ns1" {
+			t.Errorf("namespace = %v", body["namespace"])
+		}
+
+		w.Write([]byte(`{"data":{"id":"doc-123"}}`))
+	}))
+	defer server.Close()
+
+	c := testClient(t, server)
+	data, err := c.InsertDocument("doc1", "content1", "ns1", nil)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if data["id"] != "doc-123" {
+		t.Errorf("id = %v", data["id"])
+	}
+}
+
+func TestInsertDocument_EmptyTitle(t *testing.T) {
+	c, _ := NewClient("tok")
+	_, err := c.InsertDocument("", "content", "ns", nil)
+	if err == nil {
+		t.Fatal("expected error for empty title")
+	}
+}
+
+func TestInsertDocument_WithOptions(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var body map[string]interface{}
+		json.NewDecoder(r.Body).Decode(&body)
+		if body["sourceType"] != "pdf" {
+			t.Errorf("sourceType = %v", body["sourceType"])
+		}
+		if body["documentId"] != "custom-id" {
+			t.Errorf("documentId = %v", body["documentId"])
+		}
+		w.Write([]byte(`{"data":{}}`))
+	}))
+	defer server.Close()
+
+	c := testClient(t, server)
+	c.InsertDocument("t", "c", "ns", &InsertDocumentOptions{
+		SourceType: "pdf",
+		DocumentID: "custom-id",
+	})
+}
+
+// --- InsertDocumentsBatch ---
+
+func TestInsertDocumentsBatch_Success(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/memory/documents/batch" {
+			t.Errorf("path = %s, want /memory/documents/batch", r.URL.Path)
+		}
+		w.Write([]byte(`{"data":{"inserted":2}}`))
+	}))
+	defer server.Close()
+
+	c := testClient(t, server)
+	data, err := c.InsertDocumentsBatch([]DocumentItem{
+		{Title: "d1", Content: "c1", Namespace: "ns"},
+		{Title: "d2", Content: "c2", Namespace: "ns"},
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if data["inserted"] != float64(2) {
+		t.Errorf("inserted = %v", data["inserted"])
+	}
+}
+
+func TestInsertDocumentsBatch_EmptyItems(t *testing.T) {
+	c, _ := NewClient("tok")
+	_, err := c.InsertDocumentsBatch([]DocumentItem{})
+	if err == nil {
+		t.Fatal("expected error for empty items")
+	}
+}
+
+func TestInsertDocumentsBatch_MissingTitle(t *testing.T) {
+	c, _ := NewClient("tok")
+	_, err := c.InsertDocumentsBatch([]DocumentItem{{Content: "c", Namespace: "ns"}})
+	if err == nil {
+		t.Fatal("expected error for missing title")
+	}
+}
+
+// --- ListDocuments ---
+
+func TestListDocuments_Success(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if r.URL.Path != "/memory/documents" {
+			t.Errorf("path = %s", r.URL.Path)
+		}
+		if r.URL.Query().Get("namespace") != "ns1" {
+			t.Errorf("namespace = %q", r.URL.Query().Get("namespace"))
+		}
+		if r.URL.Query().Get("limit") != "10" {
+			t.Errorf("limit = %q", r.URL.Query().Get("limit"))
+		}
+		w.Write([]byte(`{"data":{"documents":[]}}`))
+	}))
+	defer server.Close()
+
+	c := testClient(t, server)
+	limit := 10
+	data, err := c.ListDocuments(&ListDocumentsOptions{Namespace: "ns1", Limit: &limit})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if data["documents"] == nil {
+		t.Error("expected documents in response")
+	}
+}
+
+// --- GetDocument ---
+
+func TestGetDocument_Success(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			t.Errorf("method = %s, want GET", r.Method)
+		}
+		if r.URL.Path != "/memory/documents/doc-123" {
+			t.Errorf("path = %s", r.URL.Path)
+		}
+		w.Write([]byte(`{"data":{"id":"doc-123","title":"test"}}`))
+	}))
+	defer server.Close()
+
+	c := testClient(t, server)
+	data, err := c.GetDocument("doc-123", nil)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if data["title"] != "test" {
+		t.Errorf("title = %v", data["title"])
+	}
+}
+
+func TestGetDocument_EmptyID(t *testing.T) {
+	c, _ := NewClient("tok")
+	_, err := c.GetDocument("", nil)
+	if err == nil {
+		t.Fatal("expected error for empty document_id")
+	}
+}
+
+// --- DeleteDocument ---
+
+func TestDeleteDocument_Success(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "DELETE" {
+			t.Errorf("method = %s, want DELETE", r.Method)
+		}
+		if r.URL.Path != "/memory/documents/doc-123" {
+			t.Errorf("path = %s", r.URL.Path)
+		}
+		if r.URL.Query().Get("namespace") != "ns1" {
+			t.Errorf("namespace = %q", r.URL.Query().Get("namespace"))
+		}
+		w.Write([]byte(`{"data":{"deleted":true}}`))
+	}))
+	defer server.Close()
+
+	c := testClient(t, server)
+	data, err := c.DeleteDocument("doc-123", "ns1")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if data["deleted"] != true {
+		t.Errorf("deleted = %v", data["deleted"])
+	}
+}
+
+func TestDeleteDocument_EmptyID(t *testing.T) {
+	c, _ := NewClient("tok")
+	_, err := c.DeleteDocument("", "ns")
+	if err == nil {
+		t.Fatal("expected error for empty document_id")
+	}
+}
+
+func TestDeleteDocument_EmptyNamespace(t *testing.T) {
+	c, _ := NewClient("tok")
+	_, err := c.DeleteDocument("doc-1", "")
+	if err == nil {
+		t.Fatal("expected error for empty namespace")
+	}
+}

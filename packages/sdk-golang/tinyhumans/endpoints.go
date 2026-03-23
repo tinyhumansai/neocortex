@@ -2,6 +2,9 @@ package tinyhumans
 
 import (
 	"errors"
+	"fmt"
+	"net/url"
+	"strconv"
 )
 
 // ChatMemory sends a chat request with memory context.
@@ -183,4 +186,120 @@ func (c *Client) sendInteraction(path, namespace string, entityNames []string, o
 	}
 
 	return c.send("POST", path, body)
+}
+
+// InsertDocument ingests a single document.
+// POST /memory/documents
+func (c *Client) InsertDocument(title, content, namespace string, opts *InsertDocumentOptions) (map[string]interface{}, error) {
+	if title == "" {
+		return nil, errors.New("title is required")
+	}
+	if content == "" {
+		return nil, errors.New("content is required")
+	}
+	if namespace == "" {
+		return nil, errors.New("namespace is required")
+	}
+
+	body := map[string]interface{}{
+		"title":     title,
+		"content":   content,
+		"namespace": namespace,
+	}
+	if opts != nil {
+		if opts.SourceType != "" {
+			body["sourceType"] = opts.SourceType
+		}
+		if opts.Metadata != nil {
+			body["metadata"] = opts.Metadata
+		}
+		if opts.Priority != "" {
+			body["priority"] = opts.Priority
+		}
+		if opts.CreatedAt != nil {
+			body["createdAt"] = *opts.CreatedAt
+		}
+		if opts.UpdatedAt != nil {
+			body["updatedAt"] = *opts.UpdatedAt
+		}
+		if opts.DocumentID != "" {
+			body["documentId"] = opts.DocumentID
+		}
+	}
+
+	return c.send("POST", "/memory/documents", body)
+}
+
+// InsertDocumentsBatch ingests multiple documents in one batch call.
+// POST /memory/documents/batch
+func (c *Client) InsertDocumentsBatch(items []DocumentItem) (map[string]interface{}, error) {
+	if len(items) == 0 {
+		return nil, errors.New("items must be a non-empty list")
+	}
+	for i, item := range items {
+		if item.Title == "" {
+			return nil, fmt.Errorf("item[%d]: title is required", i)
+		}
+		if item.Content == "" {
+			return nil, fmt.Errorf("item[%d]: content is required", i)
+		}
+		if item.Namespace == "" {
+			return nil, fmt.Errorf("item[%d]: namespace is required", i)
+		}
+	}
+
+	body := map[string]interface{}{
+		"items": items,
+	}
+
+	return c.send("POST", "/memory/documents/batch", body)
+}
+
+// ListDocuments lists ingested documents.
+// GET /memory/documents
+func (c *Client) ListDocuments(opts *ListDocumentsOptions) (map[string]interface{}, error) {
+	params := map[string]string{}
+	if opts != nil {
+		if opts.Namespace != "" {
+			params["namespace"] = opts.Namespace
+		}
+		if opts.Limit != nil {
+			params["limit"] = strconv.Itoa(*opts.Limit)
+		}
+		if opts.Offset != nil {
+			params["offset"] = strconv.Itoa(*opts.Offset)
+		}
+	}
+
+	return c.sendGet("/memory/documents", params)
+}
+
+// GetDocument retrieves details for a single document.
+// GET /memory/documents/{documentId}
+func (c *Client) GetDocument(documentID string, opts *GetDocumentOptions) (map[string]interface{}, error) {
+	if documentID == "" {
+		return nil, errors.New("document_id is required")
+	}
+
+	path := fmt.Sprintf("/memory/documents/%s", url.PathEscape(documentID))
+	params := map[string]string{}
+	if opts != nil && opts.Namespace != "" {
+		params["namespace"] = opts.Namespace
+	}
+
+	return c.sendGet(path, params)
+}
+
+// DeleteDocument deletes a single ingested document.
+// DELETE /memory/documents/{documentId}
+func (c *Client) DeleteDocument(documentID, namespace string) (map[string]interface{}, error) {
+	if documentID == "" {
+		return nil, errors.New("document_id is required")
+	}
+	if namespace == "" {
+		return nil, errors.New("namespace is required")
+	}
+
+	path := fmt.Sprintf("/memory/documents/%s", url.PathEscape(documentID))
+	return c.sendDelete(path, map[string]string{"namespace": namespace})
 }
