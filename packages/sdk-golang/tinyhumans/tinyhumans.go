@@ -81,3 +81,115 @@ type RecallWithLLMOptions struct {
 	Temperature *float64
 	URL         string
 }
+
+// --- Chat & Interaction types ---
+
+// ChatMessage represents a single message in a chat conversation.
+type ChatMessage struct {
+	Role    string `json:"role"`
+	Content string `json:"content"`
+}
+
+// ChatMemoryOptions holds optional parameters for ChatMemory and ChatMemoryContext.
+type ChatMemoryOptions struct {
+	Temperature *float64
+	MaxTokens   *int
+}
+
+// InteractMemoryOptions holds optional parameters for InteractMemory and RecordInteractions.
+type InteractMemoryOptions struct {
+	Description       string
+	InteractionLevel  string
+	InteractionLevels []string
+	Timestamp         *float64
+}
+
+// --- Advanced Recall types ---
+
+// RecallMemoriesOptions holds optional parameters for RecallMemories (Ebbinghaus bank).
+type RecallMemoriesOptions struct {
+	Namespace    string
+	TopK         *int
+	MinRetention *float64
+	AsOf         *float64
+}
+
+// RecallThoughtsOptions holds optional parameters for RecallThoughts.
+type RecallThoughtsOptions struct {
+	Namespace             string
+	MaxChunks             *int
+	Temperature           *float64
+	RandomnessSeed        *int
+	Persist               *bool
+	EnablePredictionCheck *bool
+	ThoughtPrompt         string
+}
+
+// QueryMemoryContextOptions holds optional parameters for QueryMemoryContext.
+type QueryMemoryContextOptions struct {
+	Namespace         string
+	IncludeReferences *bool
+	MaxChunks         *int
+	DocumentIDs       []string
+	RecallOnly        *bool
+	LLMQuery          string
+}
+
+// --- Document types ---
+
+// InsertDocumentOptions holds optional parameters for InsertDocument.
+type InsertDocumentOptions struct {
+	SourceType string
+	Metadata   map[string]interface{}
+	Priority   string
+	CreatedAt  *float64
+	UpdatedAt  *float64
+	DocumentID string
+}
+
+// DocumentItem represents a single document in a batch insert.
+type DocumentItem struct {
+	Title      string                 `json:"title"`
+	Content    string                 `json:"content"`
+	Namespace  string                 `json:"namespace"`
+	SourceType string                 `json:"sourceType,omitempty"`
+	Metadata   map[string]interface{} `json:"metadata,omitempty"`
+	Priority   string                 `json:"priority,omitempty"`
+	CreatedAt  *float64               `json:"createdAt,omitempty"`
+	UpdatedAt  *float64               `json:"updatedAt,omitempty"`
+	DocumentID string                 `json:"documentId,omitempty"`
+}
+
+// ListDocumentsOptions holds optional parameters for ListDocuments.
+type ListDocumentsOptions struct {
+	Namespace string
+	Limit     *int
+	Offset    *int
+}
+
+// GetDocumentOptions holds optional parameters for GetDocument.
+type GetDocumentOptions struct {
+	Namespace string
+}
+
+// --- Admin & Utility types ---
+
+// GraphSnapshotOptions holds optional parameters for GetGraphSnapshot.
+type GraphSnapshotOptions struct {
+	Namespace string
+	Mode      string
+	Limit     *int
+	SeedLimit *int
+}
+
+// SyncMemoryOptions holds optional parameters for SyncMemory.
+type SyncMemoryOptions struct {
+	WorkspaceID string
+	AgentID     string
+}
+
+// WaitForIngestionJobOptions holds optional parameters for WaitForIngestionJob.
+type WaitForIngestionJobOptions struct {
+	TimeoutSeconds      float64
+	PollIntervalSeconds float64
+}
