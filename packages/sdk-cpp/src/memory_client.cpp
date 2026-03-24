@@ -2,8 +2,10 @@
 #include "tinyhumans/error.hpp"
 
 #include <curl/curl.h>
+#include <chrono>
 #include <cstdlib>
 #include <mutex>
+#include <thread>
 
 namespace tinyhumans {
 
@@ -295,6 +297,54 @@ json TinyHumansMemoryClient::recall_thoughts(const RecallThoughtsParams& params)
 
 json TinyHumansMemoryClient::query_memory_context(const QueryMemoryContextParams& params) {
     return post("/memory/queries", params.to_json());
+}
+
+// ---- Documents ----
+
+json TinyHumansMemoryClient::insert_document(const InsertDocumentParams& params) {
+    return post("/memory/documents", params.to_json());
+}
+
+json TinyHumansMemoryClient::insert_documents_batch(const InsertDocumentsBatchParams& params) {
+    return post("/memory/documents/batch", params.to_json());
+}
+
+json TinyHumansMemoryClient::list_documents(const ListDocumentsParams& params) {
+    return send_get("/memory/documents", params.to_query_params());
+}
+
+json TinyHumansMemoryClient::get_document(const GetDocumentParams& params) {
+    params.validate();
+    return send_get("/memory/documents/" + params.id, params.to_query_params());
+}
+
+json TinyHumansMemoryClient::delete_document(const std::string& document_id, const std::string& namespace_) {
+    std::map<std::string, std::string> query_params;
+    if (!namespace_.empty()) query_params["namespace"] = namespace_;
+    return send_delete("/memory/documents/" + document_id, query_params);
+}
+
+// ---- Admin & utility ----
+
+json TinyHumansMemoryClient::get_graph_snapshot(const GraphSnapshotParams& params) {
+    return send_get("/memory/admin/graph-snapshot", params.to_query_params());
+}
+
+json TinyHumansMemoryClient::get_ingestion_job(const std::string& job_id) {
+    return send_get("/memory/ingestion/jobs/" + job_id);
+}
+
+json TinyHumansMemoryClient::wait_for_ingestion_job(const std::string& job_id, const WaitForIngestionJobOptions& opts) {
+    for (int i = 0; i < opts.max_attempts; ++i) {
+        json result = get_ingestion_job(job_id);
+        auto data = result.value("data", json::object());
+        std::string status = data.value("status", "");
+        if (status == "completed" || status == "failed") {
+            return result;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(opts.interval_ms));
+    }
+    throw std::runtime_error("ingestion job timed out after " + std::to_string(opts.max_attempts) + " attempts");
 }
 
 } // namespace tinyhumans

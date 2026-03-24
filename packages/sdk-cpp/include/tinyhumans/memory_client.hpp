@@ -38,6 +38,18 @@ public:
     json recall_thoughts(const RecallThoughtsParams& params = {});
     json query_memory_context(const QueryMemoryContextParams& params);
 
+    // Documents
+    json insert_document(const InsertDocumentParams& params);
+    json insert_documents_batch(const InsertDocumentsBatchParams& params);
+    json list_documents(const ListDocumentsParams& params = {});
+    json get_document(const GetDocumentParams& params);
+    json delete_document(const std::string& document_id, const std::string& namespace_ = "");
+
+    // Admin & utility
+    json get_graph_snapshot(const GraphSnapshotParams& params = {});
+    json get_ingestion_job(const std::string& job_id);
+    json wait_for_ingestion_job(const std::string& job_id, const WaitForIngestionJobOptions& opts = {});
+
 private:
     json post(const std::string& path, const json& body);
     json send_get(const std::string& path, const std::map<std::string, std::string>& query_params = {});

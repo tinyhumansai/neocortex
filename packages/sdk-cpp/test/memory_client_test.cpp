@@ -496,6 +496,157 @@ TEST(MemoryClientTest, QueryMemoryContextValidatesMissingQuery) {
     EXPECT_THROW(client.query_memory_context(params), std::invalid_argument);
 }
 
+// ---- insertDocument ----
+
+TEST(MemoryClientTest, InsertDocumentSendsCorrectRequest) {
+    MockHttpServer server;
+    server.set_response(200, R"({"success":true,"data":{"id":"doc-1"}})");
+    auto future = server.handle_request_async();
+
+    TinyHumansMemoryClient client("test-token", server.base_url());
+    InsertDocumentParams params;
+    params.set_title("Doc").set_content("Content").set_namespace("ns");
+    client.insert_document(params);
+
+    std::string body = future.get();
+    EXPECT_TRUE(body.find("\"title\"") != std::string::npos);
+    EXPECT_EQ(server.last_path(), "/memory/documents");
+    EXPECT_EQ(server.last_method(), "POST");
+}
+
+TEST(MemoryClientTest, InsertDocumentValidates) {
+    MockHttpServer server;
+    TinyHumansMemoryClient client("test-token", server.base_url());
+    InsertDocumentParams params;
+    EXPECT_THROW(client.insert_document(params), std::invalid_argument);
+}
+
+// ---- insertDocumentsBatch ----
+
+TEST(MemoryClientTest, InsertDocumentsBatchSendsCorrectRequest) {
+    MockHttpServer server;
+    server.set_response(200, R"({"success":true,"data":{}})");
+    auto future = server.handle_request_async();
+
+    TinyHumansMemoryClient client("test-token", server.base_url());
+    InsertDocumentParams doc1;
+    doc1.set_title("D1").set_content("C1").set_namespace("ns");
+    InsertDocumentParams doc2;
+    doc2.set_title("D2").set_content("C2").set_namespace("ns");
+    InsertDocumentsBatchParams params;
+    params.set_documents({doc1, doc2});
+    client.insert_documents_batch(params);
+
+    std::string body = future.get();
+    EXPECT_TRUE(body.find("\"documents\"") != std::string::npos);
+    EXPECT_EQ(server.last_path(), "/memory/documents/batch");
+}
+
+// ---- listDocuments ----
+
+TEST(MemoryClientTest, ListDocumentsSendsGetWithQueryParams) {
+    MockHttpServer server;
+    server.set_response(200, R"({"success":true,"data":{"documents":[]}})");
+    auto future = server.handle_request_async();
+
+    TinyHumansMemoryClient client("test-token", server.base_url());
+    ListDocumentsParams params;
+    params.set_namespace("ns");
+    client.list_documents(params);
+    future.get();
+
+    EXPECT_EQ(server.last_method(), "GET");
+    EXPECT_TRUE(server.last_path().find("/memory/documents") != std::string::npos);
+    EXPECT_TRUE(server.last_path().find("namespace=ns") != std::string::npos);
+}
+
+// ---- getDocument ----
+
+TEST(MemoryClientTest, GetDocumentSendsGetWithId) {
+    MockHttpServer server;
+    server.set_response(200, R"({"success":true,"data":{"id":"doc-1"}})");
+    auto future = server.handle_request_async();
+
+    TinyHumansMemoryClient client("test-token", server.base_url());
+    GetDocumentParams params;
+    params.set_id("doc-1").set_namespace("ns");
+    client.get_document(params);
+    future.get();
+
+    EXPECT_EQ(server.last_method(), "GET");
+    EXPECT_TRUE(server.last_path().find("/memory/documents/doc-1") != std::string::npos);
+}
+
+TEST(MemoryClientTest, GetDocumentValidatesMissingId) {
+    MockHttpServer server;
+    TinyHumansMemoryClient client("test-token", server.base_url());
+    GetDocumentParams params;
+    EXPECT_THROW(client.get_document(params), std::invalid_argument);
+}
+
+// ---- deleteDocument ----
+
+TEST(MemoryClientTest, DeleteDocumentSendsDeleteMethod) {
+    MockHttpServer server;
+    server.set_response(200, R"({"success":true,"data":{}})");
+    auto future = server.handle_request_async();
+
+    TinyHumansMemoryClient client("test-token", server.base_url());
+    client.delete_document("doc-1", "ns");
+    future.get();
+
+    EXPECT_EQ(server.last_method(), "DELETE");
+    EXPECT_TRUE(server.last_path().find("/memory/documents/doc-1") != std::string::npos);
+}
+
+// ---- getGraphSnapshot ----
+
+TEST(MemoryClientTest, GetGraphSnapshotSendsGet) {
+    MockHttpServer server;
+    server.set_response(200, R"({"success":true,"data":{}})");
+    auto future = server.handle_request_async();
+
+    TinyHumansMemoryClient client("test-token", server.base_url());
+    GraphSnapshotParams params;
+    params.set_namespace("ns");
+    client.get_graph_snapshot(params);
+    future.get();
+
+    EXPECT_EQ(server.last_method(), "GET");
+    EXPECT_TRUE(server.last_path().find("/memory/admin/graph-snapshot") != std::string::npos);
+}
+
+// ---- getIngestionJob ----
+
+TEST(MemoryClientTest, GetIngestionJobSendsGet) {
+    MockHttpServer server;
+    server.set_response(200, R"({"success":true,"data":{"status":"completed"}})");
+    auto future = server.handle_request_async();
+
+    TinyHumansMemoryClient client("test-token", server.base_url());
+    client.get_ingestion_job("job-123");
+    future.get();
+
+    EXPECT_EQ(server.last_method(), "GET");
+    EXPECT_TRUE(server.last_path().find("/memory/ingestion/jobs/job-123") != std::string::npos);
+}
+
+// ---- waitForIngestionJob ----
+
+TEST(MemoryClientTest, WaitForIngestionJobReturnsOnCompleted) {
+    MockHttpServer server;
+    server.set_response(200, R"({"success":true,"data":{"status":"completed"}})");
+    auto future = server.handle_request_async();
+
+    TinyHumansMemoryClient client("test-token", server.base_url());
+    WaitForIngestionJobOptions opts;
+    opts.set_interval_ms(10).set_max_attempts(1);
+    auto result = client.wait_for_ingestion_job("job-123", opts);
+    future.get();
+
+    EXPECT_TRUE(result.contains("success"));
+}
+
 // ---- Error handling ----
 
 TEST(MemoryClientTest, NonOkStatusThrowsTinyHumansError) {
