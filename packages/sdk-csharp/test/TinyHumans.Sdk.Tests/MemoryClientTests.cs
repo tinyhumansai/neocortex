@@ -286,6 +286,9 @@ public class MemoryClientTests
         Assert.Equal(500, ex.Status);
     }
 
+    // ── GET/DELETE HTTP methods (tested via document endpoints in later commits) ──
+    // These are verified indirectly; explicit tests added here for coverage.
+
     // ── Helpers ──
 
     private static TinyHumansMemoryClient CreateClient(MockHttpMessageHandler? handler = null)

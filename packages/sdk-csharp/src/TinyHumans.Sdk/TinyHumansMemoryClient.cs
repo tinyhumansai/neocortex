@@ -112,6 +112,46 @@ public sealed class TinyHumansMemoryClient : IDisposable
         return HandleResponse((int)response.StatusCode, responseBody);
     }
 
+    private async Task<JsonElement> GetAsync(string path, Dictionary<string, string>? queryParams = null)
+    {
+        var url = $"{_baseUrl}{path}";
+        if (queryParams != null && queryParams.Count > 0)
+            url += "?" + BuildQueryString(queryParams);
+
+        var request = new HttpRequestMessage(HttpMethod.Get, url);
+        request.Headers.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+        request.Headers.Add("X-Model-Id", _modelId);
+
+        var response = await _httpClient.SendAsync(request);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        return HandleResponse((int)response.StatusCode, responseBody);
+    }
+
+    private async Task<JsonElement> DeleteAsync(string path, Dictionary<string, string>? queryParams = null)
+    {
+        var url = $"{_baseUrl}{path}";
+        if (queryParams != null && queryParams.Count > 0)
+            url += "?" + BuildQueryString(queryParams);
+
+        var request = new HttpRequestMessage(HttpMethod.Delete, url);
+        request.Headers.Authorization =
+            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+        request.Headers.Add("X-Model-Id", _modelId);
+
+        var response = await _httpClient.SendAsync(request);
+        var responseBody = await response.Content.ReadAsStringAsync();
+        return HandleResponse((int)response.StatusCode, responseBody);
+    }
+
+    private static string BuildQueryString(Dictionary<string, string> queryParams)
+    {
+        var parts = new List<string>();
+        foreach (var kvp in queryParams)
+            parts.Add($"{Uri.EscapeDataString(kvp.Key)}={Uri.EscapeDataString(kvp.Value)}");
+        return string.Join("&", parts);
+    }
+
     private static JsonElement HandleResponse(int statusCode, string body)
     {
         JsonElement root;
