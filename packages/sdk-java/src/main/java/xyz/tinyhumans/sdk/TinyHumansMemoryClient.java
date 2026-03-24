@@ -92,6 +92,16 @@ public class TinyHumansMemoryClient implements AutoCloseable {
         return RecallMemoriesResponse.fromMap(response);
     }
 
+    /** Record entity interactions. POST /memory/interact */
+    public Map<String, Object> interactMemory(InteractMemoryParams params) {
+        return post("/memory/interact", params.toMap());
+    }
+
+    /** Record interaction signals. POST /memory/interactions */
+    public Map<String, Object> recordInteractions(InteractMemoryParams params) {
+        return post("/memory/interactions", params.toMap());
+    }
+
     /** Chat with DeltaNet memory cache. POST /memory/chat */
     public Map<String, Object> chatMemory(ChatMemoryParams params) {
         return post("/memory/chat", params.toMap());

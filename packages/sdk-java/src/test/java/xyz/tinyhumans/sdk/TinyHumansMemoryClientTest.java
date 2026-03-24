@@ -341,6 +341,61 @@ class TinyHumansMemoryClientTest {
         }
     }
 
+    // ---- interactMemory ----
+
+    @Test
+    void interactMemorySuccess() {
+        server.createContext("/memory/interact", exchange -> {
+            assertEquals("POST", exchange.getRequestMethod());
+            String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+            assertTrue(body.contains("\"namespace\""));
+            assertTrue(body.contains("\"entityNames\""));
+            String response = "{\"data\":{\"status\":\"completed\",\"interactionsRecorded\":1}}";
+            exchange.sendResponseHeaders(200, response.length());
+            try (OutputStream os = exchange.getResponseBody()) { os.write(response.getBytes(StandardCharsets.UTF_8)); }
+        });
+
+        try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("tok", baseUrl)) {
+            Map<String, Object> resp = client.interactMemory(
+                    new InteractMemoryParams("ns", List.of("entity1")));
+            assertNotNull(resp.get("data"));
+        }
+    }
+
+    @Test
+    void interactMemoryRejectsEmptyNamespace() {
+        try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("tok", baseUrl)) {
+            assertThrows(IllegalArgumentException.class, () ->
+                    client.interactMemory(new InteractMemoryParams("", List.of("e1"))));
+        }
+    }
+
+    @Test
+    void interactMemoryRejectsEmptyEntityNames() {
+        try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("tok", baseUrl)) {
+            assertThrows(IllegalArgumentException.class, () ->
+                    client.interactMemory(new InteractMemoryParams("ns", List.of())));
+        }
+    }
+
+    // ---- recordInteractions ----
+
+    @Test
+    void recordInteractionsUsesCorrectPath() {
+        server.createContext("/memory/interactions", exchange -> {
+            assertEquals("POST", exchange.getRequestMethod());
+            String response = "{\"data\":{\"status\":\"completed\"}}";
+            exchange.sendResponseHeaders(200, response.length());
+            try (OutputStream os = exchange.getResponseBody()) { os.write(response.getBytes(StandardCharsets.UTF_8)); }
+        });
+
+        try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("tok", baseUrl)) {
+            Map<String, Object> resp = client.recordInteractions(
+                    new InteractMemoryParams("ns", List.of("entity1")));
+            assertNotNull(resp);
+        }
+    }
+
     // ---- chatMemory ----
 
     @Test
