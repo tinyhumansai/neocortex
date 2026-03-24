@@ -154,7 +154,7 @@ TEST(MemoryClientTest, InsertMemorySendsCorrectRequest) {
     EXPECT_TRUE(req.find("POST") != std::string::npos);
     EXPECT_TRUE(req.find("Content-Type: application/json") != std::string::npos);
     EXPECT_TRUE(req.find("Authorization: Bearer test-token") != std::string::npos);
-    EXPECT_TRUE(req.find("/v1/memory/insert") != std::string::npos);
+    EXPECT_TRUE(req.find("/memory/insert") != std::string::npos);
 
     EXPECT_TRUE(resp.success);
     EXPECT_EQ(resp.status, "completed");

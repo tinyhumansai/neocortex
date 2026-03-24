@@ -149,31 +149,31 @@ json TinyHumansMemoryClient::handle_response(long http_code, const std::string& 
 
 InsertMemoryResponse TinyHumansMemoryClient::insert_memory(const InsertMemoryParams& params) {
     json body = params.to_json();
-    json resp = post("/v1/memory/insert", body);
+    json resp = post("/memory/insert", body);
     return InsertMemoryResponse::from_json(resp);
 }
 
 RecallMemoryResponse TinyHumansMemoryClient::recall_memory(const RecallMemoryParams& params) {
     json body = params.to_json();
-    json resp = post("/v1/memory/recall", body);
+    json resp = post("/memory/recall", body);
     return RecallMemoryResponse::from_json(resp);
 }
 
 DeleteMemoryResponse TinyHumansMemoryClient::delete_memory(const DeleteMemoryParams& params) {
     json body = params.to_json();
-    json resp = post("/v1/memory/admin/delete", body);
+    json resp = post("/memory/admin/delete", body);
     return DeleteMemoryResponse::from_json(resp);
 }
 
 QueryMemoryResponse TinyHumansMemoryClient::query_memory(const QueryMemoryParams& params) {
     json body = params.to_json();
-    json resp = post("/v1/memory/query", body);
+    json resp = post("/memory/query", body);
     return QueryMemoryResponse::from_json(resp);
 }
 
 RecallMemoriesResponse TinyHumansMemoryClient::recall_memories(const RecallMemoriesParams& params) {
     json body = params.to_json();
-    json resp = post("/v1/memory/memories/recall", body);
+    json resp = post("/memory/memories/recall", body);
     return RecallMemoriesResponse::from_json(resp);
 }
 
