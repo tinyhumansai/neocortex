@@ -7,8 +7,11 @@ public sealed class TinyHumansMemoryClient : IDisposable
 {
     private const string DefaultBaseUrl = "https://api.tinyhumans.ai";
 
+    private const string DefaultModelId = "neocortex-mk1";
+
     private readonly string _token;
     private readonly string _baseUrl;
+    private readonly string _modelId;
     private readonly HttpClient _httpClient;
     private bool _disposed;
 
@@ -18,6 +21,7 @@ public sealed class TinyHumansMemoryClient : IDisposable
             throw new ArgumentException("token is required");
 
         _token = token;
+        _modelId = DefaultModelId;
         _baseUrl = (baseUrl
             ?? Environment.GetEnvironmentVariable("TINYHUMANS_BASE_URL")
             ?? DefaultBaseUrl).TrimEnd('/');
@@ -25,12 +29,27 @@ public sealed class TinyHumansMemoryClient : IDisposable
         _httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
     }
 
-    internal TinyHumansMemoryClient(string token, string baseUrl, HttpClient httpClient)
+    public TinyHumansMemoryClient(string token, string modelId, string? baseUrl = null)
     {
         if (string.IsNullOrWhiteSpace(token))
             throw new ArgumentException("token is required");
 
         _token = token;
+        _modelId = string.IsNullOrWhiteSpace(modelId) ? DefaultModelId : modelId;
+        _baseUrl = (baseUrl
+            ?? Environment.GetEnvironmentVariable("TINYHUMANS_BASE_URL")
+            ?? DefaultBaseUrl).TrimEnd('/');
+
+        _httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
+    }
+
+    internal TinyHumansMemoryClient(string token, string baseUrl, HttpClient httpClient, string? modelId = null)
+    {
+        if (string.IsNullOrWhiteSpace(token))
+            throw new ArgumentException("token is required");
+
+        _token = token;
+        _modelId = modelId ?? DefaultModelId;
         _baseUrl = baseUrl.TrimEnd('/');
         _httpClient = httpClient;
     }
@@ -86,6 +105,7 @@ public sealed class TinyHumansMemoryClient : IDisposable
         };
         request.Headers.Authorization =
             new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
+        request.Headers.Add("X-Model-Id", _modelId);
 
         var response = await _httpClient.SendAsync(request);
         var responseBody = await response.Content.ReadAsStringAsync();

@@ -24,6 +24,45 @@ public class MemoryClientTests
         Assert.NotNull(client);
     }
 
+    // ── Model ID ──
+
+    [Fact]
+    public async Task DefaultModelId_SendsNeocortexMk1Header()
+    {
+        var handler = new MockHttpMessageHandler(HttpStatusCode.OK,
+            @"{""success"":true,""data"":{""status"":""ok"",""stats"":{}}}");
+        using var client = CreateClient(handler);
+
+        await client.InsertMemoryAsync(new InsertMemoryParams
+        {
+            Title = "t", Content = "c", Namespace = "ns",
+        });
+
+        Assert.NotNull(handler.CapturedRequest);
+        var modelIdValues = handler.CapturedRequest!.Headers.GetValues("X-Model-Id").ToList();
+        Assert.Single(modelIdValues);
+        Assert.Equal("neocortex-mk1", modelIdValues[0]);
+    }
+
+    [Fact]
+    public async Task CustomModelId_PropagatesCorrectly()
+    {
+        var handler = new MockHttpMessageHandler(HttpStatusCode.OK,
+            @"{""success"":true,""data"":{""status"":""ok"",""stats"":{}}}");
+        var httpClient = new HttpClient(handler);
+        using var client = new TinyHumansMemoryClient("test-token", "https://test.example.com", httpClient, "custom-model");
+
+        await client.InsertMemoryAsync(new InsertMemoryParams
+        {
+            Title = "t", Content = "c", Namespace = "ns",
+        });
+
+        Assert.NotNull(handler.CapturedRequest);
+        var modelIdValues = handler.CapturedRequest!.Headers.GetValues("X-Model-Id").ToList();
+        Assert.Single(modelIdValues);
+        Assert.Equal("custom-model", modelIdValues[0]);
+    }
+
     // ── InsertMemory ──
 
     [Fact]
