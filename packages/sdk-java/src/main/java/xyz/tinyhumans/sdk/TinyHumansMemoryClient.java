@@ -92,6 +92,38 @@ public class TinyHumansMemoryClient implements AutoCloseable {
         return RecallMemoriesResponse.fromMap(response);
     }
 
+    /** Insert a document. POST /memory/documents */
+    public Map<String, Object> insertDocument(InsertDocumentParams params) {
+        return post("/memory/documents", params.toMap());
+    }
+
+    /** Insert documents in batch. POST /memory/documents/batch */
+    public Map<String, Object> insertDocumentsBatch(InsertDocumentsBatchParams params) {
+        return post("/memory/documents/batch", params.toMap());
+    }
+
+    /** List documents. GET /memory/documents */
+    public Map<String, Object> listDocuments(ListDocumentsParams params) {
+        return sendGet("/memory/documents", params != null ? params.toQueryParams() : null);
+    }
+
+    /** Get a document by ID. GET /memory/documents/{documentId} */
+    public Map<String, Object> getDocument(GetDocumentParams params) {
+        params.validate();
+        return sendGet("/memory/documents/" + params.getDocumentId(), params.toQueryParams());
+    }
+
+    /** Delete a document. DELETE /memory/documents/{documentId} */
+    public Map<String, Object> deleteDocument(String documentId, String namespace) {
+        if (documentId == null || documentId.isEmpty()) {
+            throw new IllegalArgumentException("documentId is required");
+        }
+        if (namespace == null || namespace.isEmpty()) {
+            throw new IllegalArgumentException("namespace is required");
+        }
+        return sendDelete("/memory/documents/" + documentId, Map.of("namespace", namespace));
+    }
+
     /** Generate reflective thoughts. POST /memory/memories/thoughts */
     public Map<String, Object> recallThoughts(RecallThoughtsParams params) {
         return post("/memory/memories/thoughts", params != null ? params.toMap() : Map.of());

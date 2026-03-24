@@ -341,6 +341,141 @@ class TinyHumansMemoryClientTest {
         }
     }
 
+    // ---- insertDocument ----
+
+    @Test
+    void insertDocumentSuccess() {
+        server.createContext("/memory/documents", exchange -> {
+            assertEquals("POST", exchange.getRequestMethod());
+            String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+            assertTrue(body.contains("\"title\""));
+            assertTrue(body.contains("\"content\""));
+            assertTrue(body.contains("\"namespace\""));
+            String response = "{\"data\":{\"jobId\":\"j1\",\"state\":\"pending\"}}";
+            exchange.sendResponseHeaders(200, response.length());
+            try (OutputStream os = exchange.getResponseBody()) { os.write(response.getBytes(StandardCharsets.UTF_8)); }
+        });
+
+        try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("tok", baseUrl)) {
+            Map<String, Object> resp = client.insertDocument(
+                    new InsertDocumentParams("title", "content", "ns"));
+            assertNotNull(resp.get("data"));
+        }
+    }
+
+    @Test
+    void insertDocumentRejectsMissingTitle() {
+        try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("tok", baseUrl)) {
+            assertThrows(IllegalArgumentException.class, () ->
+                    client.insertDocument(new InsertDocumentParams(null, "c", "ns")));
+        }
+    }
+
+    // ---- insertDocumentsBatch ----
+
+    @Test
+    void insertDocumentsBatchSuccess() {
+        server.createContext("/memory/documents/batch", exchange -> {
+            assertEquals("POST", exchange.getRequestMethod());
+            String response = "{\"data\":{\"accepted\":[{\"index\":0,\"jobId\":\"j1\"}]}}";
+            exchange.sendResponseHeaders(200, response.length());
+            try (OutputStream os = exchange.getResponseBody()) { os.write(response.getBytes(StandardCharsets.UTF_8)); }
+        });
+
+        try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("tok", baseUrl)) {
+            Map<String, Object> resp = client.insertDocumentsBatch(
+                    new InsertDocumentsBatchParams(List.of(
+                            new InsertDocumentParams("t1", "c1", "ns"))));
+            assertNotNull(resp.get("data"));
+        }
+    }
+
+    @Test
+    void insertDocumentsBatchRejectsEmpty() {
+        try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("tok", baseUrl)) {
+            assertThrows(IllegalArgumentException.class, () ->
+                    client.insertDocumentsBatch(new InsertDocumentsBatchParams(List.of())));
+        }
+    }
+
+    // ---- listDocuments ----
+
+    @Test
+    void listDocumentsSuccess() {
+        server.createContext("/memory/documents", exchange -> {
+            assertEquals("GET", exchange.getRequestMethod());
+            assertTrue(exchange.getRequestURI().getQuery().contains("namespace=ns"));
+            String response = "{\"data\":{\"documents\":[]}}";
+            exchange.sendResponseHeaders(200, response.length());
+            try (OutputStream os = exchange.getResponseBody()) { os.write(response.getBytes(StandardCharsets.UTF_8)); }
+        });
+
+        try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("tok", baseUrl)) {
+            Map<String, Object> resp = client.listDocuments(
+                    new ListDocumentsParams().setNamespace("ns"));
+            assertNotNull(resp);
+        }
+    }
+
+    // ---- getDocument ----
+
+    @Test
+    void getDocumentSuccess() {
+        server.createContext("/memory/documents/doc1", exchange -> {
+            assertEquals("GET", exchange.getRequestMethod());
+            String response = "{\"data\":{\"title\":\"t\",\"content\":\"c\"}}";
+            exchange.sendResponseHeaders(200, response.length());
+            try (OutputStream os = exchange.getResponseBody()) { os.write(response.getBytes(StandardCharsets.UTF_8)); }
+        });
+
+        try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("tok", baseUrl)) {
+            Map<String, Object> resp = client.getDocument(new GetDocumentParams("doc1"));
+            assertNotNull(resp.get("data"));
+        }
+    }
+
+    @Test
+    void getDocumentRejectsEmptyId() {
+        try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("tok", baseUrl)) {
+            assertThrows(IllegalArgumentException.class, () ->
+                    client.getDocument(new GetDocumentParams("")));
+        }
+    }
+
+    // ---- deleteDocument ----
+
+    @Test
+    void deleteDocumentSuccess() {
+        server.createContext("/memory/documents/doc1", exchange -> {
+            assertEquals("DELETE", exchange.getRequestMethod());
+            assertTrue(exchange.getRequestURI().getQuery().contains("namespace=ns"));
+            String response = "{\"data\":{\"deleted\":true}}";
+            exchange.sendResponseHeaders(200, response.length());
+            try (OutputStream os = exchange.getResponseBody()) { os.write(response.getBytes(StandardCharsets.UTF_8)); }
+        });
+
+        try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("tok", baseUrl)) {
+            Map<String, Object> resp = client.deleteDocument("doc1", "ns");
+            assertNotNull(resp);
+        }
+    }
+
+    @Test
+    void deleteDocumentRejectsEmptyId() {
+        try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("tok", baseUrl)) {
+            assertThrows(IllegalArgumentException.class, () ->
+                    client.deleteDocument("", "ns"));
+        }
+    }
+
+    @Test
+    void deleteDocumentRejectsEmptyNamespace() {
+        try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("tok", baseUrl)) {
+            assertThrows(IllegalArgumentException.class, () ->
+                    client.deleteDocument("doc1", ""));
+        }
+    }
+
     // ---- recallThoughts ----
 
     @Test
