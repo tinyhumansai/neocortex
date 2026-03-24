@@ -92,6 +92,34 @@ public sealed class TinyHumansMemoryClient : IDisposable
         return RecallMemoriesResponse.FromJson(result);
     }
 
+    // ── Chat ──
+
+    public async Task<JsonElement> ChatMemoryAsync(ChatMemoryParams p)
+    {
+        p.Validate();
+        return await PostAsync("/memory/chat", p.ToJsonObject());
+    }
+
+    public async Task<JsonElement> ChatMemoryContextAsync(ChatMemoryParams p)
+    {
+        p.Validate();
+        return await PostAsync("/memory/conversations", p.ToJsonObject());
+    }
+
+    // ── Interactions ──
+
+    public async Task<JsonElement> InteractMemoryAsync(InteractMemoryParams p)
+    {
+        p.Validate();
+        return await PostAsync("/memory/interact", p.ToJsonObject());
+    }
+
+    public async Task<JsonElement> RecordInteractionsAsync(InteractMemoryParams p)
+    {
+        p.Validate();
+        return await PostAsync("/memory/interactions", p.ToJsonObject());
+    }
+
     private async Task<JsonElement> PostAsync(string path, Dictionary<string, object?> body)
     {
         var json = JsonSerializer.Serialize(body, new JsonSerializerOptions

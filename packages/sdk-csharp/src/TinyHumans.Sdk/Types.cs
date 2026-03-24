@@ -264,3 +264,67 @@ public class RecallMemoriesResponse
         return resp;
     }
 }
+
+// ── Chat ──
+
+public class ChatMemoryParams
+{
+    public List<Dictionary<string, string>>? Messages { get; set; }
+    public string? Namespace { get; set; }
+    public double? Temperature { get; set; }
+    public int? MaxTokens { get; set; }
+    public string? Model { get; set; }
+
+    public void Validate()
+    {
+        if (Messages == null || Messages.Count == 0)
+            throw new ArgumentException("messages is required and must be a non-empty list");
+    }
+
+    public Dictionary<string, object?> ToJsonObject()
+    {
+        var dict = new Dictionary<string, object?>
+        {
+            ["messages"] = Messages,
+        };
+        if (Namespace != null) dict["namespace"] = Namespace;
+        if (Temperature.HasValue) dict["temperature"] = Temperature.Value;
+        if (MaxTokens.HasValue) dict["maxTokens"] = MaxTokens.Value;
+        if (Model != null) dict["model"] = Model;
+        return dict;
+    }
+}
+
+// ── Interactions ──
+
+public class InteractMemoryParams
+{
+    public string? Namespace { get; set; }
+    public List<string>? EntityNames { get; set; }
+    public string? Description { get; set; }
+    public string? InteractionLevel { get; set; }
+    public List<string>? InteractionLevels { get; set; }
+    public double? Timestamp { get; set; }
+
+    public void Validate()
+    {
+        if (string.IsNullOrWhiteSpace(Namespace))
+            throw new ArgumentException("namespace is required");
+        if (EntityNames == null || EntityNames.Count == 0)
+            throw new ArgumentException("entityNames is required and must be a non-empty list");
+    }
+
+    public Dictionary<string, object?> ToJsonObject()
+    {
+        var dict = new Dictionary<string, object?>
+        {
+            ["namespace"] = Namespace,
+            ["entityNames"] = EntityNames,
+        };
+        if (Description != null) dict["description"] = Description;
+        if (InteractionLevel != null) dict["interactionLevel"] = InteractionLevel;
+        if (InteractionLevels != null) dict["interactionLevels"] = InteractionLevels;
+        if (Timestamp.HasValue) dict["timestamp"] = Timestamp.Value;
+        return dict;
+    }
+}

@@ -286,8 +286,119 @@ public class MemoryClientTests
         Assert.Equal(500, ex.Status);
     }
 
-    // ── GET/DELETE HTTP methods (tested via document endpoints in later commits) ──
-    // These are verified indirectly; explicit tests added here for coverage.
+    // ── ChatMemory ──
+
+    [Fact]
+    public async Task ChatMemory_SendsCorrectRequest()
+    {
+        var handler = new MockHttpMessageHandler(HttpStatusCode.OK,
+            @"{""success"":true,""data"":{""message"":""hi""}}");
+        using var client = CreateClient(handler);
+
+        await client.ChatMemoryAsync(new ChatMemoryParams
+        {
+            Messages = new List<Dictionary<string, string>>
+            {
+                new() { ["role"] = "user", ["content"] = "Hello!" }
+            },
+        });
+
+        Assert.NotNull(handler.CapturedRequest);
+        Assert.Equal(HttpMethod.Post, handler.CapturedRequest!.Method);
+        Assert.EndsWith("/memory/chat", handler.CapturedRequest.RequestUri!.ToString());
+
+        var body = JsonDocument.Parse(handler.CapturedRequestBody!).RootElement;
+        Assert.True(body.GetProperty("messages").GetArrayLength() > 0);
+    }
+
+    [Fact]
+    public async Task ChatMemory_ThrowsOnEmptyMessages()
+    {
+        using var client = CreateClient();
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            client.ChatMemoryAsync(new ChatMemoryParams()));
+    }
+
+    // ── ChatMemoryContext ──
+
+    [Fact]
+    public async Task ChatMemoryContext_SendsCorrectPath()
+    {
+        var handler = new MockHttpMessageHandler(HttpStatusCode.OK,
+            @"{""success"":true,""data"":{}}");
+        using var client = CreateClient(handler);
+
+        await client.ChatMemoryContextAsync(new ChatMemoryParams
+        {
+            Messages = new List<Dictionary<string, string>>
+            {
+                new() { ["role"] = "user", ["content"] = "Hello!" }
+            },
+        });
+
+        Assert.EndsWith("/memory/conversations", handler.CapturedRequest!.RequestUri!.ToString());
+    }
+
+    // ── InteractMemory ──
+
+    [Fact]
+    public async Task InteractMemory_SendsCorrectRequest()
+    {
+        var handler = new MockHttpMessageHandler(HttpStatusCode.OK,
+            @"{""success"":true,""data"":{}}");
+        using var client = CreateClient(handler);
+
+        await client.InteractMemoryAsync(new InteractMemoryParams
+        {
+            Namespace = "ns", EntityNames = new List<string> { "ENTITY1" },
+        });
+
+        Assert.EndsWith("/memory/interact", handler.CapturedRequest!.RequestUri!.ToString());
+        var body = JsonDocument.Parse(handler.CapturedRequestBody!).RootElement;
+        Assert.Equal("ns", body.GetProperty("namespace").GetString());
+        Assert.True(body.TryGetProperty("entityNames", out _));
+    }
+
+    [Fact]
+    public async Task InteractMemory_ThrowsOnMissingNamespace()
+    {
+        using var client = CreateClient();
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            client.InteractMemoryAsync(new InteractMemoryParams
+            {
+                EntityNames = new List<string> { "E" },
+            }));
+    }
+
+    [Fact]
+    public async Task InteractMemory_ThrowsOnEmptyEntityNames()
+    {
+        using var client = CreateClient();
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            client.InteractMemoryAsync(new InteractMemoryParams
+            {
+                Namespace = "ns",
+            }));
+    }
+
+    // ── RecordInteractions ──
+
+    [Fact]
+    public async Task RecordInteractions_SendsCorrectPath()
+    {
+        var handler = new MockHttpMessageHandler(HttpStatusCode.OK,
+            @"{""success"":true,""data"":{}}");
+        using var client = CreateClient(handler);
+
+        await client.RecordInteractionsAsync(new InteractMemoryParams
+        {
+            Namespace = "ns", EntityNames = new List<string> { "E" },
+        });
+
+        Assert.EndsWith("/memory/interactions", handler.CapturedRequest!.RequestUri!.ToString());
+    }
+
+    // ── GET/DELETE HTTP methods ──
 
     // ── Helpers ──
 
