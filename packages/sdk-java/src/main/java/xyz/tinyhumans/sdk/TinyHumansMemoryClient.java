@@ -92,6 +92,16 @@ public class TinyHumansMemoryClient implements AutoCloseable {
         return RecallMemoriesResponse.fromMap(response);
     }
 
+    /** Chat with DeltaNet memory cache. POST /memory/chat */
+    public Map<String, Object> chatMemory(ChatMemoryParams params) {
+        return post("/memory/chat", params.toMap());
+    }
+
+    /** Chat with memory context. POST /memory/conversations */
+    public Map<String, Object> chatMemoryContext(ChatMemoryParams params) {
+        return post("/memory/conversations", params.toMap());
+    }
+
     @Override
     public void close() {
         // HttpClient does not require explicit close in Java 11

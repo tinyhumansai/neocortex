@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -337,6 +338,65 @@ class TinyHumansMemoryClientTest {
         try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("test-token", baseUrl)) {
             assertThrows(IllegalArgumentException.class, () ->
                     client.recallMemories(new RecallMemoriesParams().setMinRetention(-0.1)));
+        }
+    }
+
+    // ---- chatMemory ----
+
+    @Test
+    void chatMemorySuccess() {
+        server.createContext("/memory/chat", exchange -> {
+            assertEquals("POST", exchange.getRequestMethod());
+            String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+            assertTrue(body.contains("\"messages\""));
+            String response = "{\"data\":{\"response\":\"hello back\"}}";
+            exchange.sendResponseHeaders(200, response.length());
+            try (OutputStream os = exchange.getResponseBody()) { os.write(response.getBytes(StandardCharsets.UTF_8)); }
+        });
+
+        try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("tok", baseUrl)) {
+            Map<String, Object> resp = client.chatMemory(new ChatMemoryParams(
+                    List.of(Map.of("role", "user", "content", "hi"))));
+            @SuppressWarnings("unchecked")
+            Map<String, Object> data = (Map<String, Object>) resp.get("data");
+            assertEquals("hello back", data.get("response"));
+        }
+    }
+
+    @Test
+    void chatMemoryRejectsEmptyMessages() {
+        try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("tok", baseUrl)) {
+            assertThrows(IllegalArgumentException.class, () ->
+                    client.chatMemory(new ChatMemoryParams()));
+        }
+    }
+
+    @Test
+    void chatMemoryRejectsEmptyRole() {
+        try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("tok", baseUrl)) {
+            assertThrows(IllegalArgumentException.class, () ->
+                    client.chatMemory(new ChatMemoryParams(
+                            List.of(Map.of("role", "", "content", "hi")))));
+        }
+    }
+
+    // ---- chatMemoryContext ----
+
+    @Test
+    void chatMemoryContextSuccess() {
+        server.createContext("/memory/conversations", exchange -> {
+            assertEquals("POST", exchange.getRequestMethod());
+            String response = "{\"data\":{\"response\":\"context reply\"}}";
+            exchange.sendResponseHeaders(200, response.length());
+            try (OutputStream os = exchange.getResponseBody()) { os.write(response.getBytes(StandardCharsets.UTF_8)); }
+        });
+
+        try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("tok", baseUrl)) {
+            Map<String, Object> resp = client.chatMemoryContext(new ChatMemoryParams(
+                    List.of(Map.of("role", "user", "content", "hi"))));
+            @SuppressWarnings("unchecked")
+            Map<String, Object> data = (Map<String, Object>) resp.get("data");
+            assertEquals("context reply", data.get("response"));
         }
     }
 
