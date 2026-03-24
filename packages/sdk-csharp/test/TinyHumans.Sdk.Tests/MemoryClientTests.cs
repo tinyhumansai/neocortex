@@ -453,7 +453,184 @@ public class MemoryClientTests
         Assert.EndsWith("/memory/interactions", handler.CapturedRequest!.RequestUri!.ToString());
     }
 
-    // ── GET/DELETE HTTP methods ──
+    // ── InsertDocument ──
+
+    [Fact]
+    public async Task InsertDocument_SendsCorrectRequest()
+    {
+        var handler = new MockHttpMessageHandler(HttpStatusCode.OK,
+            @"{""success"":true,""data"":{""jobId"":""j1""}}");
+        using var client = CreateClient(handler);
+
+        await client.InsertDocumentAsync(new InsertDocumentParams
+        {
+            Title = "Doc", Content = "Content", Namespace = "ns",
+        });
+
+        Assert.EndsWith("/memory/documents", handler.CapturedRequest!.RequestUri!.ToString());
+        Assert.Equal(HttpMethod.Post, handler.CapturedRequest.Method);
+        var body = JsonDocument.Parse(handler.CapturedRequestBody!).RootElement;
+        Assert.Equal("Doc", body.GetProperty("title").GetString());
+    }
+
+    [Fact]
+    public async Task InsertDocument_ThrowsOnMissingTitle()
+    {
+        using var client = CreateClient();
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            client.InsertDocumentAsync(new InsertDocumentParams { Content = "c", Namespace = "ns" }));
+    }
+
+    // ── InsertDocumentsBatch ──
+
+    [Fact]
+    public async Task InsertDocumentsBatch_SendsItems()
+    {
+        var handler = new MockHttpMessageHandler(HttpStatusCode.OK,
+            @"{""success"":true,""data"":{}}");
+        using var client = CreateClient(handler);
+
+        await client.InsertDocumentsBatchAsync(new InsertDocumentsBatchParams
+        {
+            Documents = new List<InsertDocumentParams>
+            {
+                new() { Title = "D1", Content = "C1", Namespace = "ns" },
+                new() { Title = "D2", Content = "C2", Namespace = "ns" },
+            },
+        });
+
+        Assert.EndsWith("/memory/documents/batch", handler.CapturedRequest!.RequestUri!.ToString());
+        var body = JsonDocument.Parse(handler.CapturedRequestBody!).RootElement;
+        Assert.Equal(2, body.GetProperty("items").GetArrayLength());
+    }
+
+    [Fact]
+    public async Task InsertDocumentsBatch_ThrowsOnEmpty()
+    {
+        using var client = CreateClient();
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            client.InsertDocumentsBatchAsync(new InsertDocumentsBatchParams()));
+    }
+
+    // ── ListDocuments ──
+
+    [Fact]
+    public async Task ListDocuments_SendsGetWithQueryParams()
+    {
+        var handler = new MockHttpMessageHandler(HttpStatusCode.OK,
+            @"{""success"":true,""data"":{""documents"":[]}}");
+        using var client = CreateClient(handler);
+
+        await client.ListDocumentsAsync(new ListDocumentsParams { Namespace = "ns", Limit = 10 });
+
+        Assert.Equal(HttpMethod.Get, handler.CapturedRequest!.Method);
+        var uri = handler.CapturedRequest.RequestUri!.ToString();
+        Assert.Contains("namespace=ns", uri);
+        Assert.Contains("limit=10", uri);
+    }
+
+    // ── GetDocument ──
+
+    [Fact]
+    public async Task GetDocument_SendsGetWithId()
+    {
+        var handler = new MockHttpMessageHandler(HttpStatusCode.OK,
+            @"{""success"":true,""data"":{""id"":""d1""}}");
+        using var client = CreateClient(handler);
+
+        await client.GetDocumentAsync(new GetDocumentParams { Id = "d1", Namespace = "ns" });
+
+        Assert.Equal(HttpMethod.Get, handler.CapturedRequest!.Method);
+        var uri = handler.CapturedRequest.RequestUri!.ToString();
+        Assert.Contains("/memory/documents/d1", uri);
+        Assert.Contains("namespace=ns", uri);
+    }
+
+    [Fact]
+    public async Task GetDocument_ThrowsOnMissingId()
+    {
+        using var client = CreateClient();
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            client.GetDocumentAsync(new GetDocumentParams()));
+    }
+
+    // ── DeleteDocument ──
+
+    [Fact]
+    public async Task DeleteDocument_SendsDeleteMethod()
+    {
+        var handler = new MockHttpMessageHandler(HttpStatusCode.OK,
+            @"{""success"":true,""data"":{}}");
+        using var client = CreateClient(handler);
+
+        await client.DeleteDocumentAsync("d1", "ns");
+
+        Assert.Equal(HttpMethod.Delete, handler.CapturedRequest!.Method);
+        var uri = handler.CapturedRequest.RequestUri!.ToString();
+        Assert.Contains("/memory/documents/d1", uri);
+        Assert.Contains("namespace=ns", uri);
+    }
+
+    [Fact]
+    public async Task DeleteDocument_ThrowsOnEmptyId()
+    {
+        using var client = CreateClient();
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            client.DeleteDocumentAsync(""));
+    }
+
+    // ── GetGraphSnapshot ──
+
+    [Fact]
+    public async Task GetGraphSnapshot_SendsGet()
+    {
+        var handler = new MockHttpMessageHandler(HttpStatusCode.OK,
+            @"{""success"":true,""data"":{}}");
+        using var client = CreateClient(handler);
+
+        await client.GetGraphSnapshotAsync(new GraphSnapshotParams { Namespace = "ns" });
+
+        Assert.Equal(HttpMethod.Get, handler.CapturedRequest!.Method);
+        Assert.Contains("/memory/admin/graph-snapshot", handler.CapturedRequest.RequestUri!.ToString());
+    }
+
+    // ── GetIngestionJob ──
+
+    [Fact]
+    public async Task GetIngestionJob_SendsGet()
+    {
+        var handler = new MockHttpMessageHandler(HttpStatusCode.OK,
+            @"{""success"":true,""data"":{""state"":""completed""}}");
+        using var client = CreateClient(handler);
+
+        await client.GetIngestionJobAsync("job123");
+
+        Assert.Equal(HttpMethod.Get, handler.CapturedRequest!.Method);
+        Assert.Contains("/memory/ingestion/jobs/job123", handler.CapturedRequest.RequestUri!.ToString());
+    }
+
+    [Fact]
+    public async Task GetIngestionJob_ThrowsOnEmptyJobId()
+    {
+        using var client = CreateClient();
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            client.GetIngestionJobAsync(""));
+    }
+
+    // ── WaitForIngestionJob ──
+
+    [Fact]
+    public async Task WaitForIngestionJob_ReturnsOnCompleted()
+    {
+        var handler = new MockHttpMessageHandler(HttpStatusCode.OK,
+            @"{""success"":true,""data"":{""state"":""completed""}}");
+        using var client = CreateClient(handler);
+
+        var result = await client.WaitForIngestionJobAsync("job123",
+            new WaitForIngestionJobOptions { IntervalMs = 10, MaxAttempts = 3 });
+
+        Assert.Equal("completed", result.GetProperty("data").GetProperty("state").GetString());
+    }
 
     // ── Helpers ──
 

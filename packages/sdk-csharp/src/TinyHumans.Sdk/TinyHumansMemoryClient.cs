@@ -137,6 +137,75 @@ public sealed class TinyHumansMemoryClient : IDisposable
         return await PostAsync("/memory/interactions", p.ToJsonObject());
     }
 
+    // ── Documents ──
+
+    public async Task<JsonElement> InsertDocumentAsync(InsertDocumentParams p)
+    {
+        p.Validate();
+        return await PostAsync("/memory/documents", p.ToJsonObject());
+    }
+
+    public async Task<JsonElement> InsertDocumentsBatchAsync(InsertDocumentsBatchParams p)
+    {
+        p.Validate();
+        return await PostAsync("/memory/documents/batch", p.ToJsonObject());
+    }
+
+    public async Task<JsonElement> ListDocumentsAsync(ListDocumentsParams? p = null)
+    {
+        p ??= new ListDocumentsParams();
+        return await GetAsync("/memory/documents", p.ToQueryParams());
+    }
+
+    public async Task<JsonElement> GetDocumentAsync(GetDocumentParams p)
+    {
+        p.Validate();
+        return await GetAsync($"/memory/documents/{Uri.EscapeDataString(p.Id!)}", p.ToQueryParams());
+    }
+
+    public async Task<JsonElement> DeleteDocumentAsync(string documentId, string? ns = null)
+    {
+        if (string.IsNullOrWhiteSpace(documentId))
+            throw new ArgumentException("documentId is required");
+
+        var queryParams = new Dictionary<string, string>();
+        if (ns != null) queryParams["namespace"] = ns;
+        return await DeleteAsync($"/memory/documents/{Uri.EscapeDataString(documentId)}", queryParams);
+    }
+
+    // ── Admin & Utility ──
+
+    public async Task<JsonElement> GetGraphSnapshotAsync(GraphSnapshotParams? p = null)
+    {
+        p ??= new GraphSnapshotParams();
+        return await GetAsync("/memory/admin/graph-snapshot", p.ToQueryParams());
+    }
+
+    public async Task<JsonElement> GetIngestionJobAsync(string jobId)
+    {
+        if (string.IsNullOrWhiteSpace(jobId))
+            throw new ArgumentException("jobId is required");
+        return await GetAsync($"/memory/ingestion/jobs/{Uri.EscapeDataString(jobId)}");
+    }
+
+    public async Task<JsonElement> WaitForIngestionJobAsync(string jobId, WaitForIngestionJobOptions? opts = null)
+    {
+        opts ??= new WaitForIngestionJobOptions();
+        for (int i = 0; i < opts.MaxAttempts; i++)
+        {
+            var result = await GetIngestionJobAsync(jobId);
+            if (result.TryGetProperty("data", out var data) &&
+                data.TryGetProperty("state", out var state))
+            {
+                var s = state.GetString();
+                if (s == "completed" || s == "failed")
+                    return result;
+            }
+            await Task.Delay(opts.IntervalMs);
+        }
+        throw new TimeoutException($"Ingestion job {jobId} did not complete within {opts.MaxAttempts} attempts");
+    }
+
     private async Task<JsonElement> PostAsync(string path, Dictionary<string, object?> body)
     {
         var json = JsonSerializer.Serialize(body, new JsonSerializerOptions

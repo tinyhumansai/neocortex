@@ -390,3 +390,123 @@ public class QueryMemoryContextParams
         return dict;
     }
 }
+
+// ── Documents ──
+
+public class InsertDocumentParams
+{
+    public string? Title { get; set; }
+    public string? Content { get; set; }
+    public string? Namespace { get; set; }
+    public Dictionary<string, object?>? Metadata { get; set; }
+    public string? SourceType { get; set; }
+
+    public void Validate()
+    {
+        if (string.IsNullOrWhiteSpace(Title))
+            throw new ArgumentException("title is required");
+        if (string.IsNullOrWhiteSpace(Content))
+            throw new ArgumentException("content is required");
+        if (string.IsNullOrWhiteSpace(Namespace))
+            throw new ArgumentException("namespace is required");
+    }
+
+    public Dictionary<string, object?> ToJsonObject()
+    {
+        var dict = new Dictionary<string, object?>
+        {
+            ["title"] = Title,
+            ["content"] = Content,
+            ["namespace"] = Namespace,
+        };
+        if (Metadata != null) dict["metadata"] = Metadata;
+        if (SourceType != null) dict["sourceType"] = SourceType;
+        return dict;
+    }
+}
+
+public class InsertDocumentsBatchParams
+{
+    public List<InsertDocumentParams>? Documents { get; set; }
+
+    public void Validate()
+    {
+        if (Documents == null || Documents.Count == 0)
+            throw new ArgumentException("documents is required and must be a non-empty list");
+    }
+
+    public Dictionary<string, object?> ToJsonObject()
+    {
+        var items = new List<Dictionary<string, object?>>();
+        foreach (var doc in Documents!)
+        {
+            doc.Validate();
+            items.Add(doc.ToJsonObject());
+        }
+        return new Dictionary<string, object?>
+        {
+            ["items"] = items,
+        };
+    }
+}
+
+public class ListDocumentsParams
+{
+    public string? Namespace { get; set; }
+    public int? Page { get; set; }
+    public int? Limit { get; set; }
+
+    public Dictionary<string, string> ToQueryParams()
+    {
+        var p = new Dictionary<string, string>();
+        if (Namespace != null) p["namespace"] = Namespace;
+        if (Page.HasValue) p["page"] = Page.Value.ToString();
+        if (Limit.HasValue) p["limit"] = Limit.Value.ToString();
+        return p;
+    }
+}
+
+public class GetDocumentParams
+{
+    public string? Id { get; set; }
+    public string? Namespace { get; set; }
+
+    public void Validate()
+    {
+        if (string.IsNullOrWhiteSpace(Id))
+            throw new ArgumentException("id is required");
+    }
+
+    public Dictionary<string, string> ToQueryParams()
+    {
+        var p = new Dictionary<string, string>();
+        if (Namespace != null) p["namespace"] = Namespace;
+        return p;
+    }
+}
+
+// ── Admin ──
+
+public class GraphSnapshotParams
+{
+    public string? Namespace { get; set; }
+    public string? Mode { get; set; }
+    public int? Limit { get; set; }
+    public int? SeedLimit { get; set; }
+
+    public Dictionary<string, string> ToQueryParams()
+    {
+        var p = new Dictionary<string, string>();
+        if (Namespace != null) p["namespace"] = Namespace;
+        if (Mode != null) p["mode"] = Mode;
+        if (Limit.HasValue) p["limit"] = Limit.Value.ToString();
+        if (SeedLimit.HasValue) p["seedLimit"] = SeedLimit.Value.ToString();
+        return p;
+    }
+}
+
+public class WaitForIngestionJobOptions
+{
+    public int IntervalMs { get; set; } = 2000;
+    public int MaxAttempts { get; set; } = 30;
+}
