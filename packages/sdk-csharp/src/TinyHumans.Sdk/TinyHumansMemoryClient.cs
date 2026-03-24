@@ -38,7 +38,7 @@ public sealed class TinyHumansMemoryClient : IDisposable
     public async Task<InsertMemoryResponse> InsertMemoryAsync(InsertMemoryParams p)
     {
         p.Validate();
-        var result = await PostAsync("/v1/memory/insert", p.ToJsonObject());
+        var result = await PostAsync("/memory/insert", p.ToJsonObject());
         return InsertMemoryResponse.FromJson(result);
     }
 
@@ -46,7 +46,7 @@ public sealed class TinyHumansMemoryClient : IDisposable
     {
         p ??= new RecallMemoryParams();
         p.Validate();
-        var result = await PostAsync("/v1/memory/recall", p.ToJsonObject());
+        var result = await PostAsync("/memory/recall", p.ToJsonObject());
         return RecallMemoryResponse.FromJson(result);
     }
 
@@ -54,14 +54,14 @@ public sealed class TinyHumansMemoryClient : IDisposable
     {
         p ??= new DeleteMemoryParams();
         p.Validate();
-        var result = await PostAsync("/v1/memory/admin/delete", p.ToJsonObject());
+        var result = await PostAsync("/memory/admin/delete", p.ToJsonObject());
         return DeleteMemoryResponse.FromJson(result);
     }
 
     public async Task<QueryMemoryResponse> QueryMemoryAsync(QueryMemoryParams p)
     {
         p.Validate();
-        var result = await PostAsync("/v1/memory/query", p.ToJsonObject());
+        var result = await PostAsync("/memory/query", p.ToJsonObject());
         return QueryMemoryResponse.FromJson(result);
     }
 
@@ -69,7 +69,7 @@ public sealed class TinyHumansMemoryClient : IDisposable
     {
         p ??= new RecallMemoriesParams();
         p.Validate();
-        var result = await PostAsync("/v1/memory/memories/recall", p.ToJsonObject());
+        var result = await PostAsync("/memory/memories/recall", p.ToJsonObject());
         return RecallMemoriesResponse.FromJson(result);
     }
 

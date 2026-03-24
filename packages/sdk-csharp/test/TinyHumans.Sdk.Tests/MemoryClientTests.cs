@@ -45,7 +45,7 @@ public class MemoryClientTests
 
         Assert.NotNull(handler.CapturedRequest);
         Assert.Equal(HttpMethod.Post, handler.CapturedRequest!.Method);
-        Assert.EndsWith("/v1/memory/insert", handler.CapturedRequest.RequestUri!.ToString());
+        Assert.EndsWith("/memory/insert", handler.CapturedRequest.RequestUri!.ToString());
         Assert.Equal("Bearer", handler.CapturedRequest.Headers.Authorization!.Scheme);
         Assert.Equal("test-token", handler.CapturedRequest.Headers.Authorization.Parameter);
 
