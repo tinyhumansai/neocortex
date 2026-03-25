@@ -4,6 +4,7 @@
 pub mod error;
 pub mod types;
 
+
 pub use error::TinyHumansError;
 pub use types::*;
 
@@ -64,6 +65,7 @@ impl TinyHumansMemoryClient {
     pub fn new(config: TinyHumanConfig) -> Result<Self, TinyHumansError> {
         let token = config.token.trim().to_string();
         if token.is_empty() {
+            log::warn!("[tinyhumansai] client init failed: token is empty");
             return Err(TinyHumansError::Validation("token is required".into()));
         }
         let base_url = TinyHumanConfig {
@@ -71,10 +73,16 @@ impl TinyHumansMemoryClient {
             base_url: config.base_url,
         }
         .resolve_base_url();
+        log::info!(
+            "[tinyhumansai] initializing client: base_url={base_url} token_len={}",
+            token.len()
+        );
         let client = Client::builder()
             .timeout(std::time::Duration::from_secs(30))
+            .use_rustls_tls()
             .build()
             .map_err(|e| TinyHumansError::Http(e.to_string()))?;
+        log::info!("[tinyhumansai] client ready");
         Ok(Self {
             client,
             base_url,
@@ -406,9 +414,17 @@ impl TinyHumansMemoryClient {
         body: Option<&B>,
     ) -> Result<T, TinyHumansError> {
         let url = format!("{}{}", self.base_url, path);
+        log::info!("[tinyhumansai] → {} {}", method, url);
+        if let Some(body) = body {
+            match serde_json::to_string(body) {
+                Ok(json) => log::debug!("[tinyhumansai] request body: {}", json),
+                Err(e) => log::warn!("[tinyhumansai] could not serialize body for logging: {e}"),
+            }
+        }
+
         let mut req = self
             .client
-            .request(method, &url)
+            .request(method.clone(), &url)
             .header("Content-Type", "application/json")
             .header("Authorization", format!("Bearer {}", self.token));
 
@@ -419,15 +435,30 @@ impl TinyHumansMemoryClient {
         let res = req
             .send()
             .await
-            .map_err(|e| TinyHumansError::Http(e.to_string()))?;
+            .map_err(|e| {
+                let mut cause = String::new();
+                let mut src: &dyn std::error::Error = &e;
+                loop {
+                    cause.push_str(&format!(" → {src}"));
+                    match src.source() {
+                        Some(next) => src = next,
+                        None => break,
+                    }
+                }
+                log::warn!("[tinyhumansai] ← {} {} send error:{}", method, url, cause);
+                TinyHumansError::Http(e.to_string())
+            })?;
 
         let status = res.status();
+        log::info!("[tinyhumansai] ← {} {} status={}", method, url, status.as_u16());
+
         let text = res
             .text()
             .await
             .map_err(|e| TinyHumansError::Http(e.to_string()))?;
 
         if !status.is_success() {
+            log::warn!("[tinyhumansai] error response body: {}", text);
             let err_payload: ErrorPayload =
                 serde_json::from_str(&text).unwrap_or_else(|_| ErrorPayload::default());
             let message = err_payload
@@ -441,6 +472,7 @@ impl TinyHumansMemoryClient {
             });
         }
 
+        log::debug!("[tinyhumansai] response body: {}", text);
         serde_json::from_str(&text).map_err(|e| TinyHumansError::Decode(e.to_string()))
     }
 }
