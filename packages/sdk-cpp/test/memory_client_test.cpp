@@ -156,7 +156,7 @@ TEST(MemoryClientTest, MockServerParsesMethodAndPath) {
 
     TinyHumansMemoryClient client("test-token", server.base_url());
     InsertMemoryParams params;
-    params.set_title("t").set_content("c").set_namespace("n");
+    params.set_title("t").set_content("c").set_namespace("n").set_document_id("doc-1");
     client.insert_memory(params);
     future.get();
 
@@ -201,7 +201,7 @@ TEST(MemoryClientTest, InsertMemorySendsCorrectRequest) {
 
     TinyHumansMemoryClient client("test-token", server.base_url());
     InsertMemoryParams params;
-    params.set_title("title").set_content("content").set_namespace("ns");
+    params.set_title("title").set_content("content").set_namespace("ns").set_document_id("doc-1");
     auto resp = client.insert_memory(params);
 
     std::string body = future.get();
@@ -241,6 +241,14 @@ TEST(MemoryClientTest, InsertMemoryValidatesMissingNamespace) {
     TinyHumansMemoryClient client("test-token", server.base_url());
     InsertMemoryParams params;
     params.set_title("title").set_content("content");
+    EXPECT_THROW(client.insert_memory(params), std::invalid_argument);
+}
+
+TEST(MemoryClientTest, InsertMemoryValidatesMissingDocumentId) {
+    MockHttpServer server;
+    TinyHumansMemoryClient client("test-token", server.base_url());
+    InsertMemoryParams params;
+    params.set_title("title").set_content("content").set_namespace("ns");
     EXPECT_THROW(client.insert_memory(params), std::invalid_argument);
 }
 
@@ -689,7 +697,7 @@ TEST(MemoryClientTest, ServerErrorThrowsWithHttpStatus) {
     TinyHumansMemoryClient client("test-token", server.base_url());
     try {
         InsertMemoryParams params;
-        params.set_title("t").set_content("c").set_namespace("n");
+        params.set_title("t").set_content("c").set_namespace("n").set_document_id("doc-1");
         client.insert_memory(params);
         FAIL() << "Expected TinyHumansError";
     } catch (const TinyHumansError& err) {
