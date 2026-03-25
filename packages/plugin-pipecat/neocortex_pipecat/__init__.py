@@ -1,4 +1,4 @@
-from .memory import NeocortexMemoryService
+from .memory import NeocortexMemoryService, NeocortexParams
 
-__all__ = ["NeocortexMemoryService"]
+__all__ = ["NeocortexMemoryService", "NeocortexParams"]
 

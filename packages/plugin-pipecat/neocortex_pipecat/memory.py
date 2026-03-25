@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Sequence
 import os
+from urllib.parse import quote
 
 import requests
 from loguru import logger
@@ -94,6 +95,21 @@ class NeocortexMemoryService(FrameProcessor):
   def _post(self, path: str, body: Dict[str, Any]) -> Dict[str, Any]:
     url = f"{self._base_url}{path}"
     resp = requests.post(url, json=body, headers=self._headers(), timeout=30)
+    return self._handle_response(resp)
+
+  def _get(self, path: str, query_params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    url = f"{self._base_url}{path}"
+    params = {k: v for k, v in (query_params or {}).items() if v is not None}
+    resp = requests.get(url, params=params, headers=self._headers(), timeout=30)
+    return self._handle_response(resp)
+
+  def _delete(self, path: str, query_params: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    url = f"{self._base_url}{path}"
+    params = {k: v for k, v in (query_params or {}).items() if v is not None}
+    resp = requests.delete(url, params=params, headers=self._headers(), timeout=30)
+    return self._handle_response(resp)
+
+  def _handle_response(self, resp: requests.Response) -> Dict[str, Any]:
     try:
       data = resp.json() if resp.text else {}
     except Exception:
@@ -107,12 +123,20 @@ class NeocortexMemoryService(FrameProcessor):
 
     return data
 
-  def _insert_memory(self, title: str, content: str, namespace: str, metadata: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+  def _insert_memory(
+    self,
+    title: str,
+    content: str,
+    namespace: str,
+    document_id: str,
+    metadata: Optional[Dict[str, Any]] = None,
+  ) -> Dict[str, Any]:
     body: Dict[str, Any] = {
       "title": title,
       "content": content,
       "namespace": namespace,
       "sourceType": "chat",
+      "document_id": document_id,
       "metadata": metadata or {},
     }
     return self._post("/v1/memory/insert", body)
@@ -130,6 +154,176 @@ class NeocortexMemoryService(FrameProcessor):
       "namespace": namespace,
     }
     return self._post("/v1/memory/admin/delete", body)
+
+  # --- Legacy/core endpoints ---
+  def _sync_memory(
+    self,
+    workspace_id: str,
+    agent_id: str,
+    files: Sequence[Dict[str, Any]],
+    source: Optional[str] = None,
+  ) -> Dict[str, Any]:
+    body: Dict[str, Any] = {
+      "workspaceId": workspace_id,
+      "agentId": agent_id,
+      "source": source,
+      "files": [
+        {
+          "filePath": f.get("file_path") or f.get("filePath"),
+          "content": f.get("content"),
+          "timestamp": f.get("timestamp"),
+          "hash": f.get("hash"),
+        }
+        for f in files
+      ],
+    }
+    return self._post("/v1/memory/sync", body)
+
+  def _recall_memory(self, namespace: Optional[str], max_chunks: Optional[int] = None) -> Dict[str, Any]:
+    return self._post("/v1/memory/recall", {"namespace": namespace, "maxChunks": max_chunks})
+
+  def _recall_memories(
+    self,
+    namespace: Optional[str],
+    top_k: Optional[int] = None,
+    min_retention: Optional[float] = None,
+    as_of: Optional[float] = None,
+  ) -> Dict[str, Any]:
+    return self._post(
+      "/v1/memory/memories/recall",
+      {
+        "namespace": namespace,
+        "topK": top_k,
+        "minRetention": min_retention,
+        "asOf": as_of,
+      },
+    )
+
+  def _chat_memory(
+    self,
+    messages: Sequence[Dict[str, Any]],
+    temperature: Optional[float] = None,
+    max_tokens: Optional[int] = None,
+  ) -> Dict[str, Any]:
+    return self._post(
+      "/v1/memory/chat",
+      {"messages": list(messages), "temperature": temperature, "maxTokens": max_tokens},
+    )
+
+  def _interact_memory(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+    return self._post("/v1/memory/interact", payload)
+
+  # --- Documents & mirrored endpoints ---
+  def _insert_document(
+    self,
+    title: str,
+    content: str,
+    namespace: str,
+    document_id: str,
+    source_type: Optional[str] = None,
+    metadata: Optional[Dict[str, Any]] = None,
+    priority: Optional[str] = None,
+    created_at: Optional[float] = None,
+    updated_at: Optional[float] = None,
+  ) -> Dict[str, Any]:
+    body: Dict[str, Any] = {
+      "title": title,
+      "content": content,
+      "namespace": namespace,
+      "sourceType": source_type or "doc",
+      "metadata": metadata or {},
+      "priority": priority,
+      "createdAt": created_at,
+      "updatedAt": updated_at,
+      "document_id": document_id,
+    }
+    return self._post("/v1/memory/documents", body)
+
+  def _insert_documents_batch(self, items: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
+    return self._post("/v1/memory/documents/batch", {"items": list(items)})
+
+  def _list_documents(
+    self,
+    namespace: Optional[str] = None,
+    limit: Optional[int] = None,
+    offset: Optional[int] = None,
+  ) -> Dict[str, Any]:
+    return self._get("/v1/memory/documents", {"namespace": namespace, "limit": limit, "offset": offset})
+
+  def _get_document(self, document_id: str, namespace: Optional[str] = None) -> Dict[str, Any]:
+    return self._get(
+      f"/v1/memory/documents/{quote(document_id, safe='')}",
+      {"namespace": namespace},
+    )
+
+  def _delete_document(self, document_id: str, namespace: str) -> Dict[str, Any]:
+    return self._delete(
+      f"/v1/memory/documents/{quote(document_id, safe='')}",
+      {"namespace": namespace},
+    )
+
+  def _query_memory_context(
+    self,
+    query: str,
+    namespace: Optional[str] = None,
+    include_references: Optional[bool] = None,
+    max_chunks: Optional[int] = None,
+    document_ids: Optional[Sequence[str]] = None,
+    recall_only: Optional[bool] = None,
+    llm_query: Optional[str] = None,
+  ) -> Dict[str, Any]:
+    return self._post(
+      "/v1/memory/queries",
+      {
+        "query": query,
+        "includeReferences": include_references,
+        "namespace": namespace,
+        "maxChunks": max_chunks,
+        "documentIds": list(document_ids) if document_ids is not None else None,
+        "recallOnly": recall_only,
+        "llmQuery": llm_query,
+      },
+    )
+
+  def _chat_memory_context(
+    self,
+    messages: Sequence[Dict[str, Any]],
+    temperature: Optional[float] = None,
+    max_tokens: Optional[int] = None,
+  ) -> Dict[str, Any]:
+    return self._post(
+      "/v1/memory/conversations",
+      {"messages": list(messages), "temperature": temperature, "maxTokens": max_tokens},
+    )
+
+  def _record_interactions(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+    return self._post("/v1/memory/interactions", payload)
+
+  def _recall_thoughts(
+    self,
+    namespace: Optional[str] = None,
+    max_chunks: Optional[int] = None,
+    temperature: Optional[float] = None,
+    randomness_seed: Optional[int] = None,
+    persist: Optional[bool] = None,
+    enable_prediction_check: Optional[bool] = None,
+    thought_prompt: Optional[str] = None,
+  ) -> Dict[str, Any]:
+    return self._post(
+      "/v1/memory/memories/thoughts",
+      {
+        "namespace": namespace,
+        "maxChunks": max_chunks,
+        "temperature": temperature,
+        "randomnessSeed": randomness_seed,
+        "persist": persist,
+        "enablePredictionCheck": enable_prediction_check,
+        "thoughtPrompt": thought_prompt,
+      },
+    )
+
+  def _get_ingestion_job(self, job_id: str) -> Dict[str, Any]:
+    return self._get(f"/v1/memory/ingestion/jobs/{quote(job_id, safe='')}")
 
   # ---------------------------
   # Memory helpers
@@ -165,6 +359,7 @@ class NeocortexMemoryService(FrameProcessor):
 
       title = text[:64] + ("..." if len(text) > 64 else "")
       namespace = self._namespace_for()
+      document_id = f"pipecat-{abs(hash((namespace, text))) % 1_000_000_000}"
 
       metadata: Dict[str, Any] = {
         "platform": "pipecat",
@@ -174,7 +369,13 @@ class NeocortexMemoryService(FrameProcessor):
       }
 
       logger.debug(f"NeocortexMemoryService: inserting memory in namespace={namespace}")
-      self._insert_memory(title=title, content=text, namespace=namespace, metadata=metadata)
+      self._insert_memory(
+        title=title,
+        content=text,
+        namespace=namespace,
+        document_id=document_id,
+        metadata=metadata,
+      )
     except Exception as e:
       logger.error(f"Error storing messages in Neocortex: {e}")
 
@@ -229,6 +430,135 @@ class NeocortexMemoryService(FrameProcessor):
       context.add_message({"role": "user", "content": full_text})
 
     logger.debug("NeocortexMemoryService: enhanced context with Neocortex memories")
+
+  # ---------------------------
+  # Public wrappers (Mastra-like endpoint surface)
+  # ---------------------------
+  def sync_memory(
+    self,
+    workspace_id: str,
+    agent_id: str,
+    files: Sequence[Dict[str, Any]],
+    source: Optional[str] = None,
+  ) -> Dict[str, Any]:
+    return self._sync_memory(workspace_id=workspace_id, agent_id=agent_id, files=files, source=source)
+
+  def recall_memory_master(self, max_chunks: Optional[int] = None) -> Dict[str, Any]:
+    return self._recall_memory(namespace=self._namespace_for(), max_chunks=max_chunks)
+
+  def recall_memories(
+    self,
+    top_k: Optional[int] = None,
+    min_retention: Optional[float] = None,
+    as_of: Optional[float] = None,
+  ) -> Dict[str, Any]:
+    return self._recall_memories(
+      namespace=self._namespace_for(),
+      top_k=top_k,
+      min_retention=min_retention,
+      as_of=as_of,
+    )
+
+  def chat_memory(
+    self,
+    messages: Sequence[Dict[str, Any]],
+    temperature: Optional[float] = None,
+    max_tokens: Optional[int] = None,
+  ) -> Dict[str, Any]:
+    return self._chat_memory(messages=messages, temperature=temperature, max_tokens=max_tokens)
+
+  def interact_memory(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+    return self._interact_memory(payload)
+
+  def insert_document(
+    self,
+    title: str,
+    content: str,
+    document_id: str,
+    source_type: Optional[str] = None,
+    metadata: Optional[Dict[str, Any]] = None,
+    priority: Optional[str] = None,
+    created_at: Optional[float] = None,
+    updated_at: Optional[float] = None,
+  ) -> Dict[str, Any]:
+    return self._insert_document(
+      title=title,
+      content=content,
+      namespace=self._namespace_for(),
+      document_id=document_id,
+      source_type=source_type,
+      metadata=metadata,
+      priority=priority,
+      created_at=created_at,
+      updated_at=updated_at,
+    )
+
+  def insert_documents_batch(self, items: Sequence[Dict[str, Any]]) -> Dict[str, Any]:
+    for item in items:
+      if not isinstance(item, dict) or not item.get("document_id"):
+        raise ValueError("each item in items must include document_id")
+    return self._insert_documents_batch(items)
+
+  def list_documents(self, limit: Optional[int] = None, offset: Optional[int] = None) -> Dict[str, Any]:
+    return self._list_documents(namespace=self._namespace_for(), limit=limit, offset=offset)
+
+  def get_document(self, document_id: str) -> Dict[str, Any]:
+    return self._get_document(document_id=document_id, namespace=self._namespace_for())
+
+  def delete_document(self, document_id: str) -> Dict[str, Any]:
+    return self._delete_document(document_id=document_id, namespace=self._namespace_for())
+
+  def query_memory_context(
+    self,
+    query: str,
+    include_references: Optional[bool] = None,
+    max_chunks: Optional[int] = None,
+    document_ids: Optional[Sequence[str]] = None,
+    recall_only: Optional[bool] = None,
+    llm_query: Optional[str] = None,
+  ) -> Dict[str, Any]:
+    return self._query_memory_context(
+      query=query,
+      namespace=self._namespace_for(),
+      include_references=include_references,
+      max_chunks=max_chunks,
+      document_ids=document_ids,
+      recall_only=recall_only,
+      llm_query=llm_query,
+    )
+
+  def chat_memory_context(
+    self,
+    messages: Sequence[Dict[str, Any]],
+    temperature: Optional[float] = None,
+    max_tokens: Optional[int] = None,
+  ) -> Dict[str, Any]:
+    return self._chat_memory_context(messages=messages, temperature=temperature, max_tokens=max_tokens)
+
+  def record_interactions(self, payload: Dict[str, Any]) -> Dict[str, Any]:
+    return self._record_interactions(payload)
+
+  def recall_thoughts(
+    self,
+    max_chunks: Optional[int] = None,
+    temperature: Optional[float] = None,
+    randomness_seed: Optional[int] = None,
+    persist: Optional[bool] = None,
+    enable_prediction_check: Optional[bool] = None,
+    thought_prompt: Optional[str] = None,
+  ) -> Dict[str, Any]:
+    return self._recall_thoughts(
+      namespace=self._namespace_for(),
+      max_chunks=max_chunks,
+      temperature=temperature,
+      randomness_seed=randomness_seed,
+      persist=persist,
+      enable_prediction_check=enable_prediction_check,
+      thought_prompt=thought_prompt,
+    )
+
+  def get_ingestion_job(self, job_id: str) -> Dict[str, Any]:
+    return self._get_ingestion_job(job_id=job_id)
 
   # ---------------------------
   # FrameProcessor implementation
