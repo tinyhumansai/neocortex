@@ -28,12 +28,13 @@ func TestIntegration_InsertRecallDelete(t *testing.T) {
 	// --- Insert ---
 	now := float64(time.Now().Unix())
 	insertResp, err := client.IngestMemory(tinyhumans.MemoryItem{
-		Key:       "test-key-1",
-		Content:   "The capital of France is Paris.",
-		Namespace: namespace,
-		Metadata:  map[string]interface{}{"source": "integration-test"},
-		CreatedAt: &now,
-		UpdatedAt: &now,
+		Key:        "test-key-1",
+		Content:    "The capital of France is Paris.",
+		Namespace:  namespace,
+		DocumentID: "integration-test-doc-1",
+		Metadata:   map[string]interface{}{"source": "integration-test"},
+		CreatedAt:  &now,
+		UpdatedAt:  &now,
 	})
 	if err != nil {
 		t.Fatalf("IngestMemory: %v", err)

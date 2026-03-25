@@ -234,7 +234,7 @@ func TestIngestMemory_Completed(t *testing.T) {
 	defer server.Close()
 
 	c := testClient(t, server)
-	resp, err := c.IngestMemory(MemoryItem{Key: "key1", Content: "hello", Namespace: "ns"})
+	resp, err := c.IngestMemory(MemoryItem{Key: "key1", Content: "hello", Namespace: "ns", DocumentID: "doc-1"})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -250,7 +250,7 @@ func TestIngestMemory_Updated(t *testing.T) {
 	defer server.Close()
 
 	c := testClient(t, server)
-	resp, err := c.IngestMemory(MemoryItem{Key: "key1", Content: "hello", Namespace: "ns"})
+	resp, err := c.IngestMemory(MemoryItem{Key: "key1", Content: "hello", Namespace: "ns", DocumentID: "doc-1"})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -267,7 +267,7 @@ func TestIngestMemory_ServerError(t *testing.T) {
 	defer server.Close()
 
 	c := testClient(t, server)
-	resp, err := c.IngestMemory(MemoryItem{Key: "key1", Content: "hello", Namespace: "ns"})
+	resp, err := c.IngestMemory(MemoryItem{Key: "key1", Content: "hello", Namespace: "ns", DocumentID: "doc-1"})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -284,10 +284,21 @@ func TestIngestMemories_EmptyList(t *testing.T) {
 	}
 }
 
+func TestIngestMemory_MissingDocumentID(t *testing.T) {
+	c, _ := NewClient("tok")
+	_, err := c.IngestMemory(MemoryItem{Key: "k", Content: "c", Namespace: "ns"})
+	if err == nil {
+		t.Fatal("expected error for missing documentId")
+	}
+	if !strings.Contains(err.Error(), "documentId") {
+		t.Errorf("error should mention documentId, got: %v", err)
+	}
+}
+
 func TestIngestMemory_InvalidTimestamp(t *testing.T) {
 	c, _ := NewClient("tok")
 	neg := -1.0
-	_, err := c.IngestMemory(MemoryItem{Key: "k", Content: "c", Namespace: "ns", CreatedAt: &neg})
+	_, err := c.IngestMemory(MemoryItem{Key: "k", Content: "c", Namespace: "ns", DocumentID: "doc-1", CreatedAt: &neg})
 	if err == nil {
 		t.Fatal("expected validation error for negative timestamp")
 	}
@@ -329,12 +340,13 @@ func TestIngestMemory_RequestBody(t *testing.T) {
 
 	c := testClient(t, server)
 	c.IngestMemory(MemoryItem{
-		Key:       "mykey",
-		Content:   "mycontent",
-		Namespace: "myns",
-		Metadata:  map[string]interface{}{"src": "test"},
-		CreatedAt: &ts,
-		UpdatedAt: &ts,
+		Key:        "mykey",
+		Content:    "mycontent",
+		Namespace:  "myns",
+		DocumentID: "doc-1",
+		Metadata:   map[string]interface{}{"src": "test"},
+		CreatedAt:  &ts,
+		UpdatedAt:  &ts,
 	})
 }
 
@@ -355,7 +367,7 @@ func TestIngestMemory_NilMetadataBecomesEmptyMap(t *testing.T) {
 	defer server.Close()
 
 	c := testClient(t, server)
-	c.IngestMemory(MemoryItem{Key: "k", Content: "c", Namespace: "ns"})
+	c.IngestMemory(MemoryItem{Key: "k", Content: "c", Namespace: "ns", DocumentID: "doc-1"})
 }
 
 // --- RecallMemory ---

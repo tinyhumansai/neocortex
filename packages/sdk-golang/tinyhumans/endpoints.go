@@ -216,7 +216,7 @@ func (c *Client) sendInteraction(path, namespace string, entityNames []string, o
 
 // InsertDocument ingests a single document.
 // POST /memory/documents
-func (c *Client) InsertDocument(title, content, namespace string, opts *InsertDocumentOptions) (map[string]interface{}, error) {
+func (c *Client) InsertDocument(title, content, namespace, documentID string, opts *InsertDocumentOptions) (map[string]interface{}, error) {
 	if title == "" {
 		return nil, errors.New("title is required")
 	}
@@ -226,11 +226,15 @@ func (c *Client) InsertDocument(title, content, namespace string, opts *InsertDo
 	if namespace == "" {
 		return nil, errors.New("namespace is required")
 	}
+	if documentID == "" {
+		return nil, errors.New("documentId is required")
+	}
 
 	body := map[string]interface{}{
-		"title":     title,
-		"content":   content,
-		"namespace": namespace,
+		"title":      title,
+		"content":    content,
+		"namespace":  namespace,
+		"documentId": documentID,
 	}
 	if opts != nil {
 		if opts.SourceType != "" {
@@ -247,9 +251,6 @@ func (c *Client) InsertDocument(title, content, namespace string, opts *InsertDo
 		}
 		if opts.UpdatedAt != nil {
 			body["updatedAt"] = *opts.UpdatedAt
-		}
-		if opts.DocumentID != "" {
-			body["documentId"] = opts.DocumentID
 		}
 	}
 
@@ -271,6 +272,9 @@ func (c *Client) InsertDocumentsBatch(items []DocumentItem) (map[string]interfac
 		}
 		if item.Namespace == "" {
 			return nil, fmt.Errorf("item[%d]: namespace is required", i)
+		}
+		if item.DocumentID == "" {
+			return nil, fmt.Errorf("item[%d]: documentId is required", i)
 		}
 	}
 

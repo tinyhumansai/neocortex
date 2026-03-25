@@ -79,6 +79,9 @@ func (c *Client) IngestMemories(items []MemoryItem) (*IngestMemoryResponse, erro
 	errCount := 0
 
 	for _, item := range items {
+		if item.DocumentID == "" {
+			return nil, errors.New("documentId is required for each memory item")
+		}
 		if err := validateTimestamps(item.CreatedAt, item.UpdatedAt); err != nil {
 			return nil, err
 		}
@@ -87,6 +90,7 @@ func (c *Client) IngestMemories(items []MemoryItem) (*IngestMemoryResponse, erro
 			"title":      item.Key,
 			"content":    item.Content,
 			"namespace":  item.Namespace,
+			"documentId": item.DocumentID,
 			"sourceType": "doc",
 			"metadata":   item.Metadata,
 		}

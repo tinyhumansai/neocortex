@@ -397,7 +397,7 @@ func TestInsertDocument_Success(t *testing.T) {
 	defer server.Close()
 
 	c := testClient(t, server)
-	data, err := c.InsertDocument("doc1", "content1", "ns1", nil)
+	data, err := c.InsertDocument("doc1", "content1", "ns1", "doc-123", nil)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -408,9 +408,17 @@ func TestInsertDocument_Success(t *testing.T) {
 
 func TestInsertDocument_EmptyTitle(t *testing.T) {
 	c, _ := NewClient("tok")
-	_, err := c.InsertDocument("", "content", "ns", nil)
+	_, err := c.InsertDocument("", "content", "ns", "doc-1", nil)
 	if err == nil {
 		t.Fatal("expected error for empty title")
+	}
+}
+
+func TestInsertDocument_EmptyDocumentID(t *testing.T) {
+	c, _ := NewClient("tok")
+	_, err := c.InsertDocument("title", "content", "ns", "", nil)
+	if err == nil {
+		t.Fatal("expected error for empty documentId")
 	}
 }
 
@@ -429,9 +437,8 @@ func TestInsertDocument_WithOptions(t *testing.T) {
 	defer server.Close()
 
 	c := testClient(t, server)
-	c.InsertDocument("t", "c", "ns", &InsertDocumentOptions{
+	c.InsertDocument("t", "c", "ns", "custom-id", &InsertDocumentOptions{
 		SourceType: "pdf",
-		DocumentID: "custom-id",
 	})
 }
 
@@ -448,8 +455,8 @@ func TestInsertDocumentsBatch_Success(t *testing.T) {
 
 	c := testClient(t, server)
 	data, err := c.InsertDocumentsBatch([]DocumentItem{
-		{Title: "d1", Content: "c1", Namespace: "ns"},
-		{Title: "d2", Content: "c2", Namespace: "ns"},
+		{Title: "d1", Content: "c1", Namespace: "ns", DocumentID: "doc-1"},
+		{Title: "d2", Content: "c2", Namespace: "ns", DocumentID: "doc-2"},
 	})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -469,9 +476,17 @@ func TestInsertDocumentsBatch_EmptyItems(t *testing.T) {
 
 func TestInsertDocumentsBatch_MissingTitle(t *testing.T) {
 	c, _ := NewClient("tok")
-	_, err := c.InsertDocumentsBatch([]DocumentItem{{Content: "c", Namespace: "ns"}})
+	_, err := c.InsertDocumentsBatch([]DocumentItem{{Content: "c", Namespace: "ns", DocumentID: "doc-1"}})
 	if err == nil {
 		t.Fatal("expected error for missing title")
+	}
+}
+
+func TestInsertDocumentsBatch_MissingDocumentID(t *testing.T) {
+	c, _ := NewClient("tok")
+	_, err := c.InsertDocumentsBatch([]DocumentItem{{Title: "t", Content: "c", Namespace: "ns"}})
+	if err == nil {
+		t.Fatal("expected error for missing documentId")
 	}
 }
 
