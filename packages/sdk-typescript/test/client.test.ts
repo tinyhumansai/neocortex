@@ -9,7 +9,7 @@ import {
   RecallMemoriesParams,
 } from '../src/index';
 
-describe('AlphahumanMemoryClient', () => {
+describe('TinyHumansMemoryClient', () => {
   const baseUrl = 'https://api.test.example';
   const token = 'test-token';
 
@@ -89,7 +89,6 @@ describe('AlphahumanMemoryClient', () => {
             priority: undefined,
             createdAt: undefined,
             updatedAt: undefined,
-            document_id: 'doc_1',
           }),
         })
       );
