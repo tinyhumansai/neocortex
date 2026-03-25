@@ -61,7 +61,7 @@ pub struct InsertMemoryParams {
     pub priority: Option<Priority>,
     pub created_at: Option<f64>,
     pub updated_at: Option<f64>,
-    pub document_id: Option<String>,
+    pub document_id: String,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -402,15 +402,16 @@ pub struct IngestDocumentParams {
     pub created_at: Option<f64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<f64>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub document_id: Option<String>,
+    pub document_id: String,
 }
 
 #[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct BatchDocumentItem {
     pub title: String,
     pub content: String,
     pub namespace: String,
+    pub document_id: String,
 }
 
 #[derive(Debug, Clone, Serialize)]

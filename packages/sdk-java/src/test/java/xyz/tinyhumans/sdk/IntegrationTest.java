@@ -22,6 +22,7 @@ class IntegrationTest {
             long now = System.currentTimeMillis() / 1000;
             InsertMemoryResponse insertResp = client.insertMemory(
                     new InsertMemoryParams("test-key-1", "The capital of France is Paris.", namespace)
+                            .setDocumentId("integration-test-doc-1")
                             .setMetadata(Map.of("source", "integration-test"))
                             .setCreatedAt(now)
                             .setUpdatedAt(now));
@@ -41,14 +42,14 @@ class IntegrationTest {
 
             // --- Insert Document ---
             Map<String, Object> docResp = client.insertDocument(
-                    new InsertDocumentParams("Test Doc", "Document content", namespace));
+                    new InsertDocumentParams("Test Doc", "Document content", namespace).setDocumentId("test-doc-1"));
             System.out.println("InsertDocument: " + docResp);
 
             // --- Insert Documents Batch ---
             Map<String, Object> batchResp = client.insertDocumentsBatch(
                     new InsertDocumentsBatchParams(List.of(
-                            new InsertDocumentParams("Batch 1", "Content 1", namespace),
-                            new InsertDocumentParams("Batch 2", "Content 2", namespace))));
+                            new InsertDocumentParams("Batch 1", "Content 1", namespace).setDocumentId("batch-doc-1"),
+                            new InsertDocumentParams("Batch 2", "Content 2", namespace).setDocumentId("batch-doc-2"))));
             System.out.println("InsertDocumentsBatch: " + batchResp);
 
             // --- List Documents ---

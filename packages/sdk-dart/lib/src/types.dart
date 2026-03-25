@@ -33,6 +33,9 @@ class InsertMemoryParams {
     if (namespace == null || namespace!.trim().isEmpty) {
       throw ArgumentError('namespace is required and must be a string');
     }
+    if (documentId == null || documentId!.trim().isEmpty) {
+      throw ArgumentError('documentId is required and must be a non-empty string');
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -41,12 +44,12 @@ class InsertMemoryParams {
       'content': content,
       'namespace': namespace,
       'sourceType': sourceType,
+      'documentId': documentId,
     };
     if (metadata != null) map['metadata'] = metadata;
     if (priority != null) map['priority'] = priority;
     if (createdAt != null) map['createdAt'] = createdAt;
     if (updatedAt != null) map['updatedAt'] = updatedAt;
-    if (documentId != null) map['documentId'] = documentId;
     return map;
   }
 }
@@ -460,6 +463,7 @@ class InsertDocumentParams {
   final String title;
   final String content;
   final String namespace;
+  final String documentId;
   final Map<String, dynamic>? metadata;
   final String? sourceType;
 
@@ -467,6 +471,7 @@ class InsertDocumentParams {
     required this.title,
     required this.content,
     required this.namespace,
+    required this.documentId,
     this.metadata,
     this.sourceType,
   });
@@ -481,6 +486,9 @@ class InsertDocumentParams {
     if (namespace.trim().isEmpty) {
       throw ArgumentError('namespace is required');
     }
+    if (documentId.trim().isEmpty) {
+      throw ArgumentError('documentId is required');
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -488,6 +496,7 @@ class InsertDocumentParams {
       'title': title,
       'content': content,
       'namespace': namespace,
+      'documentId': documentId,
     };
     if (metadata != null) map['metadata'] = metadata;
     if (sourceType != null) map['sourceType'] = sourceType;

@@ -25,6 +25,7 @@ int main() {
         insert_params.set_title("example-doc")
             .set_content("The speed of light is approximately 299,792 km/s.")
             .set_namespace(ns)
+            .set_document_id("cpp-example-001")
             .set_metadata(json{{"lang", "cpp"}});
         auto insert_resp = client.insert_memory(insert_params);
         std::cout << "success=" << insert_resp.success << " status=" << insert_resp.status << std::endl;

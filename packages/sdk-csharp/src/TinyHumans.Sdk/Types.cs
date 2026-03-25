@@ -24,6 +24,8 @@ public class InsertMemoryParams
             throw new ArgumentException("content is required and must be a string");
         if (string.IsNullOrWhiteSpace(Namespace))
             throw new ArgumentException("namespace is required and must be a string");
+        if (string.IsNullOrWhiteSpace(DocumentId))
+            throw new ArgumentException("documentId is required and must be a non-empty string");
     }
 
     public Dictionary<string, object?> ToJsonObject()
@@ -34,12 +36,12 @@ public class InsertMemoryParams
             ["content"] = Content,
             ["namespace"] = Namespace,
             ["sourceType"] = SourceType,
+            ["documentId"] = DocumentId,
         };
         if (Metadata != null) dict["metadata"] = Metadata;
         if (Priority != null) dict["priority"] = Priority;
         if (CreatedAt.HasValue) dict["createdAt"] = CreatedAt.Value;
         if (UpdatedAt.HasValue) dict["updatedAt"] = UpdatedAt.Value;
-        if (DocumentId != null) dict["documentId"] = DocumentId;
         return dict;
     }
 }

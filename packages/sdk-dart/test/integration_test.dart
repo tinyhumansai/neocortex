@@ -23,6 +23,7 @@ void main() {
         title: 'test-key-1',
         content: 'The capital of France is Paris.',
         namespace: ns,
+        documentId: 'integration-test-doc-1',
         metadata: {'source': 'integration-test'},
         createdAt: nowSeconds,
         updatedAt: nowSeconds,
@@ -51,6 +52,7 @@ void main() {
           title: 'Test Doc',
           content: 'Document content for integration test',
           namespace: ns,
+          documentId: 'test-doc-1',
         ));
         print('InsertDocument: $docResp');
       } catch (e) {
@@ -63,9 +65,9 @@ void main() {
             await client.insertDocumentsBatch(InsertDocumentsBatchParams(
           documents: [
             InsertDocumentParams(
-                title: 'Batch 1', content: 'Content 1', namespace: ns),
+                title: 'Batch 1', content: 'Content 1', namespace: ns, documentId: 'batch-doc-1'),
             InsertDocumentParams(
-                title: 'Batch 2', content: 'Content 2', namespace: ns),
+                title: 'Batch 2', content: 'Content 2', namespace: ns, documentId: 'batch-doc-2'),
           ],
         ));
         print('InsertDocumentsBatch: $batchResp');

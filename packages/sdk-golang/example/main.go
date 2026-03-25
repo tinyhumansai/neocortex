@@ -24,12 +24,13 @@ func main() {
 	// Ingest (upsert) a single memory
 	now := float64(time.Now().Unix())
 	result, err := client.IngestMemory(tinyhumans.MemoryItem{
-		Key:       "user-preference-theme",
-		Content:   "User prefers dark mode",
-		Namespace: "preferences",
-		Metadata:  map[string]interface{}{"source": "onboarding"},
-		CreatedAt: &now,
-		UpdatedAt: &now,
+		Key:        "user-preference-theme",
+		Content:    "User prefers dark mode",
+		Namespace:  "preferences",
+		DocumentID: "pref-theme-001",
+		Metadata:   map[string]interface{}{"source": "onboarding"},
+		CreatedAt:  &now,
+		UpdatedAt:  &now,
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -39,15 +40,17 @@ func main() {
 	// Ingest multiple memories
 	batch, err := client.IngestMemories([]tinyhumans.MemoryItem{
 		{
-			Key:       "go-sdk-example-1",
-			Content:   "Go SDK can ingest multiple memories.",
-			Namespace: "preferences",
-			Metadata:  map[string]interface{}{"source": "go-example"},
+			Key:        "go-sdk-example-1",
+			Content:    "Go SDK can ingest multiple memories.",
+			Namespace:  "preferences",
+			DocumentID: "go-example-001",
+			Metadata:   map[string]interface{}{"source": "go-example"},
 		},
 		{
-			Key:       "go-sdk-example-2",
-			Content:   "This is a second memory from the Go example.",
-			Namespace: "preferences",
+			Key:        "go-sdk-example-2",
+			Content:    "This is a second memory from the Go example.",
+			Namespace:  "preferences",
+			DocumentID: "go-example-002",
 		},
 	})
 	if err != nil {
@@ -93,7 +96,7 @@ func main() {
 	// --- Document operations ---
 
 	// Insert a single document
-	docResult, err := client.InsertDocument("Meeting Notes", "Discussed Q2 roadmap priorities.", "docs", &tinyhumans.InsertDocumentOptions{
+	docResult, err := client.InsertDocument("Meeting Notes", "Discussed Q2 roadmap priorities.", "docs", "meeting-001", &tinyhumans.InsertDocumentOptions{
 		SourceType: "note",
 		Metadata:   map[string]interface{}{"team": "engineering"},
 	})
@@ -105,8 +108,8 @@ func main() {
 
 	// Batch insert documents
 	batchResult, err := client.InsertDocumentsBatch([]tinyhumans.DocumentItem{
-		{Title: "Doc A", Content: "Content A", Namespace: "docs"},
-		{Title: "Doc B", Content: "Content B", Namespace: "docs"},
+		{Title: "Doc A", Content: "Content A", Namespace: "docs", DocumentID: "doc-a-001"},
+		{Title: "Doc B", Content: "Content B", Namespace: "docs", DocumentID: "doc-b-001"},
 	})
 	if err != nil {
 		log.Printf("InsertDocumentsBatch: %v", err)

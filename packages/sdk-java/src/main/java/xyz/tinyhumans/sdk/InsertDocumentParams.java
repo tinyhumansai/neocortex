@@ -33,6 +33,9 @@ public class InsertDocumentParams {
         if (namespace == null || namespace.isEmpty()) {
             throw new IllegalArgumentException("namespace is required");
         }
+        if (documentId == null || documentId.isEmpty()) {
+            throw new IllegalArgumentException("documentId is required");
+        }
     }
 
     public Map<String, Object> toMap() {
@@ -46,7 +49,7 @@ public class InsertDocumentParams {
         if (priority != null) map.put("priority", priority);
         if (createdAt != null) map.put("createdAt", createdAt);
         if (updatedAt != null) map.put("updatedAt", updatedAt);
-        if (documentId != null) map.put("documentId", documentId);
+        map.put("documentId", documentId);
         return map;
     }
 

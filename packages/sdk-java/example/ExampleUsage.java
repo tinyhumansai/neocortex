@@ -28,6 +28,7 @@ public class ExampleUsage {
             System.out.println("=== Insert Memory ===");
             InsertMemoryResponse insertResp = client.insertMemory(
                     new InsertMemoryParams("greeting", "Hello from Java SDK!", namespace)
+                            .setDocumentId("java-greeting-001")
                             .setMetadata(Map.of("lang", "java")));
             System.out.println("Success: " + insertResp.isSuccess() + ", Status: " + insertResp.getStatus());
 
@@ -96,7 +97,7 @@ public class ExampleUsage {
             System.out.println("\n=== Insert Document ===");
             try {
                 Map<String, Object> docResp = client.insertDocument(
-                        new InsertDocumentParams("Java Guide", "Java SDK usage guide", namespace));
+                        new InsertDocumentParams("Java Guide", "Java SDK usage guide", namespace).setDocumentId("java-guide-001"));
                 System.out.println("InsertDocument: " + docResp);
             } catch (Exception e) {
                 System.out.println("InsertDocument: " + e.getMessage());
@@ -107,8 +108,8 @@ public class ExampleUsage {
             try {
                 Map<String, Object> batchResp = client.insertDocumentsBatch(
                         new InsertDocumentsBatchParams(List.of(
-                                new InsertDocumentParams("Doc 1", "Content 1", namespace),
-                                new InsertDocumentParams("Doc 2", "Content 2", namespace))));
+                                new InsertDocumentParams("Doc 1", "Content 1", namespace).setDocumentId("doc-001"),
+                                new InsertDocumentParams("Doc 2", "Content 2", namespace).setDocumentId("doc-002"))));
                 System.out.println("InsertDocumentsBatch: " + batchResp);
             } catch (Exception e) {
                 System.out.println("InsertDocumentsBatch: " + e.getMessage());

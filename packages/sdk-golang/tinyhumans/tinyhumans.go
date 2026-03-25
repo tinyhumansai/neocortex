@@ -14,12 +14,13 @@ const (
 
 // MemoryItem represents a single memory item to ingest.
 type MemoryItem struct {
-	Key       string                 `json:"key"`
-	Content   string                 `json:"content"`
-	Namespace string                 `json:"namespace"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
-	CreatedAt *float64               `json:"created_at,omitempty"`
-	UpdatedAt *float64               `json:"updated_at,omitempty"`
+	Key        string                 `json:"key"`
+	Content    string                 `json:"content"`
+	Namespace  string                 `json:"namespace"`
+	DocumentID string                 `json:"documentId"`
+	Metadata   map[string]interface{} `json:"metadata,omitempty"`
+	CreatedAt  *float64               `json:"created_at,omitempty"`
+	UpdatedAt  *float64               `json:"updated_at,omitempty"`
 }
 
 // ReadMemoryItem represents a memory item returned from recall.
@@ -151,7 +152,6 @@ type InsertDocumentOptions struct {
 	Priority   string
 	CreatedAt  *float64
 	UpdatedAt  *float64
-	DocumentID string
 }
 
 // DocumentItem represents a single document in a batch insert.
@@ -164,7 +164,7 @@ type DocumentItem struct {
 	Priority   string                 `json:"priority,omitempty"`
 	CreatedAt  *float64               `json:"createdAt,omitempty"`
 	UpdatedAt  *float64               `json:"updatedAt,omitempty"`
-	DocumentID string                 `json:"documentId,omitempty"`
+	DocumentID string                 `json:"documentId"`
 }
 
 // ListDocumentsOptions holds optional parameters for ListDocuments.

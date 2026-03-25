@@ -179,7 +179,7 @@ async fn main() {
             priority: None,
             created_at: None,
             updated_at: None,
-            document_id: Some(format!("{doc_single}-memory")),
+            document_id: format!("{doc_single}-memory"),
         })
         .await;
     let insert_memory_data = push_result(&mut results, "insert_memory", insert_memory_res, false);
@@ -237,7 +237,7 @@ async fn main() {
                 priority: None,
                 created_at: None,
                 updated_at: None,
-                document_id: Some(doc_single.clone()),
+                document_id: doc_single.clone(),
             })
             .await,
         false,
@@ -265,11 +265,13 @@ async fn main() {
                         title: "Rust Route Test Batch 1".to_string(),
                         content: format!("Batch document 1 id={doc_batch_1}"),
                         namespace: namespace.clone(),
+                        document_id: doc_batch_1.clone(),
                     },
                     BatchDocumentItem {
                         title: "Rust Route Test Batch 2".to_string(),
                         content: format!("Batch document 2 id={doc_batch_2}"),
                         namespace: namespace.clone(),
+                        document_id: doc_batch_2.clone(),
                     },
                 ],
             })

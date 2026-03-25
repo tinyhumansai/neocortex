@@ -66,7 +66,7 @@ class TinyHumansMemoryClientTest {
         });
 
         try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("tok", baseUrl)) {
-            client.insertMemory(new InsertMemoryParams("t", "c", "n"));
+            client.insertMemory(new InsertMemoryParams("t", "c", "n").setDocumentId("doc-1"));
         }
     }
 
@@ -80,7 +80,7 @@ class TinyHumansMemoryClientTest {
         });
 
         try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("tok", "custom-model", baseUrl)) {
-            client.insertMemory(new InsertMemoryParams("t", "c", "n"));
+            client.insertMemory(new InsertMemoryParams("t", "c", "n").setDocumentId("doc-1"));
         }
     }
 
@@ -94,7 +94,7 @@ class TinyHumansMemoryClientTest {
         });
 
         try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("tok", "", baseUrl)) {
-            client.insertMemory(new InsertMemoryParams("t", "c", "n"));
+            client.insertMemory(new InsertMemoryParams("t", "c", "n").setDocumentId("doc-1"));
         }
     }
 
@@ -180,7 +180,7 @@ class TinyHumansMemoryClientTest {
 
         try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("test-token", baseUrl)) {
             InsertMemoryResponse resp = client.insertMemory(
-                    new InsertMemoryParams("title", "content", "ns"));
+                    new InsertMemoryParams("title", "content", "ns").setDocumentId("doc-1"));
             assertTrue(resp.isSuccess());
             assertEquals("completed", resp.getStatus());
         }
@@ -207,6 +207,14 @@ class TinyHumansMemoryClientTest {
         try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("test-token", baseUrl)) {
             assertThrows(IllegalArgumentException.class, () ->
                     client.insertMemory(new InsertMemoryParams("title", "content", null)));
+        }
+    }
+
+    @Test
+    void insertMemoryValidatesMissingDocumentId() {
+        try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("test-token", baseUrl)) {
+            assertThrows(IllegalArgumentException.class, () ->
+                    client.insertMemory(new InsertMemoryParams("title", "content", "ns")));
         }
     }
 
@@ -478,7 +486,7 @@ class TinyHumansMemoryClientTest {
 
         try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("tok", baseUrl)) {
             Map<String, Object> resp = client.insertDocument(
-                    new InsertDocumentParams("title", "content", "ns"));
+                    new InsertDocumentParams("title", "content", "ns").setDocumentId("doc-1"));
             assertNotNull(resp.get("data"));
         }
     }
@@ -488,6 +496,14 @@ class TinyHumansMemoryClientTest {
         try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("tok", baseUrl)) {
             assertThrows(IllegalArgumentException.class, () ->
                     client.insertDocument(new InsertDocumentParams(null, "c", "ns")));
+        }
+    }
+
+    @Test
+    void insertDocumentRejectsMissingDocumentId() {
+        try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("tok", baseUrl)) {
+            assertThrows(IllegalArgumentException.class, () ->
+                    client.insertDocument(new InsertDocumentParams("title", "content", "ns")));
         }
     }
 
@@ -505,7 +521,7 @@ class TinyHumansMemoryClientTest {
         try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("tok", baseUrl)) {
             Map<String, Object> resp = client.insertDocumentsBatch(
                     new InsertDocumentsBatchParams(List.of(
-                            new InsertDocumentParams("t1", "c1", "ns"))));
+                            new InsertDocumentParams("t1", "c1", "ns").setDocumentId("doc-1"))));
             assertNotNull(resp.get("data"));
         }
     }
@@ -822,7 +838,7 @@ class TinyHumansMemoryClientTest {
 
         try (TinyHumansMemoryClient client = new TinyHumansMemoryClient("test-token", baseUrl)) {
             TinyHumansError err = assertThrows(TinyHumansError.class, () ->
-                    client.insertMemory(new InsertMemoryParams("t", "c", "n")));
+                    client.insertMemory(new InsertMemoryParams("t", "c", "n").setDocumentId("doc-1")));
             assertEquals(500, err.getStatus());
             assertTrue(err.getMessage().contains("500"));
         }

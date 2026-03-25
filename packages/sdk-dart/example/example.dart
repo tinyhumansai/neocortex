@@ -19,6 +19,7 @@ Future<void> main() async {
       title: 'example-doc',
       content: 'Dart was created by Google and first appeared in 2011.',
       namespace: ns,
+      documentId: 'dart-example-001',
     ));
     print('Success=${insertResp.success} Status=${insertResp.status}');
 
@@ -101,6 +102,7 @@ Future<void> main() async {
         title: 'Dart Guide',
         content: 'Dart SDK usage guide',
         namespace: ns,
+        documentId: 'dart-guide-001',
       ));
       print('InsertDocument: $docResp');
     } catch (e) {
@@ -114,9 +116,9 @@ Future<void> main() async {
           await client.insertDocumentsBatch(InsertDocumentsBatchParams(
         documents: [
           InsertDocumentParams(
-              title: 'Doc 1', content: 'Content 1', namespace: ns),
+              title: 'Doc 1', content: 'Content 1', namespace: ns, documentId: 'doc-001'),
           InsertDocumentParams(
-              title: 'Doc 2', content: 'Content 2', namespace: ns),
+              title: 'Doc 2', content: 'Content 2', namespace: ns, documentId: 'doc-002'),
         ],
       ));
       print('InsertDocumentsBatch: $batchResp');

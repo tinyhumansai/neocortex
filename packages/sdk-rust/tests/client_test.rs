@@ -35,6 +35,15 @@ async fn insert_memory_validates_required() {
         ..Default::default()
     };
     assert!(client.insert_memory(empty_ns).await.is_err());
+
+    let empty_doc_id = InsertMemoryParams {
+        title: "t".into(),
+        content: "c".into(),
+        namespace: "ns".into(),
+        document_id: String::new(),
+        ..Default::default()
+    };
+    assert!(client.insert_memory(empty_doc_id).await.is_err());
 }
 
 #[tokio::test]
@@ -56,6 +65,7 @@ async fn insert_memory_posts_correctly() {
         title: "Doc".into(),
         content: "Content".into(),
         namespace: "default".into(),
+        document_id: "doc-1".into(),
         ..Default::default()
     };
     let res = client.insert_memory(params).await.unwrap();
@@ -193,6 +203,7 @@ async fn api_error_returns_tinyhumans_error() {
         title: "T".into(),
         content: "C".into(),
         namespace: "ns".into(),
+        document_id: "doc-1".into(),
         ..Default::default()
     };
     let err = client.insert_memory(params).await.unwrap_err();

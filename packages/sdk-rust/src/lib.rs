@@ -109,6 +109,11 @@ impl TinyHumansMemoryClient {
                 "namespace is required and must be a string".into(),
             ));
         }
+        if params.document_id.is_empty() {
+            return Err(TinyHumansError::Validation(
+                "documentId is required and must be a non-empty string".into(),
+            ));
+        }
         let body = InsertMemoryBody {
             title: params.title,
             content: params.content,
@@ -281,6 +286,11 @@ impl TinyHumansMemoryClient {
                 "namespace is required and must be a string".into(),
             ));
         }
+        if params.document_id.is_empty() {
+            return Err(TinyHumansError::Validation(
+                "documentId is required and must be a non-empty string".into(),
+            ));
+        }
         self.post("/memory/documents", &params).await
     }
 
@@ -293,6 +303,13 @@ impl TinyHumansMemoryClient {
             return Err(TinyHumansError::Validation(
                 "items must be a non-empty list".into(),
             ));
+        }
+        for (i, item) in params.items.iter().enumerate() {
+            if item.document_id.is_empty() {
+                return Err(TinyHumansError::Validation(
+                    format!("items[{}]: documentId is required", i),
+                ));
+            }
         }
         self.post("/memory/documents/batch", &params).await
     }
@@ -499,8 +516,8 @@ struct InsertMemoryBody {
     created_at: Option<f64>,
     #[serde(rename = "updatedAt", skip_serializing_if = "Option::is_none")]
     updated_at: Option<f64>,
-    #[serde(rename = "documentId", skip_serializing_if = "Option::is_none")]
-    document_id: Option<String>,
+    #[serde(rename = "documentId")]
+    document_id: String,
 }
 
 #[derive(serde::Deserialize, Default)]

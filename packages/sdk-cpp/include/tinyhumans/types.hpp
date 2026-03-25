@@ -22,7 +22,7 @@ struct InsertMemoryParams {
     std::optional<std::string> priority;
     std::optional<long> created_at;
     std::optional<long> updated_at;
-    std::optional<std::string> document_id;
+    std::string document_id;
 
     InsertMemoryParams& set_title(const std::string& v) { title = v; return *this; }
     InsertMemoryParams& set_content(const std::string& v) { content = v; return *this; }
@@ -38,6 +38,7 @@ struct InsertMemoryParams {
         if (title.empty()) throw std::invalid_argument("title is required");
         if (content.empty()) throw std::invalid_argument("content is required");
         if (namespace_.empty()) throw std::invalid_argument("namespace is required");
+        if (document_id.empty()) throw std::invalid_argument("documentId is required");
     }
 
     json to_json() const {
@@ -47,11 +48,11 @@ struct InsertMemoryParams {
         j["content"] = content;
         j["namespace"] = namespace_;
         j["sourceType"] = source_type;
+        j["documentId"] = document_id;
         if (metadata) j["metadata"] = *metadata;
         if (priority) j["priority"] = *priority;
         if (created_at) j["createdAt"] = *created_at;
         if (updated_at) j["updatedAt"] = *updated_at;
-        if (document_id) j["documentId"] = *document_id;
         return j;
     }
 };

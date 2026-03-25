@@ -16,6 +16,7 @@ try
         Title = "example-doc",
         Content = "The speed of light is approximately 299,792 km/s.",
         Namespace = ns,
+        DocumentId = "csharp-example-001",
         Metadata = new Dictionary<string, object?> { ["lang"] = "csharp" },
     });
     Console.WriteLine($"Success={insertResp.Success} Status={insertResp.Status}");

@@ -34,6 +34,7 @@ public class IntegrationTest
             Title = "test-key-1",
             Content = "The capital of France is Paris.",
             Namespace = ns,
+            DocumentId = "integration-test-doc-1",
             Metadata = new Dictionary<string, object?> { ["source"] = "integration-test" },
             CreatedAt = nowSeconds,
             UpdatedAt = nowSeconds,

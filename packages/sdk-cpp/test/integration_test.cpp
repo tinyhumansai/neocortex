@@ -28,6 +28,7 @@ TEST(IntegrationTest, FullLifecycle) {
     insert_params.set_title("test-key-1")
         .set_content("The capital of France is Paris.")
         .set_namespace(ns)
+        .set_document_id("integration-test-doc-1")
         .set_metadata(json{{"source", "integration-test"}})
         .set_created_at(now_s)
         .set_updated_at(now_s);

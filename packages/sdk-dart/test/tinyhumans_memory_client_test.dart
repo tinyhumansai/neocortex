@@ -106,6 +106,7 @@ void main() {
         title: 't1',
         content: 'c1',
         namespace: 'ns1',
+        documentId: 'doc-1',
       ));
 
       expect(resp.success, isTrue);
@@ -139,6 +140,7 @@ void main() {
         title: 't',
         content: 'c',
         namespace: 'ns',
+        documentId: 'doc-1',
       ));
 
       expect(resp.usage, isNotNull);
@@ -167,6 +169,15 @@ void main() {
       expect(
         () => client.insertMemory(
             InsertMemoryParams(title: 't', content: 'c')),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
+    test('throws on missing documentId', () {
+      final client = createClient();
+      expect(
+        () => client.insertMemory(
+            InsertMemoryParams(title: 't', content: 'c', namespace: 'ns')),
         throwsA(isA<ArgumentError>()),
       );
     });
@@ -493,6 +504,7 @@ void main() {
         title: 'Doc Title',
         content: 'Doc content',
         namespace: 'ns',
+        documentId: 'doc-1',
       ));
 
       expect(captured!.method, equals('POST'));
@@ -510,6 +522,20 @@ void main() {
           title: '',
           content: 'c',
           namespace: 'ns',
+          documentId: 'doc-1',
+        )),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
+    test('throws on empty documentId', () {
+      final client = createClient();
+      expect(
+        () => client.insertDocument(InsertDocumentParams(
+          title: 't',
+          content: 'c',
+          namespace: 'ns',
+          documentId: '',
         )),
         throwsA(isA<ArgumentError>()),
       );
@@ -526,9 +552,9 @@ void main() {
       await client.insertDocumentsBatch(InsertDocumentsBatchParams(
         documents: [
           InsertDocumentParams(
-              title: 'D1', content: 'C1', namespace: 'ns'),
+              title: 'D1', content: 'C1', namespace: 'ns', documentId: 'doc-1'),
           InsertDocumentParams(
-              title: 'D2', content: 'C2', namespace: 'ns'),
+              title: 'D2', content: 'C2', namespace: 'ns', documentId: 'doc-2'),
         ],
       ));
 

@@ -35,7 +35,7 @@ public class MemoryClientTests
 
         await client.InsertMemoryAsync(new InsertMemoryParams
         {
-            Title = "t", Content = "c", Namespace = "ns",
+            Title = "t", Content = "c", Namespace = "ns", DocumentId = "doc-1",
         });
 
         Assert.NotNull(handler.CapturedRequest);
@@ -54,7 +54,7 @@ public class MemoryClientTests
 
         await client.InsertMemoryAsync(new InsertMemoryParams
         {
-            Title = "t", Content = "c", Namespace = "ns",
+            Title = "t", Content = "c", Namespace = "ns", DocumentId = "doc-1",
         });
 
         Assert.NotNull(handler.CapturedRequest);
@@ -77,6 +77,7 @@ public class MemoryClientTests
             Title = "t1",
             Content = "c1",
             Namespace = "ns1",
+            DocumentId = "doc-1",
         });
 
         Assert.True(resp.Success);
@@ -104,7 +105,7 @@ public class MemoryClientTests
 
         var resp = await client.InsertMemoryAsync(new InsertMemoryParams
         {
-            Title = "t", Content = "c", Namespace = "ns",
+            Title = "t", Content = "c", Namespace = "ns", DocumentId = "doc-1",
         });
 
         Assert.NotNull(resp.Usage);
@@ -132,6 +133,14 @@ public class MemoryClientTests
         using var client = CreateClient();
         await Assert.ThrowsAsync<ArgumentException>(() =>
             client.InsertMemoryAsync(new InsertMemoryParams { Title = "t", Content = "c" }));
+    }
+
+    [Fact]
+    public async Task InsertMemory_ThrowsOnMissingDocumentId()
+    {
+        using var client = CreateClient();
+        await Assert.ThrowsAsync<ArgumentException>(() =>
+            client.InsertMemoryAsync(new InsertMemoryParams { Title = "t", Content = "c", Namespace = "ns" }));
     }
 
     // ── RecallMemory ──
