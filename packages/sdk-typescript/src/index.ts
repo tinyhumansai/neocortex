@@ -391,11 +391,7 @@ export class TinyHumansMemoryClient {
     params: InsertMemoryParams,
   ): Promise<InsertMemoryResponse> {
     this.validateInsertParams(params);
-    return this.post<InsertMemoryResponse>("/memory/insert", {
-      ...params,
-      // Backend commonly accepts snake_case too; send both for compatibility.
-      document_id: params.documentId,
-    });
+    return this.post<InsertMemoryResponse>("/memory/insert", params);
   }
 
   /** Query memory via RAG. POST /memory/query */
