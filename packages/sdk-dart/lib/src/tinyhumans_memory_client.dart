@@ -85,6 +85,38 @@ class TinyHumansMemoryClient {
     return _handleResponse(response);
   }
 
+  Future<Map<String, dynamic>> _get(String path,
+      [Map<String, String>? queryParams]) async {
+    var uri = Uri.parse('$_baseUrl$path');
+    if (queryParams != null && queryParams.isNotEmpty) {
+      uri = uri.replace(queryParameters: queryParams);
+    }
+    final response = await _httpClient.get(
+      uri,
+      headers: {
+        'Authorization': 'Bearer $_token',
+        'X-Model-Id': _modelId,
+      },
+    );
+    return _handleResponse(response);
+  }
+
+  Future<Map<String, dynamic>> _delete(String path,
+      [Map<String, String>? queryParams]) async {
+    var uri = Uri.parse('$_baseUrl$path');
+    if (queryParams != null && queryParams.isNotEmpty) {
+      uri = uri.replace(queryParameters: queryParams);
+    }
+    final response = await _httpClient.delete(
+      uri,
+      headers: {
+        'Authorization': 'Bearer $_token',
+        'X-Model-Id': _modelId,
+      },
+    );
+    return _handleResponse(response);
+  }
+
   Map<String, dynamic> _handleResponse(http.Response response) {
     Map<String, dynamic> json;
     try {
