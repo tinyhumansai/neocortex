@@ -143,3 +143,20 @@ pytest -q
 - `delete_memory`
 - `build_prompt_with_memory`
 
+## Endpoint Mapping
+
+This plugin now uses the document/query endpoint family:
+
+- Save memory -> `POST /v1/memory/insert`
+- Recall memory -> `POST /v1/memory/query`
+- Delete namespace memory -> `POST /v1/memory/admin/delete`
+- Batch insert -> `POST /v1/memory/documents/batch`
+- List documents -> `GET /v1/memory/documents`
+- Get document -> `GET /v1/memory/documents/:documentId`
+- Delete document -> `DELETE /v1/memory/documents/:documentId`
+- Recall master memory -> `POST /v1/memory/recall`
+- Recall memories -> `POST /v1/memory/memories/recall`
+- Ingestion job status -> `GET /v1/memory/ingestion/jobs/:jobId`
+
+`save_memory` uses the core memory insert endpoint and sends `documentId`/`document_id` using the `key` value, so document IDs remain deterministic.
+

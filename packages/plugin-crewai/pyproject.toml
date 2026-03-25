@@ -13,6 +13,7 @@ dependencies = [
     "tinyhumansai>=0.5",
     "crewai>=0.28.0",
     "pydantic>=2.4.0",
+    "httpx>=0.27",
 ]
 
 [project.optional-dependencies]

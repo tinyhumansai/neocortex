@@ -33,7 +33,23 @@ def main():
     )
 
     # 2. Setup Explicit Memory Tools
-    memory_tools = NeocortexToolSpec(client=memory_client, default_namespace="agent_memory").to_tool_list()
+    default_namespace = "agent_memory"
+    tool_spec = NeocortexToolSpec(client=memory_client, default_namespace=default_namespace)
+    memory_tools = tool_spec.to_tool_list()
+
+    # 3. Explicit document memory example (document_id is required)
+    document_id = "llamaindex-example-doc-001"
+    insert_result = tool_spec.insert_document(
+        title="User profile",
+        content="The user's favorite color is cerulean blue.",
+        document_id=document_id,
+        namespace=default_namespace,
+        source_type="doc",
+    )
+    print("\nInserted document:", insert_result)
+
+    docs_result = tool_spec.list_documents(namespace=default_namespace, limit=10)
+    print("Documents in namespace:", docs_result)
     
     # Optional: other tools
     time_tool = FunctionTool.from_defaults(fn=get_current_time)
@@ -43,7 +59,7 @@ def main():
     llm = OpenAI(model="gpt-4o-mini")
     agent = ReActAgent.from_tools(tools, llm=llm, memory=memory, verbose=True)
 
-    # Test
+    # 4. Agent test
     print("Agent prompt: 'Remember that my favorite color is cerulean blue.'")
     response = agent.chat("Remember that my favorite color is cerulean blue.")
     print("Response:", response)

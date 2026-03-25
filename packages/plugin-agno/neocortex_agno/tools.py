@@ -75,6 +75,7 @@ class TinyHumanMemoryClient:
         title: str,
         content: str,
         namespace: str,
+        document_id: str,
         metadata: Optional[dict[str, Any]] = None,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {
@@ -83,6 +84,7 @@ class TinyHumanMemoryClient:
             "namespace": namespace,
             "sourceType": "doc",
             "metadata": metadata or {},
+            "document_id": document_id,
         }
         return self._post("/v1/memory/insert", body)
 
@@ -116,7 +118,7 @@ class TinyHumanMemoryClient:
         priority: Optional[str] = None,
         created_at: Optional[float] = None,
         updated_at: Optional[float] = None,
-        document_id: Optional[str] = None,
+        document_id: str,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {
             "title": title,
@@ -133,8 +135,7 @@ class TinyHumanMemoryClient:
             body["createdAt"] = created_at
         if updated_at is not None:
             body["updatedAt"] = updated_at
-        if document_id is not None:
-            body["documentId"] = document_id
+        body["documentId"] = document_id
         result = self._post("/v1/memory/documents", body)
         return self._wait_for_document_ingestion(result)
 
@@ -619,6 +620,7 @@ class NeocortexTools(Toolkit):
             title=key,
             content=content,
             namespace=namespace,
+            document_id=key,
             metadata=metadata or {},
         )
         status = result.get("status") or "ok"
@@ -719,12 +721,12 @@ class NeocortexTools(Toolkit):
         title: str,
         content: str,
         namespace: str,
+        document_id: str,
         source_type: Optional[str] = None,
         metadata: Optional[dict[str, Any]] = None,
         priority: Optional[str] = None,
         created_at: Optional[float] = None,
         updated_at: Optional[float] = None,
-        document_id: Optional[str] = None,
     ) -> str:
         """Insert a single memory document (POST /v1/memory/documents)."""
         result = self._client.insert_document(

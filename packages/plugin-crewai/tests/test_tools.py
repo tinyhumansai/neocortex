@@ -3,7 +3,10 @@
 import pytest
 from unittest.mock import MagicMock
 
-from neocortex_crewai import NeocortexSaveMemoryTool
+from neocortex_crewai import (
+    NeocortexSaveMemoryTool,
+    create_neocortex_tools,
+)
 from tinyhumansai import TinyHumanMemoryClient
 
 @pytest.fixture
@@ -18,3 +21,8 @@ def test_save_memory_tool(mock_client):
     )
     assert mock_client.ingest_memory.called
     assert "test_key" in res
+
+
+def test_create_neocortex_tools_count(mock_client):
+    tools = create_neocortex_tools(client=mock_client, default_namespace="test_ns")
+    assert len(tools) == 19

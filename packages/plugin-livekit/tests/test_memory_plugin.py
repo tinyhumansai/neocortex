@@ -7,12 +7,13 @@ class _FakeClient:
         self.query_calls = []
         self.delete_calls = []
 
-    def insert_memory(self, *, title, content, namespace, metadata):
+    def insert_memory(self, *, title, content, namespace, document_id, metadata):
         self.insert_calls.append(
             {
                 "title": title,
                 "content": content,
                 "namespace": namespace,
+                "document_id": document_id,
                 "metadata": metadata,
             }
         )
@@ -41,6 +42,7 @@ def test_save_memory_uses_default_namespace():
 
     assert "pref-theme" in msg
     assert fake.insert_calls[0]["namespace"] == "room-1"
+    assert fake.insert_calls[0]["document_id"] == "pref-theme"
 
 
 def test_recall_memory_and_prompt_builder():

@@ -2,14 +2,20 @@
 
 OpenCode plugin for **Neocortex-powered long‑term memory**.
 
-This package exposes Neocortex memory as first-class OpenCode tools so agents can **save**, **recall**, and **delete** persistent memory directly from within OpenCode, similar to other memory plugins like `opencode-mem` and `opencode-supermemory`, but backed by Neocortex instead of local storage.
+This package exposes Neocortex memory as first-class OpenCode tools so agents can save, query, and manage persistent memory directly from OpenCode.
 
 ## Features
 
-- **Custom tools for OpenCode** — three tools:
-  - `neocortex_save_memory`
-  - `neocortex_recall_memory`
-  - `neocortex_delete_memory`
+- **Custom tools for OpenCode** — Mastra-aligned Neocortex tools:
+  - `neocortex_save_memory`, `neocortex_recall_memory`, `neocortex_delete_memory`
+  - `neocortex_sync_memory`
+  - `neocortex_insert_document`, `neocortex_insert_documents_batch`
+  - `neocortex_list_documents`, `neocortex_get_document`, `neocortex_delete_document`
+  - `neocortex_query_memory_context`, `neocortex_chat_memory_context`
+  - `neocortex_record_interactions`, `neocortex_recall_thoughts`
+  - `neocortex_chat_memory`, `neocortex_interact_memory`
+  - `neocortex_recall_memory_master`, `neocortex_recall_memories`
+  - `neocortex_get_ingestion_job`
 - **Shared client** — reuses the same `NeocortexMemoryClient` and types as the other Neocortex plugins.
 - **Simple installation** — add the npm package to your OpenCode config and set Neocortex environment variables.
 
@@ -41,13 +47,33 @@ The plugin also respects `NEOCORTEX_API_KEY` / `NEOCORTEX_TOKEN` and `NEOCORTEX_
 
 ## Exposed Tools
 
-Once loaded, the plugin registers the following tools in OpenCode:
+Once loaded, the plugin registers:
 
 - `neocortex_save_memory`
 - `neocortex_recall_memory`
 - `neocortex_delete_memory`
+- `neocortex_sync_memory`
+- `neocortex_insert_document`
+- `neocortex_insert_documents_batch`
+- `neocortex_list_documents`
+- `neocortex_get_document`
+- `neocortex_delete_document`
+- `neocortex_query_memory_context`
+- `neocortex_chat_memory_context`
+- `neocortex_record_interactions`
+- `neocortex_recall_thoughts`
+- `neocortex_chat_memory`
+- `neocortex_interact_memory`
+- `neocortex_recall_memory_master`
+- `neocortex_recall_memories`
+- `neocortex_get_ingestion_job`
 
 These appear alongside other tools in OpenCode and can be used by agents automatically.
+
+## Document Insert Contract
+
+- `neocortex_insert_document` requires `document_id`.
+- `neocortex_insert_documents_batch` requires `document_id` on every item.
 
 ### Example: Agent Instructions
 
@@ -57,7 +83,9 @@ Update your system prompt (e.g. in project instructions) to encourage tool usage
 You have access to long-term memory tools backed by Neocortex:
 
 - Use neocortex_save_memory to store important facts, user preferences, and decisions.
-- Use neocortex_recall_memory when you need to remember past facts or preferences.
+- Use neocortex_recall_memory or neocortex_query_memory_context to retrieve context.
+- Use document tools (insert/list/get/delete) when memory should be managed as documents.
+- Use interaction/thought tools to log interactions and produce reflective context.
 - Use neocortex_delete_memory only when explicitly asked to clear a namespace.
 ```
 

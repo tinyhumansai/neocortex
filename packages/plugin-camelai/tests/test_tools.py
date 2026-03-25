@@ -22,4 +22,15 @@ def test_save_memory_tool(mock_client):
 def test_get_tools(mock_client):
     toolkit = NeocortexToolkit(client=mock_client)
     tools = toolkit.get_tools()
-    assert len(tools) == 3
+    assert len(tools) == 19
+
+
+def test_query_memory_context_uses_default_namespace(mock_client):
+    toolkit = NeocortexToolkit(client=mock_client, default_namespace="my_default")
+    toolkit._request_json = MagicMock(return_value={"context": {"chunks": []}})
+
+    toolkit.query_memory_context(query="user preference")
+
+    call_kwargs = toolkit._request_json.call_args.kwargs
+    assert call_kwargs["path"] == "/v1/memory/queries"
+    assert call_kwargs["json_body"]["namespace"] == "my_default"

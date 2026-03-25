@@ -18,6 +18,7 @@ export interface InsertMemoryParams {
   title: string;
   content: string;
   namespace: string;
+  documentId: string;
   sourceType?: "doc" | "chat" | "email";
   metadata?: Record<string, unknown>;
 }
@@ -52,11 +53,22 @@ export interface QueryMemoryResponse {
   data: QueryMemoryResponseData;
 }
 
+export interface InsertDocumentsBatchParams {
+  items: Array<Record<string, unknown> & { document_id: string }>;
+}
+
+export interface ListDocumentsParams {
+  namespace?: string;
+  limit?: number;
+  offset?: number;
+}
+
 export interface SaveMemoryRequest {
   user_id?: string;
   conversation_id?: string;
   phone_number?: string;
   namespace?: string;
+  document_id: string;
   key: string;
   content: string;
   metadata?: Record<string, unknown>;

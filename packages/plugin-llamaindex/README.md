@@ -5,7 +5,7 @@ Neocortex (TinyHuman) memory integration for LlamaIndex.
 ## Features
 
 - **`NeocortexChatStore`**: A persistent chat store for LlamaIndex `ChatMemoryBuffer` that saves conversation history using the TinyHumans memory API.
-- **`NeocortexToolSpec`**: A LlamaIndex `BaseToolSpec` that provides explicit `save_memory`, `recall_memory`, and `delete_memory` tools for LlamaIndex agents.
+- **`NeocortexToolSpec`**: A LlamaIndex `BaseToolSpec` that provides the full Neocortex tool surface (core + `/v1/memory/*` mirrored/document/interactions endpoints).
 
 ## Installation
 
@@ -62,3 +62,8 @@ memory_tools = NeocortexToolSpec(client=client).to_tool_list()
 agent = ReActAgent.from_tools(memory_tools, llm=OpenAI())
 agent.chat("Remember that my name is Alice.")
 ```
+
+### Document Insert Contract
+
+- `insert_document` requires `document_id`.
+- `insert_documents_batch` requires `document_id` on every item in `items_json`.

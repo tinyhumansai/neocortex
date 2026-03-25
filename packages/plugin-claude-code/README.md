@@ -2,14 +2,20 @@
 
 Claude Code plugin for **Neocortex-powered long‑term memory** exposed via the Model Context Protocol (MCP).
 
-This package provides a small MCP server and TypeScript helpers so Claude Code can call Neocortex tools to **save**, **recall**, and **delete** persistent memory.
+This package provides an MCP server and TypeScript helpers so Claude Code can call the full Neocortex tool surface for persistent memory operations.
 
 ## Features
 
-- **MCP server for Claude Code** — exposes three tools:
-  - `neocortex_save_memory`
-  - `neocortex_recall_memory`
-  - `neocortex_delete_memory`
+- **MCP server for Claude Code** — exposes Mastra-aligned tools:
+  - `neocortex_save_memory`, `neocortex_recall_memory`, `neocortex_delete_memory`
+  - `neocortex_sync_memory`
+  - `neocortex_insert_document`, `neocortex_insert_documents_batch`
+  - `neocortex_list_documents`, `neocortex_get_document`, `neocortex_delete_document`
+  - `neocortex_query_memory_context`, `neocortex_chat_memory_context`
+  - `neocortex_record_interactions`, `neocortex_recall_thoughts`
+  - `neocortex_chat_memory`, `neocortex_interact_memory`
+  - `neocortex_recall_memory_master`, `neocortex_recall_memories`
+  - `neocortex_get_ingestion_job`
 - **Shared client** — reuses the same `NeocortexMemoryClient` and types as the other Neocortex plugins.
 - **Simple bootstrap** — one helper (`runNeocortexMcpServerFromEnv`) you can point to from Claude Code’s MCP configuration.
 
@@ -50,11 +56,23 @@ npm install @neocortex/plugin-claude-code
 3. When Claude Code starts, it will:
 
 - Launch the MCP server via `node dist/index.js`.
-- Discover the tools:
-  - `neocortex_save_memory`
-  - `neocortex_recall_memory`
-  - `neocortex_delete_memory`
+- Discover all registered `neocortex_*` tools listed above.
 - Allow Claude (and your skills/agents/hooks) to call these tools as standard MCP tools.
+
+## Claude Code Compatibility Check
+
+Run this check to verify the package is Claude Code-compatible (MCP tools are registered, have schemas/handlers, and match the expected tool set):
+
+```bash
+npm run check:claude-code
+```
+
+What this check validates:
+- The exact expected MCP tool names are present.
+- No unexpected tools are registered.
+- Every tool has `name`, `description`, `inputSchema`, and `handler`.
+
+If this command passes, the plugin is ready to be used by Claude Code as an MCP server (assuming your runtime env vars are set).
 
 ## Programmatic Usage
 
@@ -84,6 +102,11 @@ console.log("Recalled context:", recalled.context);
 ```
 
 Under the hood, this uses the same `NeocortexMemoryClient` as the other plugins, mapping your calls to Neocortex’s `/v1/memory/*` API.
+
+## Document Insert Contract
+
+- `insert_document` requires `document_id`.
+- `insert_documents_batch` requires `document_id` on every item.
 
 
 ## Notes

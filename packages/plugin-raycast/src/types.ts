@@ -17,6 +17,7 @@ export interface InsertMemoryParams {
   title: string;
   content: string;
   namespace: string;
+  documentId: string;
   sourceType?: "doc" | "chat" | "email";
   metadata?: Record<string, unknown>;
 }

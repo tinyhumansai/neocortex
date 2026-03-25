@@ -112,6 +112,11 @@ console.log("Recalled context:", recalled.context);
 
 Internally, this uses the shared `NeocortexMemoryClient` to call Neocortex’s `/v1/memory/*` API.
 
+## Document Insert Contract
+
+- `neocortex_insert_document` requires `document_id`.
+- `neocortex_insert_documents_batch` requires `document_id` on every item.
+
 
 ## Notes
 

@@ -41,3 +41,18 @@ tool:
       - tools/save_memory.yaml
       - tools/recall_memory.yaml
       - tools/delete_memory.yaml
+      - tools/sync_memory.yaml
+      - tools/insert_document.yaml
+      - tools/insert_documents_batch.yaml
+      - tools/list_documents.yaml
+      - tools/get_document.yaml
+      - tools/delete_document.yaml
+      - tools/query_memory_context.yaml
+      - tools/chat_memory_context.yaml
+      - tools/record_interactions.yaml
+      - tools/recall_thoughts.yaml
+      - tools/chat_memory.yaml
+      - tools/interact_memory.yaml
+      - tools/recall_memory_master.yaml
+      - tools/recall_memories.yaml
+      - tools/get_ingestion_job.yaml

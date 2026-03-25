@@ -50,6 +50,7 @@ class TinyHumanMemoryClient:
         title: str,
         content: str,
         namespace: str,
+        document_id: str,
         metadata: Optional[dict[str, Any]] = None,
     ) -> dict[str, Any]:
         body: dict[str, Any] = {
@@ -58,6 +59,7 @@ class TinyHumanMemoryClient:
             "namespace": namespace,
             "sourceType": "doc",
             "metadata": metadata or {},
+            "document_id": document_id,
         }
         return self._post("/v1/memory/insert", body)
 
@@ -80,8 +82,66 @@ class TinyHumanMemoryClient:
         body: dict[str, Any] = {"namespace": namespace}
         return self._post("/v1/memory/admin/delete", body)
 
+    def insert_documents_batch(self, *, items: list[dict[str, Any]]) -> dict[str, Any]:
+        return self._post("/v1/memory/documents/batch", {"items": items})
+
+    def list_documents(
+        self,
+        *,
+        namespace: Optional[str] = None,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+    ) -> dict[str, Any]:
+        return self._get(
+            "/v1/memory/documents",
+            {"namespace": namespace, "limit": limit, "offset": offset},
+        )
+
+    def get_document(self, *, document_id: str, namespace: Optional[str] = None) -> dict[str, Any]:
+        return self._get(f"/v1/memory/documents/{document_id}", {"namespace": namespace})
+
+    def delete_document(self, *, document_id: str, namespace: str) -> dict[str, Any]:
+        return self._delete(f"/v1/memory/documents/{document_id}", {"namespace": namespace})
+
+    def recall_memory(self, *, query: str, namespace: Optional[str] = None) -> dict[str, Any]:
+        return self._post("/v1/memory/recall", {"query": query, "namespace": namespace})
+
+    def recall_memories(
+        self,
+        *,
+        query: str,
+        namespace: Optional[str] = None,
+        include_references: bool = False,
+        max_chunks: Optional[int] = None,
+    ) -> dict[str, Any]:
+        return self._post(
+            "/v1/memory/memories/recall",
+            {
+                "query": query,
+                "namespace": namespace,
+                "includeReferences": include_references,
+                "maxChunks": max_chunks,
+            },
+        )
+
+    def get_ingestion_job(self, *, job_id: str) -> dict[str, Any]:
+        return self._get(f"/v1/memory/ingestion/jobs/{job_id}")
+
     def _post(self, path: str, body: dict[str, Any]) -> dict[str, Any]:
         res = self._http.post(path, json=body)
+        return self._handle_response(res)
+
+    def _get(self, path: str, query_params: Optional[dict[str, Any]] = None) -> dict[str, Any]:
+        params = {k: v for k, v in (query_params or {}).items() if v is not None}
+        res = self._http.get(path, params=params)
+        return self._handle_response(res)
+
+    def _delete(self, path: str, query_params: Optional[dict[str, Any]] = None) -> dict[str, Any]:
+        params = {k: v for k, v in (query_params or {}).items() if v is not None}
+        res = self._http.delete(path, params=params)
+        return self._handle_response(res)
+
+    def _handle_response(self, res: httpx.Response) -> dict[str, Any]:
         try:
             payload = res.json()
         except Exception:
@@ -132,6 +192,7 @@ class NeocortexLiveKitTools:
             title=key,
             content=content,
             namespace=ns,
+            document_id=key,
             metadata=metadata or {},
         )
         status = result.get("status") or "ok"
@@ -203,3 +264,52 @@ class NeocortexLiveKitTools:
             f"{memory}\n\n"
             f"User: {user_prompt.strip()}"
         )
+
+    def list_documents(
+        self,
+        *,
+        namespace: Optional[str] = None,
+        limit: Optional[int] = None,
+        offset: Optional[int] = None,
+    ) -> dict[str, Any]:
+        ns = self._ns(namespace)
+        return self._client.list_documents(namespace=ns, limit=limit, offset=offset)
+
+    def get_document(self, *, document_id: str, namespace: Optional[str] = None) -> dict[str, Any]:
+        ns = self._ns(namespace)
+        return self._client.get_document(document_id=document_id, namespace=ns)
+
+    def delete_document(self, *, document_id: str, namespace: Optional[str] = None) -> dict[str, Any]:
+        ns = self._ns(namespace)
+        if not ns:
+            raise ValueError("namespace is required")
+        return self._client.delete_document(document_id=document_id, namespace=ns)
+
+    def insert_documents_batch(self, *, items: list[dict[str, Any]]) -> dict[str, Any]:
+        for item in items:
+            if not isinstance(item, dict) or not item.get("document_id"):
+                raise ValueError("each item in items must include document_id")
+        return self._client.insert_documents_batch(items=items)
+
+    def recall_memory_master(self, *, query: str, namespace: Optional[str] = None) -> dict[str, Any]:
+        ns = self._ns(namespace)
+        return self._client.recall_memory(query=query, namespace=ns)
+
+    def recall_memories(
+        self,
+        *,
+        query: str,
+        namespace: Optional[str] = None,
+        include_references: bool = False,
+        max_chunks: Optional[int] = None,
+    ) -> dict[str, Any]:
+        ns = self._ns(namespace)
+        return self._client.recall_memories(
+            query=query,
+            namespace=ns,
+            include_references=include_references,
+            max_chunks=max_chunks,
+        )
+
+    def get_ingestion_job(self, *, job_id: str) -> dict[str, Any]:
+        return self._client.get_ingestion_job(job_id=job_id)

@@ -10,6 +10,28 @@ This package provides TypeScript helpers that integrate with the [ElevenLabs Con
 - **Server tools** — Webhook handlers (`handleSaveTool` / `handleRecallTool`) for use behind Express/Fastify when using ElevenLabs server-side webhook tools.
 - **Tool definitions** — Helpers to generate ElevenLabs-compatible JSON tool schemas for both client and server tools.
 
+## Endpoint Mapping
+
+This plugin now uses:
+
+- `POST /v1/memory/insert` for memory writes
+- `POST /v1/memory/query` for memory retrieval
+- `POST /v1/memory/memories/recall` and `POST /v1/memory/recall` for recall endpoints
+- `GET /v1/memory/documents` and `GET /v1/memory/documents/:documentId` for document listing/retrieval
+- `DELETE /v1/memory/documents/:documentId` for document deletion
+- `GET /v1/memory/ingestion/jobs/:jobId` for ingestion job status checks
+- `POST /v1/memory/documents/batch` for batch document insertion
+
+Core `addMemories`/`handleSaveTool` writes use the standard insert endpoint and always include `document_id` (client tools default it to the memory `key` when not provided explicitly).
+
+Advanced wrappers are available on `ElevenLabsNeocortexMemory`:
+- `listDocuments`
+- `getDocument`
+- `deleteDocument`
+- `recallMemoryMaster`
+- `recallMemories`
+- `getIngestionJob`
+
 ## Install
 
 ```bash
@@ -118,6 +140,7 @@ const memory = new ElevenLabsNeocortexMemory({
 });
 
 app.post("/elevenlabs/tools/neocortex-save", async (req, res) => {
+  // Optional: pass document_id in req.body for deterministic IDs.
   const result = await memory.handleSaveTool(req.body);
   res.json(result);
 });

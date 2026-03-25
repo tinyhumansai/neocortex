@@ -38,6 +38,7 @@ export class RaycastNeocortexMemory {
       title: input.key,
       content: input.content,
       namespace,
+      documentId: input.key,
       sourceType: "doc",
       metadata: input.metadata,
     });
@@ -255,7 +256,7 @@ export class RaycastNeocortexMemory {
       priority: z.string().optional(),
       created_at: z.number().optional(),
       updated_at: z.number().optional(),
-      document_id: z.string().optional(),
+      document_id: z.string(),
     });
 
     const insertDocumentsBatchSchema = z.object({
