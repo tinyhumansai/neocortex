@@ -146,12 +146,12 @@ class TinyHumansMemoryClient:
     def __exit__(self, *_: object) -> None:
         self.close()
 
-    def ingest_memory(
+    def insert_memory(
         self,
         *,
         item: Union[MemoryItem, dict[str, Any]],
     ) -> IngestMemoryResponse:
-        """Ingest (upsert) a single memory item.
+        """Insert (upsert) a single memory item.
 
         The item is deduped by (namespace, key). If a matching item already
         exists its content and metadata are updated; otherwise a new item is created.
@@ -167,14 +167,14 @@ class TinyHumansMemoryClient:
         Raises:
             TinyHumansError: On API errors.
         """
-        return self.ingest_memories(items=[item])
+        return self.insert_memories(items=[item])
 
-    def ingest_memories(
+    def insert_memories(
         self,
         *,
         items: Sequence[Union[MemoryItem, dict[str, Any]]],
     ) -> IngestMemoryResponse:
-        """Ingest (upsert) one or more memory items.
+        """Insert (upsert) one or more memory items.
 
         Items are deduped by (namespace, key). If a matching item already
         exists its content and metadata are updated; otherwise a new item

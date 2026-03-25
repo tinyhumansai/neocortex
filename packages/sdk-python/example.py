@@ -53,8 +53,8 @@ preferences_ns = "preferences"
 ingest_key = f"user-preference-theme-{int(time.time())}"
 
 ok, result = run_step(
-    "ingest_memory",
-    lambda: client.ingest_memory(
+    "insert_memory",
+    lambda: client.insert_memory(
         item={
             # For the legacy ingest route, `key` is mapped to backend `documentId` (and title).
             "key": ingest_key,
@@ -66,11 +66,11 @@ ok, result = run_step(
         }
     ),
 )
-results.append(("ingest_memory", ok))
+results.append(("insert_memory", ok))
 if result is not None:
-    print("ingest_memory:", result)  # IngestMemoryResponse(...)
+    print("insert_memory:", result)  # IngestMemoryResponse(...)
 
-# Or ingest multiple at once: client.ingest_memories(items=[...])
+# Or ingest multiple at once: client.insert_memories(items=[...])
 
 # Get LLM context (prompt fetches relevant chunks; num_chunks limits how many)
 ok, ctx = run_step(

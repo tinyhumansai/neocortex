@@ -59,7 +59,7 @@ print(ctx.context)
 ```
 
 Notes:
-- The legacy `ingest_memory` route maps `key` to the backend `documentId`.
+- The legacy `insert_memory` route maps `key` to the backend `documentId`.
 
 ## Full route example
 
@@ -80,7 +80,7 @@ python3 example.py
 | `model_id` | `str` | | Sent as `X-Model-Id` |
 | `base_url` | `str \| None` | | Override API URL. If not set, uses `TINYHUMANS_BASE_URL` env or SDK default |
 
-### `client.ingest_memory(item={...})`
+### `client.insert_memory(item={...})`
 
 Legacy ingest route. **POST /v1/memory/insert**
 
@@ -239,8 +239,8 @@ Poll an ingestion job until it reaches a terminal state.
 ## Implemented methods
 
 Core methods:
-- `ingest_memory`
-- `ingest_memories`
+- `insert_memory`
+- `insert_memories`
 - `recall_memory`
 - `delete_memory`
 - `recall_with_llm`

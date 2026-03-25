@@ -125,8 +125,8 @@ def main() -> int:
 
     try:
         run(
-            "ingest_memory",
-            lambda: client.ingest_memory(
+            "insert_memory",
+            lambda: client.insert_memory(
                 item={
                     "key": f"{doc_single}-memory",
                     "content": "python route test memory",
