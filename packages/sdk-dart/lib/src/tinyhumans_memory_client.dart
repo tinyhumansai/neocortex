@@ -8,17 +8,23 @@ import 'types.dart';
 
 class TinyHumansMemoryClient {
   static const _defaultBaseUrl = 'https://api.tinyhumans.ai';
+  static const _defaultModelId = 'neocortex-mk1';
 
   final String _token;
   final String _baseUrl;
+  final String _modelId;
   final http.Client _httpClient;
   final bool _ownsClient;
 
   TinyHumansMemoryClient(
     String token, {
+    String? modelId,
     String? baseUrl,
     http.Client? httpClient,
   })  : _token = token,
+        _modelId = (modelId != null && modelId.trim().isNotEmpty)
+            ? modelId
+            : _defaultModelId,
         _baseUrl = (baseUrl ??
                 Platform.environment['TINYHUMANS_BASE_URL'] ??
                 _defaultBaseUrl)
@@ -72,6 +78,7 @@ class TinyHumansMemoryClient {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $_token',
+        'X-Model-Id': _modelId,
       },
       body: jsonEncode(body),
     );

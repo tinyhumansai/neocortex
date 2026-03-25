@@ -59,6 +59,38 @@ void main() {
     });
   });
 
+  // ── Model ID ──
+
+  group('modelId', () {
+    test('sends default X-Model-Id header', () async {
+      http.Request? captured;
+      final client = createClient(
+        onRequest: (r) => captured = r,
+      );
+
+      await client.recallMemory();
+
+      expect(captured, isNotNull);
+      expect(captured!.headers['x-model-id'], equals('neocortex-mk1'));
+    });
+
+    test('sends custom X-Model-Id header', () async {
+      http.Request? captured;
+      final client = TinyHumansMemoryClient(
+        'test-token',
+        modelId: 'custom-model',
+        baseUrl: 'https://test.example.com',
+        httpClient: mockClient(200, '{"success":true,"data":{}}',
+            onRequest: (r) => captured = r),
+      );
+
+      await client.recallMemory();
+
+      expect(captured, isNotNull);
+      expect(captured!.headers['x-model-id'], equals('custom-model'));
+    });
+  });
+
   // ── InsertMemory ──
 
   group('insertMemory', () {
@@ -87,6 +119,8 @@ void main() {
           equals('Bearer test-token'));
       expect(captured!.headers['content-type'],
           equals('application/json'));
+      expect(captured!.headers['x-model-id'],
+          equals('neocortex-mk1'));
 
       final reqBody = jsonDecode(captured!.body) as Map<String, dynamic>;
       expect(reqBody['title'], equals('t1'));
