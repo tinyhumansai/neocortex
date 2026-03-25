@@ -37,12 +37,13 @@ export interface InsertMemoryParams {
   content: string;
   /** Namespace (required) */
   namespace: string;
+  /** Unique document identifier (required) */
+  documentId: string;
   sourceType?: "doc" | "chat" | "email";
   metadata?: Record<string, unknown>;
   priority?: "high" | "medium" | "low";
   createdAt?: number;
   updatedAt?: number;
-  documentId?: string;
 }
 
 export interface InsertMemoryResponse {
@@ -174,12 +175,12 @@ export interface InsertDocumentsBatchParams {
     title: string;
     content: string;
     namespace: string;
+    documentId: string;
     sourceType?: "doc" | "chat" | "email";
     metadata?: Record<string, unknown>;
     priority?: "high" | "medium" | "low";
     createdAt?: number;
     updatedAt?: number;
-    documentId?: string;
   }>;
 }
 
@@ -390,7 +391,11 @@ export class TinyHumansMemoryClient {
     params: InsertMemoryParams,
   ): Promise<InsertMemoryResponse> {
     this.validateInsertParams(params);
-    return this.post<InsertMemoryResponse>("/memory/insert", params);
+    return this.post<InsertMemoryResponse>("/memory/insert", {
+      ...params,
+      // Backend commonly accepts snake_case too; send both for compatibility.
+      document_id: params.documentId,
+    });
   }
 
   /** Query memory via RAG. POST /memory/query */
@@ -542,7 +547,10 @@ export class TinyHumansMemoryClient {
     params: InsertMemoryParams,
   ): Promise<InsertMemoryResponse> {
     this.validateInsertParams(params);
-    return this.post<InsertMemoryResponse>("/memory/documents", params);
+    return this.post<InsertMemoryResponse>("/memory/documents", {
+      ...params,
+      document_id: params.documentId,
+    });
   }
 
   /** Ingest multiple memory documents in batch. POST /memory/documents/batch */
@@ -556,9 +564,20 @@ export class TinyHumansMemoryClient {
     ) {
       throw new Error("items must be a non-empty array");
     }
+    for (const item of params.items) {
+      if (!item?.documentId || typeof item.documentId !== "string") {
+        throw new Error("each item must include documentId");
+      }
+    }
     return this.post<InsertDocumentsBatchResponse>(
       "/memory/documents/batch",
-      params,
+      {
+        ...params,
+        items: params.items.map((item) => ({
+          ...item,
+          document_id: item.documentId,
+        })),
+      },
     );
   }
 
@@ -655,6 +674,9 @@ export class TinyHumansMemoryClient {
     if (!params.namespace || typeof params.namespace !== "string") {
       throw new Error("namespace is required and must be a string");
     }
+    if (!params.documentId || typeof params.documentId !== "string") {
+      throw new Error("documentId is required and must be a string");
+    }
   }
 
   private validateQueryParams(params: QueryMemoryParams) {
@@ -672,7 +694,7 @@ export class TinyHumansMemoryClient {
   }
 
   private async get<T>(path: string): Promise<T> {
-    const url = `${this.baseUrl}${path}`;
+    const url = `${this.baseUrl}${path.startsWith("/v1/") ? "" : "/v1"}${path}`;
     const res = await fetch(url, {
       method: "GET",
       headers: {
@@ -683,7 +705,7 @@ export class TinyHumansMemoryClient {
   }
 
   private async post<T>(path: string, body: unknown): Promise<T> {
-    const url = `${this.baseUrl}${path}`;
+    const url = `${this.baseUrl}${path.startsWith("/v1/") ? "" : "/v1"}${path}`;
     const res = await fetch(url, {
       method: "POST",
       headers: {
@@ -696,7 +718,7 @@ export class TinyHumansMemoryClient {
   }
 
   private async delete<T>(path: string): Promise<T> {
-    const url = `${this.baseUrl}${path}`;
+    const url = `${this.baseUrl}${path.startsWith("/v1/") ? "" : "/v1"}${path}`;
     const res = await fetch(url, {
       method: "DELETE",
       headers: {

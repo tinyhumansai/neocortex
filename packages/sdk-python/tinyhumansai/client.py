@@ -558,12 +558,12 @@ class TinyHumansMemoryClient:
         title: str,
         content: str,
         namespace: str,
+        document_id: str,
         source_type: Optional[str] = None,
         metadata: Optional[dict[str, Any]] = None,
         priority: Optional[str] = None,
         created_at: Optional[float] = None,
-        updated_at: Optional[float] = None,
-        document_id: Optional[str] = None,
+        updated_at: Optional[float] = None
     ) -> dict[str, Any]:
         """Ingest a single document into the documents backend."""
         if not title or not isinstance(title, str):
@@ -572,6 +572,8 @@ class TinyHumansMemoryClient:
             raise ValueError("content is required and must be a string")
         if not namespace or not isinstance(namespace, str):
             raise ValueError("namespace is required and must be a string")
+        if not document_id or not isinstance(document_id, str):
+            raise ValueError("document_id is required and must be a string")
 
         _validate_timestamps(created_at, updated_at)
 
@@ -579,6 +581,7 @@ class TinyHumansMemoryClient:
             "title": title,
             "content": content,
             "namespace": namespace,
+            "document_id": document_id,
         }
         if source_type is not None:
             body["sourceType"] = source_type
@@ -590,8 +593,6 @@ class TinyHumansMemoryClient:
             body["createdAt"] = created_at
         if updated_at is not None:
             body["updatedAt"] = updated_at
-        if document_id is not None:
-            body["documentId"] = document_id
 
         return self._send("POST", DOCUMENTS_INSERT_PATH, body)
 
@@ -616,6 +617,10 @@ class TinyHumansMemoryClient:
             if not isinstance(namespace, str) or not namespace:
                 raise ValueError("each item requires string 'namespace'")
 
+            doc_id = item.get("documentId", item.get("document_id"))
+            if not isinstance(doc_id, str) or not doc_id:
+                raise ValueError("each item requires string 'documentId' (or 'document_id')")
+
             created_at = item.get("createdAt", item.get("created_at"))
             updated_at = item.get("updatedAt", item.get("updated_at"))
             _validate_timestamps(created_at, updated_at)
@@ -624,6 +629,7 @@ class TinyHumansMemoryClient:
                 "title": title,
                 "content": content,
                 "namespace": namespace,
+                "document_id": doc_id,
             }
             if "sourceType" in item or "source_type" in item:
                 body_item["sourceType"] = item.get("sourceType", item.get("source_type"))
@@ -635,8 +641,6 @@ class TinyHumansMemoryClient:
                 body_item["createdAt"] = created_at
             if updated_at is not None:
                 body_item["updatedAt"] = updated_at
-            if "documentId" in item or "document_id" in item:
-                body_item["documentId"] = item.get("documentId", item.get("document_id"))
 
             normalized_items.append(body_item)
 

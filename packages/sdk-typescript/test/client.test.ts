@@ -35,18 +35,21 @@ describe('TinyHumansMemoryClient', () => {
   describe('insertMemory', () => {
     it('validates required fields', async () => {
       const client = new TinyHumansMemoryClient({ token, baseUrl });
-      await expect(client.insertMemory({ title: '', content: 'x', namespace: 'ns' })).rejects.toThrow(
+      await expect(client.insertMemory({ title: '', content: 'x', namespace: 'ns', documentId: 'doc_x' })).rejects.toThrow(
         'title is required'
       );
-      await expect(client.insertMemory({ title: 't', content: '', namespace: 'ns' })).rejects.toThrow(
+      await expect(client.insertMemory({ title: 't', content: '', namespace: 'ns', documentId: 'doc_x' })).rejects.toThrow(
         'content is required'
       );
-      await expect(client.insertMemory({ title: 't', content: 'c', namespace: '' })).rejects.toThrow(
+      await expect(client.insertMemory({ title: 't', content: 'c', namespace: '', documentId: 'doc_x' })).rejects.toThrow(
         'namespace is required'
+      );
+      await expect(client.insertMemory({ title: 't', content: 'c', namespace: 'ns', documentId: '' })).rejects.toThrow(
+        'documentId is required'
       );
     });
 
-    it('POSTs to /memory/insert with correct body and headers', async () => {
+    it('POSTs to /v1/memory/insert with correct body and headers', async () => {
       fetchMock.mockResolvedValueOnce({
         ok: true,
         text: () =>
@@ -62,13 +65,14 @@ describe('TinyHumansMemoryClient', () => {
         title: 'My Doc',
         content: 'Some content',
         namespace: 'default',
+        documentId: 'doc_1',
         sourceType: 'doc',
         metadata: { source: 'test' },
       };
       await client.insertMemory(params);
       expect(fetchMock).toHaveBeenCalledTimes(1);
       expect(fetchMock).toHaveBeenCalledWith(
-        `${baseUrl}/memory/insert`,
+        `${baseUrl}/v1/memory/insert`,
         expect.objectContaining({
           method: 'POST',
           headers: {
@@ -79,12 +83,12 @@ describe('TinyHumansMemoryClient', () => {
             title: 'My Doc',
             content: 'Some content',
             namespace: 'default',
+            documentId: 'doc_1',
             sourceType: 'doc',
             metadata: { source: 'test' },
             priority: undefined,
             createdAt: undefined,
             updatedAt: undefined,
-            documentId: undefined,
           }),
         })
       );
@@ -101,6 +105,7 @@ describe('TinyHumansMemoryClient', () => {
         title: 'T',
         content: 'C',
         namespace: 'ns',
+        documentId: 'doc_2',
       });
       expect(result.success).toBe(true);
       expect(result.data).toEqual(data);
@@ -122,7 +127,7 @@ describe('TinyHumansMemoryClient', () => {
       await expect(client.queryMemory({ query: 'q', maxChunks: 201 })).rejects.toThrow('maxChunks');
     });
 
-    it('POSTs to /memory/query', async () => {
+    it('POSTs to /v1/memory/query', async () => {
       fetchMock.mockResolvedValueOnce({
         ok: true,
         text: () =>
@@ -136,7 +141,7 @@ describe('TinyHumansMemoryClient', () => {
       const client = new TinyHumansMemoryClient({ token, baseUrl });
       await client.queryMemory({ query: 'hello', namespace: 'ns', maxChunks: 10 });
       expect(fetchMock).toHaveBeenCalledWith(
-        `${baseUrl}/memory/query`,
+        `${baseUrl}/v1/memory/query`,
         expect.objectContaining({
           method: 'POST',
           body: JSON.stringify({
@@ -153,7 +158,7 @@ describe('TinyHumansMemoryClient', () => {
   });
 
   describe('deleteMemory', () => {
-    it('POSTs to /memory/admin/delete', async () => {
+    it('POSTs to /v1/memory/admin/delete', async () => {
       fetchMock.mockResolvedValueOnce({
         ok: true,
         text: () =>
@@ -173,7 +178,7 @@ describe('TinyHumansMemoryClient', () => {
       const params: DeleteMemoryParams = { namespace: 'my-ns' };
       await client.deleteMemory(params);
       expect(fetchMock).toHaveBeenCalledWith(
-        `${baseUrl}/memory/admin/delete`,
+        `${baseUrl}/v1/memory/admin/delete`,
         expect.objectContaining({
           method: 'POST',
           body: JSON.stringify({ namespace: 'my-ns' }),
@@ -192,7 +197,7 @@ describe('TinyHumansMemoryClient', () => {
       }
     });
 
-    it('POSTs to /memory/recall', async () => {
+    it('POSTs to /v1/memory/recall', async () => {
       fetchMock.mockResolvedValueOnce({
         ok: true,
         text: () =>
@@ -206,7 +211,7 @@ describe('TinyHumansMemoryClient', () => {
       const client = new TinyHumansMemoryClient({ token, baseUrl });
       await client.recallMemory({ namespace: 'ns', maxChunks: 10 });
       expect(fetchMock).toHaveBeenCalledWith(
-        `${baseUrl}/memory/recall`,
+        `${baseUrl}/v1/memory/recall`,
         expect.objectContaining({
           method: 'POST',
           body: JSON.stringify({ namespace: 'ns', maxChunks: 10 }),
@@ -225,7 +230,7 @@ describe('TinyHumansMemoryClient', () => {
       }
     });
 
-    it('POSTs to /memory/memories/recall', async () => {
+    it('POSTs to /v1/memory/memories/recall', async () => {
       fetchMock.mockResolvedValueOnce({
         ok: true,
         text: () =>
@@ -239,7 +244,7 @@ describe('TinyHumansMemoryClient', () => {
       const client = new TinyHumansMemoryClient({ token, baseUrl });
       await client.recallMemories({ namespace: 'ns', topK: 5 });
       expect(fetchMock).toHaveBeenCalledWith(
-        `${baseUrl}/memory/memories/recall`,
+        `${baseUrl}/v1/memory/memories/recall`,
         expect.objectContaining({
           method: 'POST',
           body: JSON.stringify({ namespace: 'ns', topK: 5, minRetention: undefined, asOf: undefined }),
@@ -249,7 +254,7 @@ describe('TinyHumansMemoryClient', () => {
   });
 
   describe('error handling', () => {
-    it('throws TinyHumansError on non-ok response with error message', async () => {
+    it('throws AlphahumanError on non-ok response with error message', async () => {
       fetchMock.mockResolvedValueOnce({
         ok: false,
         status: 400,
@@ -257,7 +262,7 @@ describe('TinyHumansMemoryClient', () => {
       });
       const client = new TinyHumansMemoryClient({ token, baseUrl });
       try {
-        await client.insertMemory({ title: 'T', content: 'C', namespace: 'ns' });
+        await client.insertMemory({ title: 'T', content: 'C', namespace: 'ns', documentId: 'doc_3' });
         expect.fail('should throw');
       } catch (e) {
         expect(e).toBeInstanceOf(TinyHumansError);
@@ -270,14 +275,14 @@ describe('TinyHumansMemoryClient', () => {
     it('throws on non-JSON response', async () => {
       fetchMock.mockResolvedValueOnce({ ok: false, status: 500, text: () => Promise.resolve('not json') });
       const client = new TinyHumansMemoryClient({ token, baseUrl });
-      await expect(client.insertMemory({ title: 'T', content: 'C', namespace: 'ns' })).rejects.toThrow(
+      await expect(client.insertMemory({ title: 'T', content: 'C', namespace: 'ns', documentId: 'doc_4' })).rejects.toThrow(
         'non-JSON response'
       );
     });
   });
 
   describe('chatMemory', () => {
-    it('POSTs to /memory/chat', async () => {
+    it('POSTs to /v1/memory/chat', async () => {
       fetchMock.mockResolvedValueOnce({
         ok: true,
         text: () => Promise.resolve(JSON.stringify({ success: true, data: { content: 'hello' } })),
@@ -285,7 +290,7 @@ describe('TinyHumansMemoryClient', () => {
       const client = new TinyHumansMemoryClient({ token, baseUrl });
       await client.chatMemory({ messages: [{ role: 'user', content: 'hi' }] });
       expect(fetchMock).toHaveBeenCalledWith(
-        `${baseUrl}/memory/chat`,
+        `${baseUrl}/v1/memory/chat`,
         expect.objectContaining({
           method: 'POST',
           body: JSON.stringify({ messages: [{ role: 'user', content: 'hi' }] }),
@@ -295,7 +300,7 @@ describe('TinyHumansMemoryClient', () => {
   });
 
   describe('listDocuments', () => {
-    it('GETs from /memory/documents with query params', async () => {
+    it('GETs from /v1/memory/documents with query params', async () => {
       fetchMock.mockResolvedValueOnce({
         ok: true,
         text: () => Promise.resolve(JSON.stringify({ success: true, data: {} })),
@@ -303,7 +308,7 @@ describe('TinyHumansMemoryClient', () => {
       const client = new TinyHumansMemoryClient({ token, baseUrl });
       await client.listDocuments({ namespace: 'ns', limit: 10 });
       expect(fetchMock).toHaveBeenCalledWith(
-        `${baseUrl}/memory/documents?namespace=ns&limit=10`,
+        `${baseUrl}/v1/memory/documents?namespace=ns&limit=10`,
         expect.objectContaining({ method: 'GET' })
       );
     });
