@@ -51,6 +51,7 @@ export class NeocortexMemoryClient {
       title: params.title,
       content: params.content,
       namespace: params.namespace,
+      document_id: params.documentId,
       sourceType: params.sourceType ?? "doc",
       metadata: params.metadata ?? {},
     };
@@ -129,7 +130,7 @@ export class NeocortexMemoryClient {
 
   // --- Documents & mirrored endpoints ---
 
-  async insertDocument(params: InsertMemoryParams & { documentId?: string }): Promise<any> {
+  async insertDocument(params: InsertMemoryParams & { documentId: string }): Promise<any> {
     const body = {
       title: params.title,
       content: params.content,

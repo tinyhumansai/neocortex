@@ -17,6 +17,7 @@ export interface InsertMemoryParams {
   title: string;
   content: string;
   namespace: string;
+  documentId: string;
   sourceType?: "doc" | "chat" | "email";
   metadata?: Record<string, unknown>;
 }
@@ -203,7 +204,7 @@ export interface InsertDocumentsBatchParams {
     priority?: "high" | "medium" | "low";
     createdAt?: number;
     updatedAt?: number;
-    documentId?: string;
+    documentId: string;
   }>;
 }
 
@@ -368,7 +369,7 @@ export interface InsertDocumentInput {
   priority?: string;
   created_at?: number;
   updated_at?: number;
-  document_id?: string;
+  document_id: string;
 }
 
 export interface InsertDocumentsBatchInput {

@@ -68,6 +68,11 @@ const agent = new Agent({
 - `neocortexSyncMemory`, `neocortexChatMemory`, `neocortexInteractMemory`, `neocortexRecallMemoryMaster`, `neocortexRecallMemories`
 - `neocortexGetIngestionJob`, `neocortexGetGraphSnapshot`
 
+### Document Insert Contract
+
+- `neocortexInsertDocument` requires `document_id`.
+- `neocortexInsertDocumentsBatch` requires `document_id` on every item.
+
 ## Environment variables
 
 - `ALPHAHUMAN_API_KEY` (required): Bearer token for the Alphahuman backend

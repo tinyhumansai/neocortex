@@ -97,9 +97,9 @@ export const NEOCORTEX_MASTRA_TOOL_SCHEMAS = {
         priority: { type: "string", description: "Optional priority: high | medium | low." },
         created_at: { type: "number", description: "Optional Unix timestamp (seconds)." },
         updated_at: { type: "number", description: "Optional Unix timestamp (seconds)." },
-        document_id: { type: "string", description: "Optional documentId override." },
+        document_id: { type: "string", description: "Document id." },
       },
-      required: ["title", "content", "namespace"],
+      required: ["title", "content", "namespace", "document_id"],
     }),
   },
   neocortex_insert_documents_batch: {

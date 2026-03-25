@@ -129,7 +129,7 @@ export function createNeocortexMastraTools(config: MastraNeocortexConfig) {
       priority: z.string().optional(),
       created_at: z.number().optional(),
       updated_at: z.number().optional(),
-      document_id: z.string().optional(),
+      document_id: z.string(),
     }),
     outputSchema: z.object({ ok: z.literal(true), raw: z.unknown() }),
     execute: async (inputData) => memory.insertDocument(inputData),
@@ -149,7 +149,7 @@ export function createNeocortexMastraTools(config: MastraNeocortexConfig) {
           priority: z.string().optional(),
           created_at: z.number().optional(),
           updated_at: z.number().optional(),
-          document_id: z.string().optional(),
+          document_id: z.string(),
         })
       ),
     }),
@@ -356,6 +356,7 @@ export class MastraNeocortexMemory {
       title: input.key,
       content: input.content,
       namespace,
+      documentId: input.key,
       metadata: input.metadata,
       sourceType: "doc",
     });
@@ -464,7 +465,7 @@ export class MastraNeocortexMemory {
       priority: it.priority,
       createdAt: it.created_at ?? it.createdAt,
       updatedAt: it.updated_at ?? it.updatedAt,
-      documentId: it.document_id ?? it.documentId,
+      documentId: it.document_id,
     }));
     const res = await this.client.insertDocumentsBatch({ items });
     return { ok: true, raw: res };
