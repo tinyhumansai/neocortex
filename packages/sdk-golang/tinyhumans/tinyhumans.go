@@ -189,6 +189,12 @@ type GraphSnapshotOptions struct {
 	SeedLimit *int
 }
 
+// RecallMemoriesContextOptions holds optional parameters for RecallMemoriesContext.
+type RecallMemoriesContextOptions struct {
+	Namespace string
+	MaxChunks float64
+}
+
 // SyncMemoryOptions holds optional parameters for SyncMemory.
 type SyncMemoryOptions struct {
 	WorkspaceID string

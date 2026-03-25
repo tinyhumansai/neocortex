@@ -368,6 +368,27 @@ func (c *Client) SyncMemory(opts *SyncMemoryOptions) (map[string]interface{}, er
 	return c.send("POST", "/memory/sync", body)
 }
 
+// RecallMemoriesContext recalls memory context from Ebbinghaus bank.
+// POST /memory/memories/context
+func (c *Client) RecallMemoriesContext(opts *RecallMemoriesContextOptions) (map[string]interface{}, error) {
+	body := map[string]interface{}{}
+	if opts != nil {
+		if opts.Namespace != "" {
+			body["namespace"] = opts.Namespace
+		}
+		if opts.MaxChunks > 0 {
+			body["maxChunks"] = opts.MaxChunks
+		}
+	}
+	return c.send("POST", "/memory/memories/context", body)
+}
+
+// MemoryHealth checks the memory server health status.
+// GET /memory/health
+func (c *Client) MemoryHealth() (map[string]interface{}, error) {
+	return c.sendGet("/memory/health", nil)
+}
+
 // GetIngestionJob retrieves the status of a memory ingestion job.
 // GET /memory/ingestion/jobs/{jobId}
 func (c *Client) GetIngestionJob(jobID string) (map[string]interface{}, error) {
