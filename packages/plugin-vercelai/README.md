@@ -6,7 +6,23 @@ Neocortex (Alphahuman) memory integrations for the Python Vercel AI SDK (`ai_sdk
 
 Provides explicitly `@tool` decorated functions ready to be injected into the `tools` array of Vercel AI SDK calls.
 - **`NeocortexMemoryTools`**: Wrapper class for the memory client.
-  - `get_tools()`: Returns a dictionary of configured tools (`save_memory`, `recall_memory`, `delete_memory`).
+  - `get_tools()`: Returns a dictionary of configured tools (Mastra-compatible tool surface).
+
+Tools:
+- `save_memory`, `recall_memory`, `delete_memory`
+- `sync_memory`
+- `insert_document`, `insert_documents_batch`
+- `list_documents`, `get_document`, `delete_document`
+- `query_memory_context`, `chat_memory_context`
+- `record_interactions`, `recall_thoughts`
+- `chat_memory`, `interact_memory`
+- `recall_memory_master`, `recall_memories`
+- `get_ingestion_job`
+
+### Document Insert Contract
+
+- `insert_document` requires `document_id`.
+- `insert_documents_batch` requires `document_id` on every item in `items_json`.
 
 ## Installation
 
