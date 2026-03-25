@@ -50,8 +50,8 @@ The `NeocortexTools` toolkit exposes tools aligned with the TinyHumans/Neocortex
 | `recall_memory` | Recall relevant memories for a natural-language query in a namespace. |
 | `delete_memory` | Delete one or more memories by key/keys or delete all in a namespace. |
 | `sync_memory` | Sync OpenClaw memory files (workspace/agent + file objects). |
-| `insert_document` | Insert a single memory document (title/content/namespace). |
-| `insert_documents_batch` | Insert multiple documents in one call. |
+| `insert_document` | Insert a single memory document (title/content/namespace). `document_id` is required. |
+| `insert_documents_batch` | Insert multiple documents in one call. Each item must include `document_id`. |
 | `list_documents` | List documents in a namespace. |
 | `get_document` | Get a specific document by `document_id`. |
 | `delete_document` | Delete a specific document by `document_id`. |
