@@ -10,6 +10,28 @@ This package provides TypeScript helpers that integrate with the [ElevenLabs Con
 - **Server tools** — Webhook handlers (`handleSaveTool` / `handleRecallTool`) for use behind Express/Fastify when using ElevenLabs server-side webhook tools.
 - **Tool definitions** — Helpers to generate ElevenLabs-compatible JSON tool schemas for both client and server tools.
 
+## Endpoint Mapping
+
+This plugin now uses:
+
+- `POST /v1/memory/insert` for memory writes
+- `POST /v1/memory/query` for memory retrieval
+- `POST /v1/memory/memories/recall` and `POST /v1/memory/recall` for recall endpoints
+- `GET /v1/memory/documents` and `GET /v1/memory/documents/:documentId` for document listing/retrieval
+- `DELETE /v1/memory/documents/:documentId` for document deletion
+- `GET /v1/memory/ingestion/jobs/:jobId` for ingestion job status checks
+- `POST /v1/memory/documents/batch` for batch document insertion
+
+Core `addMemories`/`handleSaveTool` writes use the standard insert endpoint and always include `document_id` (client tools default it to the memory `key` when not provided explicitly).
+
+Advanced wrappers are available on `ElevenLabsNeocortexMemory`:
+- `listDocuments`
+- `getDocument`
+- `deleteDocument`
+- `recallMemoryMaster`
+- `recallMemories`
+- `getIngestionJob`
+
 ## Install
 
 ```bash
@@ -118,6 +140,7 @@ const memory = new ElevenLabsNeocortexMemory({
 });
 
 app.post("/elevenlabs/tools/neocortex-save", async (req, res) => {
+  // Optional: pass document_id in req.body for deterministic IDs.
   const result = await memory.handleSaveTool(req.body);
   res.json(result);
 });
@@ -151,39 +174,6 @@ const memory = new ElevenLabsNeocortexMemory({
 });
 ```
 
-## E2E Tests
-
-The `e2e.ts` script validates the full data store → recall lifecycle:
-
-- **Phase 1** — Client tools: `addMemories` → `retrieveMemories` round-trip
-- **Phase 2** — Server tools: `handleSaveTool` → `handleRecallTool` round-trip
-- **Phase 3** — ElevenLabs agent simulation (optional, requires `ELEVENLABS_API_KEY`)
-
-```bash
-# Phases 1 & 2 only
-ALPHAHUMAN_API_KEY=xxx npx tsx e2e.ts
-
-# All phases including ElevenLabs simulation
-ALPHAHUMAN_API_KEY=xxx ELEVENLABS_API_KEY=sk_xxx npx tsx e2e.ts
-```
-
-## Voice Demo (Interactive)
-
-To test with **real voice** in the browser:
-
-1. Create an ElevenLabs agent at https://elevenlabs.io/app/agents
-2. Add two **Client** tools (`addMemories` and `retrieveMemories`) with schemas shown above — enable "Wait for response" on both
-3. Run the demo server:
-
-```bash
-ALPHAHUMAN_API_KEY=xxx AGENT_ID=your-agent-id npx tsx example/voice-demo.ts
-```
-
-4. Open http://localhost:3737 in your browser
-5. Click "🎙️ Start Conversation" and allow microphone access
-6. Say: *"Remember that my favorite color is blue"*
-7. End the conversation, start a new one, and ask: *"What's my favorite color?"*
-8. The agent should recall "blue" from Neocortex memory! 🎉
 
 ## Example Conversation Flow
 

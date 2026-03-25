@@ -1,6 +1,8 @@
 import {
   NeocortexConfig,
   InsertMemoryParams,
+  InsertDocumentsBatchParams,
+  ListDocumentsParams,
   QueryMemoryResponse,
   QueryMemoryParams,
   NeocortexLogger,
@@ -29,6 +31,7 @@ export class NeocortexMemoryClient {
       title: params.title,
       content: params.content,
       namespace: params.namespace,
+      document_id: params.documentId,
       sourceType: params.sourceType ?? "doc",
       metadata: params.metadata ?? {},
     };
@@ -49,6 +52,64 @@ export class NeocortexMemoryClient {
     };
 
     return this.post<QueryMemoryResponse>("/v1/memory/query", body);
+  }
+
+  async insertDocumentsBatch(params: InsertDocumentsBatchParams): Promise<{ data: Record<string, unknown> }> {
+    return this.post<{ success: boolean; data: Record<string, unknown>; error?: string }>(
+      "/v1/memory/documents/batch",
+      { items: params.items },
+    );
+  }
+
+  async listDocuments(params: ListDocumentsParams): Promise<{ data: Record<string, unknown> }> {
+    return this.get<{ success: boolean; data: Record<string, unknown>; error?: string }>(
+      "/v1/memory/documents",
+      { ...params },
+    );
+  }
+
+  async getDocument(params: { documentId: string; namespace?: string }): Promise<{ data: Record<string, unknown> }> {
+    return this.get<{ success: boolean; data: Record<string, unknown>; error?: string }>(
+      `/v1/memory/documents/${encodeURIComponent(params.documentId)}`,
+      { namespace: params.namespace },
+    );
+  }
+
+  async deleteDocument(params: { documentId: string; namespace: string }): Promise<{ data: Record<string, unknown> }> {
+    return this.delete<{ success: boolean; data: Record<string, unknown>; error?: string }>(
+      `/v1/memory/documents/${encodeURIComponent(params.documentId)}`,
+      { namespace: params.namespace },
+    );
+  }
+
+  async recallMemory(params: { query: string; namespace?: string }): Promise<{ data: Record<string, unknown> }> {
+    return this.post<{ success: boolean; data: Record<string, unknown>; error?: string }>(
+      "/v1/memory/recall",
+      { query: params.query, namespace: params.namespace },
+    );
+  }
+
+  async recallMemories(params: {
+    query: string;
+    namespace?: string;
+    includeReferences?: boolean;
+    maxChunks?: number;
+  }): Promise<{ data: Record<string, unknown> }> {
+    return this.post<{ success: boolean; data: Record<string, unknown>; error?: string }>(
+      "/v1/memory/memories/recall",
+      {
+        query: params.query,
+        namespace: params.namespace,
+        includeReferences: params.includeReferences,
+        maxChunks: params.maxChunks,
+      },
+    );
+  }
+
+  async getIngestionJob(params: { jobId: string }): Promise<{ data: Record<string, unknown> }> {
+    return this.get<{ success: boolean; data: Record<string, unknown>; error?: string }>(
+      `/v1/memory/ingestion/jobs/${encodeURIComponent(params.jobId)}`,
+    );
   }
 
   private async post<T>(path: string, body: any): Promise<T> {
@@ -78,6 +139,54 @@ export class NeocortexMemoryClient {
         throw new Error(msg);
       }
 
+      return json as T;
+    } catch (err: any) {
+      this.logger?.error(`Neocortex network/request error: ${err.message}`);
+      throw err;
+    }
+  }
+
+  private async get<T>(path: string, queryParams?: Record<string, unknown>): Promise<T> {
+    const url = new URL(`${this.baseUrl}${path}`);
+    for (const [key, value] of Object.entries(queryParams ?? {})) {
+      if (value !== undefined && value !== null) {
+        url.searchParams.set(key, String(value));
+      }
+    }
+    return this.request<T>(url.toString(), "GET");
+  }
+
+  private async delete<T>(path: string, queryParams?: Record<string, unknown>): Promise<T> {
+    const url = new URL(`${this.baseUrl}${path}`);
+    for (const [key, value] of Object.entries(queryParams ?? {})) {
+      if (value !== undefined && value !== null) {
+        url.searchParams.set(key, String(value));
+      }
+    }
+    return this.request<T>(url.toString(), "DELETE");
+  }
+
+  private async request<T>(url: string, method: "GET" | "DELETE"): Promise<T> {
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.token}`,
+        },
+      });
+      const text = await res.text();
+      let json: any;
+      try {
+        json = text ? JSON.parse(text) : {};
+      } catch {
+        throw new Error(`HTTP ${res.status}: Non-JSON response`);
+      }
+      if (!res.ok || json.success === false) {
+        const msg = json.error || `HTTP ${res.status}`;
+        this.logger?.error(`Neocortex API error: ${msg}`, { status: res.status, body: json });
+        throw new Error(msg);
+      }
       return json as T;
     } catch (err: any) {
       this.logger?.error(`Neocortex network/request error: ${err.message}`);
