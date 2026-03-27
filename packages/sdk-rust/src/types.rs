@@ -419,6 +419,17 @@ pub struct BatchInsertDocumentsParams {
     pub items: Vec<BatchDocumentItem>,
 }
 
+#[derive(Debug, Clone, Serialize, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct ListDocumentsParams {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub namespace: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub limit: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub offset: Option<f64>,
+}
+
 // Document route response schemas are not specified in swagger.
 pub type InsertDocumentResponse = serde_json::Value;
 pub type BatchInsertDocumentsResponse = serde_json::Value;

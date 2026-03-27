@@ -315,8 +315,26 @@ impl TinyHumansMemoryClient {
     }
 
     /// List ingested memory documents. GET /memory/documents
-    pub async fn list_documents(&self) -> Result<ListDocumentsResponse, TinyHumansError> {
-        self.get("/memory/documents").await
+    pub async fn list_documents(
+        &self,
+        params: ListDocumentsParams,
+    ) -> Result<ListDocumentsResponse, TinyHumansError> {
+        let mut qs_parts: Vec<String> = Vec::new();
+        if let Some(ns) = params.namespace {
+            qs_parts.push(format!("namespace={ns}"));
+        }
+        if let Some(limit) = params.limit {
+            qs_parts.push(format!("limit={limit}"));
+        }
+        if let Some(offset) = params.offset {
+            qs_parts.push(format!("offset={offset}"));
+        }
+        let qs = if qs_parts.is_empty() {
+            String::new()
+        } else {
+            format!("?{}", qs_parts.join("&"))
+        };
+        self.get(&format!("/memory/documents{qs}")).await
     }
 
     /// Get details for a memory document. GET /memory/documents/{documentId}
