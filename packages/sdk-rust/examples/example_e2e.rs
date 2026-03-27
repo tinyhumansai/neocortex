@@ -178,7 +178,7 @@ async fn main() {
         .map(|d| d.as_millis())
         .unwrap_or(0);
     let namespace = "sdk-rust-e2e".to_string();
-    let _single_doc_id = format!("sdk-rust-e2e-doc-single-{ts}");
+    let single_doc_id = format!("sdk-rust-e2e-doc-single-{ts}");
 
     let result = async {
         let insert_job_id = step1_insert_memory(&client, &namespace, &single_doc_id).await?;
