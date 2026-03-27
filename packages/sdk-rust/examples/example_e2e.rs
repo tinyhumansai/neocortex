@@ -161,7 +161,7 @@ async fn main() {
     };
 
     let mut config = TinyHumanConfig::new(token);
-   
+
     config = config.with_base_url(TINYHUMANS_BASE_URL.to_string());
 
     let client = match TinyHumansMemoryClient::new(config) {

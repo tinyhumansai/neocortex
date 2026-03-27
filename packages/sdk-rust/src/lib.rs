@@ -306,9 +306,10 @@ impl TinyHumansMemoryClient {
         }
         for (i, item) in params.items.iter().enumerate() {
             if item.document_id.is_empty() {
-                return Err(TinyHumansError::Validation(
-                    format!("items[{}]: documentId is required", i),
-                ));
+                return Err(TinyHumansError::Validation(format!(
+                    "items[{}]: documentId is required",
+                    i
+                )));
             }
         }
         self.post("/memory/documents/batch", &params).await
@@ -476,10 +477,9 @@ impl TinyHumansMemoryClient {
             ["completed", "done", "succeeded", "success"]
                 .into_iter()
                 .collect();
-        let failed: std::collections::HashSet<&str> =
-            ["failed", "error", "cancelled", "canceled"]
-                .into_iter()
-                .collect();
+        let failed: std::collections::HashSet<&str> = ["failed", "error", "cancelled", "canceled"]
+            .into_iter()
+            .collect();
 
         let deadline = std::time::Instant::now() + std::time::Duration::from_millis(timeout);
         let mut last: Option<IngestionJobStatusResponse> = None;
